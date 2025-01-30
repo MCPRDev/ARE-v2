@@ -1,5 +1,10 @@
 import psycopg2
 from outfuctions import document_id_validation, phone_number_validation
+
+
+#Esta query es para una base de datos en localhost (como se especifica en host)
+
+
 class Postgresqueries():
     def __init__(self):
         connection = psycopg2.connect(host="localhost", 
