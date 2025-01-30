@@ -1,0 +1,1 @@
+#Aqui van las funciones que se utilizaran en la GUI junto con PYQT5
