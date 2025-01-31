@@ -1,5 +1,5 @@
 import psycopg2
-from outfuctions import document_id_validation, phone_number_validation
+from outfuctions import document_id_validation, phone_number_validation, id_validation, student_code_validation
 
 
 #Esta query es para una base de datos en localhost (como se especifica en host)
@@ -73,5 +73,134 @@ class Postgresqueries():
         except Exception as e:
              self.connection.rollback()
              print(f'Error: {e}')
-     
-     def searh_query(self, table, register_id, document_id, ):
+    def searh_query(self, table, register_id, document_id, student_code):
+         if table == 'staff':
+              if register_id:
+                   
+                   if id_validation(register_id):
+                        pass
+                   else: 
+                        print("Invalid register id. Please try again.")
+                        return False
+                   
+                   query = f"SELECT * FROM {table} WHERE staff_id = %s"
+                   self.cursor.execute(query, (register_id,))
+                   result = self.cursor.fetchone()
+                   if result:
+                        print(f"Resultado de la consulta: {result}")
+                        return result
+                   else:
+                        print(f"No se encontró el registro con el id {register_id} en la tabla {table}.")
+                        return False
+               
+              elif document_id:
+                    
+                    if document_id_validation(document_id):
+                         pass
+                    else:
+                         print("Invalid document id. Please try again.")
+                         return False
+                    
+                    query = f"SELECT * FROM {table} WHERE document_id = %s"
+                    self.cursor.execute(query, (document_id,))
+                    result = self.cursor.fetchone()
+                    if result:
+                         print(f"Resultado de la consulta: {result}")
+                         return result
+                    else:
+                         print(f"No se encontró el registro con el documento_id {document_id} en la tabla {table}.")
+                         return False
+              else:
+                   print("Debe especificar un de id de registro o un documento de identificacion.")
+                   return False
+          
+         elif table == 'student_representative':
+              if register_id:
+                   
+                   if id_validation(register_id):
+                        pass
+                   else: 
+                        print("Invalid register id. Please try again.")
+                        return False
+                   
+                   query = f"SELECT * FROM {table} WHERE representative_id = %s"
+                   self.cursor.execute(query, (register_id,))
+                   result = self.cursor.fetchone()
+                   if result:
+                        print(f"Resultado de la consulta: {result}")
+                        return result
+                   else:
+                        print(f"No se encontró el registro con el id {register_id} en la tabla {table}.")
+                        return False
+               
+              elif document_id:
+                    
+                    if document_id_validation(document_id):
+                         pass
+                    else:
+                         print("Invalid document id. Please try again.")
+                         return False
+                    
+                    query = f"SELECT * FROM {table} WHERE representative_document_id = %s"
+                    self.cursor.execute(query, (document_id,))
+                    result = self.cursor.fetchone()
+                    if result:
+                         print(f"Resultado de la consulta: {result}")
+                         return result
+                    else:
+                         print(f"No se encontró el registro con el documento_id {document_id} en la tabla {table}.")
+                         return False
+               
+              else:
+                   print("Debe especificar un de id de registro o un documento de identificacion.")
+                   return False
+          
+         elif table == "students":
+              if register_id:
+                   
+                   if id_validation(register_id):
+                        pass
+                   else: 
+                        print("Invalid register id. Please try again.")
+                        return False
+                   
+                   query = f"SELECT * FROM {table} WHERE register_id = %s"
+                   self.cursor.execute(query, (register_id,))
+                   result = self.cursor.fetchone()
+                   if result:
+                        print(f"Resultado de la consulta: {result}")
+                        return result
+                   else:
+                        print(f"No se encontró el registro con el id {register_id} en la tabla {table}.")
+                        return False
+          
+              elif student_code:
+                   
+                   if student_code_validation(student_code):
+                        pass
+                   else: 
+                        print("Invalid student code. Please try again.")
+                        return False
+                   
+                   query = f"SELECT * FROM {table} WHERE student_code = %s"
+                   self.cursor.execute(query, (student_code,))
+                   result = self.cursor.fetchone()
+                   if result:
+                        print(f"Resultado de la consulta: {result}")
+                        return result
+                   else:
+                        print(f"No se encontró el registro con el documento_id {student_code} en la tabla {table}.")
+                        return False
+               
+              else:
+                   print("Debe especificar un de id de registro o un codigo de estudiante.")
+                   return False
+          
+         else:
+              print("La tabla a la que esta accediendo no se encuentra disponible.")
+              return False
+
+pg = Postgresqueries()
+#pg.searh_query('staff', None, None, None)
+#pg.searh_query('student_representative', None, None, None)
+#pg.searh_query('students', None, None, 1)
