@@ -51,7 +51,3 @@ def code_center_generator(student_code, student_total):
     except Exception as e:
         print(f"Error generating code center: {e}")
         return None
-
-st = int(32)
-code = "MCPR-021205-1234567"
-print(code_center_generator(code, st))
