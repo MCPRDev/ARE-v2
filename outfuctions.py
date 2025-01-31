@@ -1,5 +1,6 @@
 from datetime import datetime
 import re
+import uuid
 
 def document_id_validation(document):
     if not isinstance(document, str):
@@ -20,12 +21,37 @@ def id_validation(id):
 def student_code_validation(student_code):
     if not isinstance(student_code, str):
         return False
-    else:
-        return True
+    
+    match len(student_code):
+        case 19:
+            patron = r"^[A-Z]{4}-\d{6}-\d{7}$"
+        case 18:
+            patron = r"^[A-Z]{3}-\d{6}-\d{7}$"
+        case 17:
+            patron = r"^[A-Z]{2}-\d{6}-\d{7}$"
+        case _:
+            return False
+    
+    return re.match(patron, student_code) is not None
 
 def phone_number_validation(phone_number):
     patron = r"^\d{4}-\d{4}"
-    if re.match(patron, phone_number):
+    if re.match(patron, phone_number): 
         return True
     else:
         return False
+
+def code_center_generator(student_code, student_total):
+    try:
+        first_code_part = student_code.split('-')[0]
+        register_time = datetime.now().strftime('%d%m%y%H%M%S')
+        unique_id = str(int(uuid.uuid4().int) % (10**8))
+        student_center_code = f"{first_code_part}-{register_time}-{student_total}-{unique_id}"
+        return student_center_code
+    except Exception as e:
+        print(f"Error generating code center: {e}")
+        return None
+
+st = int(32)
+code = "MCPR-021205-1234567"
+print(code_center_generator(code, st))
