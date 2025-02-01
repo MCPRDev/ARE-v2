@@ -109,7 +109,14 @@ class Postgresqueries():
             return False
 
         self.cursor.execute(query, params)
-        result = self.cursor.fetchone() + (table,)
+        result = self.cursor.fetchone()
+       
+        if result: # it's solve the problem when you add the table you are serching on the tuple you need to use in the other functions
+            result = result + (table,)
+        else:
+            print(f"Record not found in table {table}.")
+            return False
+        
         if result:
             print(f"Query result: {result}")
             self.query_search_results = result
@@ -134,7 +141,7 @@ class Postgresqueries():
         table = self.table_search_results
         edit_table_id = self.column_search_results
         edit_id = self.id_search_results
-        
+
         query = f'UPDATE {table} SET active = {boolean_flag} WHERE {edit_table_id} = {edit_id}'
         self.cursor.execute(query)
         self.connection.commit()
@@ -149,5 +156,5 @@ pg = Postgresqueries()
 
 #pg.change_status('students', )
 
-pg.search_query('students', 1, None, None)
-pg.change_status('True')
+pg.search_query('student_representative', 2, None, None)
+#pg.change_status('False')
