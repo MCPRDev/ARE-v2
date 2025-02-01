@@ -134,6 +134,10 @@ class Postgresqueries():
             return False
 
     def change_status(self, boolean_flag):
+        if not hasattr(self, 'table_search_results') or not hasattr(self, 'column_search_results') or not hasattr(self, 'id_search_results'):
+            print("No search results available. Please perform a search first.")
+            return False
+    
         if boolean_flag not in ['True', 'False']:
             print("Invalid boolean flag. Please use True or False.")
             return False
@@ -143,9 +147,15 @@ class Postgresqueries():
         edit_id = self.id_search_results
 
         query = f'UPDATE {table} SET active = {boolean_flag} WHERE {edit_table_id} = {edit_id}'
-        self.cursor.execute(query)
-        self.connection.commit()
-        print('Updated')
+        try:
+            self.cursor.execute(query)
+            self.connection.commit()
+            print('Status updated successfully!')
+            return True
+        except Exception as e:
+            self.connection.rollback()
+            print(f"Error updating status: {e}")
+            return False
 
 
 pg = Postgresqueries()
@@ -156,5 +166,5 @@ pg = Postgresqueries()
 
 #pg.change_status('students', )
 
-pg.search_query('student_representative', 2, None, None)
-#pg.change_status('False')
+pg.search_query('staff', None, '123-123123-1234K', None)
+pg.change_status('False')
