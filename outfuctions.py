@@ -51,3 +51,17 @@ def code_center_generator(student_code, student_total):
     except Exception as e:
         print(f"Error generating code center: {e}")
         return None
+
+def validate_date(date):
+    if not isinstance(date, str):
+        return False
+    
+    patron = r"^\d{4}-\d{2}-\d{2}$"
+    if re.match(patron, date):
+        try:
+            datetime.strptime(date, "%Y-%m-%d")
+            return True
+        except ValueError:
+            return False
+    else:
+        return False
