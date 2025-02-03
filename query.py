@@ -1,5 +1,5 @@
 import psycopg2
-from outfuctions import document_id_validation, phone_number_validation, id_validation, student_code_validation, validate_date, code_center_generator
+from outfuctions import document_id_validation, phone_number_validation, id_validation, student_code_validation, validate_date, code_center_generator, validate_grade
 
 
 #Esta query es para una base de datos en localhost (como se especifica en host)
@@ -330,6 +330,30 @@ class Postgresqueries():
         except Exception as e:
             self.connection.rollback()
             print(f'Error inserting student: {e}')
+    
+    def query_students_by_grade(self, grade_id):
+        if not validate_grade(grade_id):
+            print('Invalid grade ID')
+            return False
+        
+        try:
+            query = f"SELECT * FROM students WHERE grade_id = %s"
+            self.cursor.execute(query, (grade_id,))
+            results = self.cursor.fetchall()
+            if results is not None:
+                if len(results) > 0:
+                    print(f'Query result: {results}')
+                    return results
+                else:
+                    print('No students found for this grade.')
+                    return None
+            else:
+                print('No students found for this grade or could be an error.')
+                return None
+        except Exception as e:
+            print(f'Error querying students by grade: {e}')
+            return None
+        
 
 
         
@@ -357,4 +381,6 @@ pg = Postgresqueries()
 #pg.show_table_record('students', 5)
 #code = 'MC-021205-1234567'
 #pg.query_insert_student(code, 'John', '', 'John', '', '1990-01-01', 1, 1)
+
+#print(type(pg.query_students_by_grade(1)))
 

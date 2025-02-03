@@ -65,3 +65,9 @@ def validate_date(date):
             return False
     else:
         return False
+
+def validate_grade(grade):
+    if not isinstance(grade, int) or grade < 0 or grade > 11:
+        return False
+    
+    return True
