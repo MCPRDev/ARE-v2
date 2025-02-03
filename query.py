@@ -1,5 +1,5 @@
 import psycopg2
-from outfuctions import document_id_validation, phone_number_validation, id_validation, student_code_validation, validate_date
+from outfuctions import document_id_validation, phone_number_validation, id_validation, student_code_validation, validate_date, code_center_generator
 
 
 #Esta query es para una base de datos en localhost (como se especifica en host)
@@ -33,7 +33,7 @@ class Postgresqueries():
                 else:
                      print("An error occurred during login.")
                      return False
-    def insert_staff(self, first_name, middle_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthday): #SQL INSERT just for staff
+    def insert_staff(self, first_name, middle_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthday): #Custom staff insert on the table
 
         if document_id_validation(document_id):
              pass
@@ -212,7 +212,7 @@ class Postgresqueries():
             print(f"Error updating the registry: {e}")
             return False
         
-    def edit_multiple_columns(self, updates):
+    def edit_multiple_columns(self, updates): #This function depends: edit_record.
         if not self.search_results_validator():
             print("search_results_validator didn't detect a search")
             return False
@@ -268,6 +268,70 @@ class Postgresqueries():
             self.connection.rollback()
             print(f"Error updating status: {e}")
             return False
+    
+    def show_table_record(self, table, number_results):
+        tables = ['staff', 'student_representative', 'students']
+        if table not in tables:
+            print(f'Invalid table. Choose from: {tables}')
+            return False
+        
+        query = f"SELECT * FROM {table} LIMIT {number_results}"
+        self.cursor.execute(query)
+        results = self.cursor.fetchall()
+        print(f"Query result: {results}")
+        return results
+    
+    def query_total_records_by_table(self, table):
+        try:
+            query = f"SELECT COUNT(*) FROM {table}"
+            self.cursor.execute(query)
+            result = self.cursor.fetchone()
+            print(f"Total records in {table}: {result[0]}")
+            if result is not None:
+                return result[0]
+            else:
+                print('No records found')
+                return None
+        except Exception as e:
+            print(f'Error querying total records: {e}')
+            return None
+
+    def query_insert_student(self, student_code, first_name, middle_name, first_surname, second_surname, birthday, grade_id, representative_id): #Custom query to insert students on the table
+        if not student_code_validation(student_code):
+            print('Invalid student code')
+            return False
+        
+        if not validate_date(birthday):
+            print('Invalid birthday')
+            return False
+        
+        total_students = self.query_total_records_by_table('students')
+        unique_code_center = code_center_generator(student_code, total_students)
+
+        middle_name = middle_name if middle_name else None
+        second_surname = second_surname if second_surname else None
+
+        data_entry = (student_code, first_name, middle_name, first_surname, second_surname, birthday, grade_id, representative_id)
+        
+        if not data_entry:
+            print('There is something wrong with the data you are trying to insert.')
+            return False
+        
+        data_insert = (student_code, unique_code_center, first_name, middle_name, first_surname, second_surname, birthday, grade_id, representative_id)
+        query = """
+        INSERT INTO students (student_code, student_center_code, first_name, middle_name, first_surname, second_surname, birthday, grade_id, representative_id)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        try:
+            self.cursor.execute(query, data_insert)
+            self.connection.commit()
+            print('Student inserted successfully.')
+        except Exception as e:
+            self.connection.rollback()
+            print(f'Error inserting student: {e}')
+
+
         
 
 
@@ -289,3 +353,8 @@ pg = Postgresqueries()
 #    }
 #
 #pg.edit_multiple_columns(update)
+
+#pg.show_table_record('students', 5)
+#code = 'MC-021205-1234567'
+#pg.query_insert_student(code, 'John', '', 'John', '', '1990-01-01', 1, 1)
+
