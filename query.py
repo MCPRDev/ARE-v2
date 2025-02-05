@@ -15,7 +15,7 @@ class Postgresqueries():
         self.cursor = connection.cursor()
         self.connection = connection
 
-    def login(self, username_input, password_input): #Login fuctions to check password and username registered on the table
+    def login(self, username_input, password_input): #Login fuctions to check password and username registered on the table --- This must be upgraded with authentication tokens
             query_username = "SELECT * FROM login_access"
             self.cursor.execute(query_username)
             rows = self.cursor.fetchall()
@@ -140,7 +140,7 @@ class Postgresqueries():
         else:
             return True
     
-    def get_editable_columns(self, table):
+    def get_editable_columns(self, table): #Here we get the column names that are editable, this works with edit_record a and therefore with edit_multiple_columns
         if not self.search_results_validator():
             print("search_results_validator didn't detect a search")
             return False
@@ -153,7 +153,7 @@ class Postgresqueries():
         self.column_search = editable_columns_by_table.get(table, [])
         return editable_columns_by_table.get(table, [])
 
-    def validate_value(self, table, column, value):
+    def validate_value(self, table, column, value): #Validate the entry value in the other fuctions
 
         if value is None or value == "":
             print("The value cannot be empty.")
@@ -228,7 +228,7 @@ class Postgresqueries():
         print("All updates were performed correctly.")
         return True
     
-    def get_table_columns(self):
+    def get_table_columns(self): #With this we can get all the columns depending what table we want to...
         if not self.search_results_validator():
             print("search_results_validator didn't detect a search")
             return False
@@ -246,7 +246,7 @@ class Postgresqueries():
         return [column[0] for column in columns]
 
     def change_status(self, boolean_flag): #This function is like delete data from the database/table, only changin the status of the registered value
-        if not self.search_results_validator():
+        if not self.search_results_validator(): #change_status works for staff, students and representative_students
             print("search_results_validator didn't detect a search")
             return False
     
@@ -269,7 +269,7 @@ class Postgresqueries():
             print(f"Error updating status: {e}")
             return False
     
-    def show_table_record(self, table, number_results):
+    def show_table_record(self, table, number_results): #Here we can get the records in the table but we can limit the number of results
         tables = ['staff', 'student_representative', 'students']
         if table not in tables:
             print(f'Invalid table. Choose from: {tables}')
@@ -281,11 +281,11 @@ class Postgresqueries():
         print(f"Query result: {results}")
         return results
     
-    def query_total_records_by_table(self, table):
+    def query_total_records_by_table(self, table): #With this function we get the total number of records
         try:
             query = f"SELECT COUNT(*) FROM {table}"
             self.cursor.execute(query)
-            result = self.cursor.fetchone()
+            result = self.cursor.fetchone() + 1
             print(f"Total records in {table}: {result[0]}")
             if result is not None:
                 return result[0]
@@ -353,13 +353,81 @@ class Postgresqueries():
         except Exception as e:
             print(f'Error querying students by grade: {e}')
             return None
+    
+    def query_insert_student_representative(self, first_name, middle_name, first_surname, second_surname, representative_document_id, residential_address, phone_number):
+        if not document_id_validation(representative_document_id):
+            print('Invalid representative document ID')
+            return False
         
-
-
+        if not phone_number_validation(phone_number):
+            print('Invalid phone number')
+            return False
         
+        middle_name = middle_name if middle_name else None
+        second_surname = second_surname if second_surname else None
+
+        query_check_document_id = "SELECT COUNT(*) FROM student_representative WHERE representative_document_id = %s"
+        self.cursor.execute(query_check_document_id, (representative_document_id,))
+        count = self.cursor.fetchone()[0]
+
+        if count > 0:
+            print(f"The register with the document id {representative_document_id} already exist.")
+            return 
+        
+        data_entry = (first_name, middle_name, first_surname, second_surname, representative_document_id, residential_address, phone_number)
+        
+        if not data_entry:
+            print('There is something wrong with the data you are trying to insert.')
+            return False
+        
+        query = """
+        INSERT INTO student_representative (first_name, middle_name, first_surname, second_surname, representative_document_id, residential_address, phone_number)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """
+        try:
+            self.cursor.execute(query, data_entry)
+            self.connection.commit()
+            print('Student representative inserted successfully.')
+        except Exception as e:
+            self.connection.rollback()
+            print(f'Error inserting student representative: {e}')
+    
+    def show_students_by_guide_teacher(self, id_teacher):
+        if not id_validation(id_teacher):
+            print('Invalid ID teacher')
+            return False
+        
+        query = f"""SELECT 
+                    CONCAT_WS(' ', s.first_name, s.first_surname) AS teacher_name,
+                    st.register_id AS id_register_student,
+                    g.grade AS current_grade,
+                    CONCAT_WS(' ', st.first_name, st.middle_name, st.first_surname, st.second_surname) AS student_name
+                    FROM teachers t
+                    JOIN staff s ON t.staff_id = s.staff_id
+                    JOIN students st ON t.guide_grade_id = st.grade_id
+                    JOIN grades g ON st.grade_id = g.grade_id
+                    WHERE t.guide_grade_id = %s;"""
+        try:
+            self.cursor.execute(query, (id_teacher,))
+            results = self.cursor.fetchall()
+            if results is not None:
+                if len(results) > 0:
+                    print(f'Query result: {results}')
+                    return results
+                else:
+                    print('No students found for this guide teacher.')
+                    return None
+            else:
+                print('No students found for this guide teacher or could be an error.')
+                return None
+        except Exception as e:
+            print(f'Error querying students by guide teacher: {e}')
+            return None
+    
+    #
 
 
-
+#########################CONSOLE TEST#########################
 pg = Postgresqueries()
 #pg.search_query('staff', None, None, None)
 #pg.search_query('student_representative', None, '123-123123-1234K', None)
@@ -381,6 +449,5 @@ pg = Postgresqueries()
 #pg.show_table_record('students', 5)
 #code = 'MC-021205-1234567'
 #pg.query_insert_student(code, 'John', '', 'John', '', '1990-01-01', 1, 1)
-
+#pg.query_insert_student_representative('Yoquese', '', 'Perez', '', '123-654321-1234A', 'Main ST 534' ,'0000-0000')
 #print(type(pg.query_students_by_grade(1)))
-
