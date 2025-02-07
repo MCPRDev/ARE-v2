@@ -1,6 +1,22 @@
 from datetime import datetime
 import re
 import uuid
+import bcrypt
+
+#OutFuctions for query#
+def is_valid_username(username):
+    return bool(re.match(r"^\w+$", username))
+
+def is_valid_password(password):
+    return len(password) >= 12
+
+def hash_password(password):
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed_password
+
+def verify_password(input_password, hashed_password):
+    return bcrypt.checkpw(input_password.encode('utf-8'), hashed_password)
 
 def document_id_validation(document):
     if not isinstance(document, str):
@@ -71,3 +87,12 @@ def validate_grade(grade):
         return False
     
     return True
+
+
+#OutFuctions for fuctions.py#
+def clear_entry_data(data):
+    if not isinstance(data, str):
+        return False
+    
+    return data.strip()
+

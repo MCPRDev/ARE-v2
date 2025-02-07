@@ -1,12 +1,12 @@
 import psycopg2
-from outfuctions import document_id_validation, phone_number_validation, id_validation, student_code_validation, validate_date, code_center_generator, validate_grade
+from outfuctions import *
 
 
 #Esta query es para una base de datos en localhost (como se especifica en host)
 
 
 class Postgresqueries():
-    def __init__(self): #
+    def __init__(self): 
         connection = psycopg2.connect(host="localhost", 
                               port=5432, 
                               dbname="are_v2",
@@ -15,24 +15,33 @@ class Postgresqueries():
         self.cursor = connection.cursor()
         self.connection = connection
 
+    def close_connection(self):
+        self.cursor.close()
+        self.connection.close()
+
+    def __del__(self):
+        self.close_connection()
+
     def login(self, username_input, password_input): #Login fuctions to check password and username registered on the table --- This must be upgraded with authentication tokens
             query_username = "SELECT * FROM login_access"
             self.cursor.execute(query_username)
             rows = self.cursor.fetchall()
 
-            for row in rows:
-                if row[2] == username_input and row[3] == password_input:
-                    print("Login successful!")
-                    return True
-                elif row[2] != username_input:
-                     print("Incorrect username. Please try again.")
-                     return False
-                elif row[3]!= password_input:
-                     print("Incorrect password. Please try again.")
-                     return False
-                else:
-                     print("An error occurred during login.")
-                     return False
+            if not is_valid_username(username_input) or not is_valid_password(password_input):
+                print("Invalid username or password format. Please try again.")
+                return False
+
+            query = "SELECT log_password FROM login_access WHERE log_user = %s"
+            self.cursor.execute(query, (username_input,))
+            row = self.cursor.fetchone()
+
+            if row[0] == password_input:
+                print("Login successful!")
+                return True
+            else:
+                print("Invalid username or password.")
+                return False
+            
     def insert_staff(self, first_name, middle_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthday): #Custom staff insert on the table
 
         if document_id_validation(document_id):
@@ -285,7 +294,7 @@ class Postgresqueries():
         try:
             query = f"SELECT COUNT(*) FROM {table}"
             self.cursor.execute(query)
-            result = self.cursor.fetchone() + 1
+            result = self.cursor.fetchone()
             print(f"Total records in {table}: {result[0]}")
             if result is not None:
                 return result[0]
@@ -424,11 +433,11 @@ class Postgresqueries():
             print(f'Error querying students by guide teacher: {e}')
             return None
     
-    #
+
 
 
 #########################CONSOLE TEST#########################
-pg = Postgresqueries()
+#pg = Postgresqueries()
 #pg.search_query('staff', None, None, None)
 #pg.search_query('student_representative', None, '123-123123-1234K', None)
 #datos = pg.search_query('students', 1, None, None)
@@ -451,3 +460,5 @@ pg = Postgresqueries()
 #pg.query_insert_student(code, 'John', '', 'John', '', '1990-01-01', 1, 1)
 #pg.query_insert_student_representative('Yoquese', '', 'Perez', '', '123-654321-1234A', 'Main ST 534' ,'0000-0000')
 #print(type(pg.query_students_by_grade(1)))
+
+#pg.login('admin_basic_log_in_user','admin_basic_log_in_password')
