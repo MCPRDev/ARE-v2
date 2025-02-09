@@ -29,18 +29,18 @@ class Postgresqueries():
 
             if not is_valid_username(username_input) or not is_valid_password(password_input):
                 print("Invalid username or password format. Please try again.")
-                return False
+                return False, None
 
-            query = "SELECT log_password FROM login_access WHERE log_user = %s"
+            query = "SELECT log_password, access_type FROM login_access WHERE log_user = %s"
             self.cursor.execute(query, (username_input,))
             row = self.cursor.fetchone()
 
-            if row[0] == password_input:
+            if row and row[0] == password_input:
                 print("Login successful!")
-                return True
+                return True, row[1]
             else:
                 print("Invalid username or password.")
-                return False
+                return False, None
             
     def insert_staff(self, first_name, middle_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthday): #Custom staff insert on the table
 
@@ -438,6 +438,7 @@ class Postgresqueries():
 
 #########################CONSOLE TEST#########################
 #pg = Postgresqueries()
+#pg.login('admin_basic_log_in_user', 'admin_basic_log_in_password')
 #pg.search_query('staff', None, None, None)
 #pg.search_query('student_representative', None, '123-123123-1234K', None)
 #datos = pg.search_query('students', 1, None, None)

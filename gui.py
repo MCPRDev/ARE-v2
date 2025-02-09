@@ -11,7 +11,7 @@ class Ui_login_windows(object):
         login_windows.setMinimumSize(QtCore.QSize(600, 315))
         login_windows.setMaximumSize(QtCore.QSize(600, 315))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../GUI IMAGE/login_windows_images/login_icon_window.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("GUI IMAGE/login_windows_images/login_icon_window.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         login_windows.setWindowIcon(icon)
         login_windows.setToolTip("")
         login_windows.setDocumentMode(False)
@@ -86,8 +86,10 @@ class Ui_login_windows(object):
 
             username = str(self.line_input_user.text()).lower().strip()
             password = str(self.line_input_password.text()).lower().strip()
+            
+            success, access_type = self.log_actions.log_button_action(username, password)
 
-            if not self.log_actions.log_button_action(username, password):
+            if not success:
                 self.line_input_user.clear()
                 self.line_input_password.clear()
                 show_message_box = QMessageBox()
@@ -98,12 +100,42 @@ class Ui_login_windows(object):
                 x = show_message_box.exec_()
                 return False
             
-            login_success = QMessageBox()
-            login_success.setIcon(QMessageBox.Information)
-            login_success.setText("Success Login successful")
+            match access_type: #Here we check what kind of access has the user logging in
+                case 0:
+                    login_success = QMessageBox()
+                    login_success.setIcon(QMessageBox.Information)
+                    login_success.setText("Success Login successful as Administrator (All Permissions granted)")
 
-            x = login_success.exec_()
-            return True
+                    x = login_success.exec_()
+                    return False, access_type
+                case 1:
+                    login_success = QMessageBox()
+                    login_success.setIcon(QMessageBox.Information)
+                    login_success.setText("Success Login successful as Administrator")
+
+                    x = login_success.exec_()
+                    return False, access_type
+                case 2:
+                    login_success = QMessageBox()
+                    login_success.setIcon(QMessageBox.Information)
+                    login_success.setText("Success Login successful as Teacher [In progress]")
+
+                    x = login_success.exec_()
+                    return False, access_type
+                case 3:
+                    login_success = QMessageBox()
+                    login_success.setIcon(QMessageBox.Advertisement)
+                    login_success.setText("No Login Successfully, no permission granted")
+
+                    x = login_success.exec_()
+                    return False, None
+                case _:
+                    login_success = QMessageBox()
+                    login_success.setIcon(QMessageBox.Warning)
+                    login_success.setText("No Login Successfully, wrong username or password")
+                    
+                    x = login_success.exec_()
+                    return False, None
         
         except Exception as e:
             print(f"An error occurred: {e}")

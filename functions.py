@@ -7,10 +7,11 @@ class loggin_gui_action():
     
     def log_button_action(self, username, password):
         if not clear_entry_data(username) or not clear_entry_data(password):
-            return False
+            return False, None
         
-        if self.query.login(username, password):
-            return True
-    
+        login_success, access_type = self.query.login(username, password)
 
-    
+        if login_success:
+            return True, access_type
+        
+        return False, None
