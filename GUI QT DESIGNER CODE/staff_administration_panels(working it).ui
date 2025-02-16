@@ -67,7 +67,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>9</number>
+     <number>4</number>
     </property>
     <property name="documentMode">
      <bool>false</bool>
@@ -1430,9 +1430,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-10</y>
         <width>491</width>
-        <height>101</height>
+        <height>111</height>
        </rect>
       </property>
       <property name="font">
@@ -1532,7 +1532,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QLabel" name="label_full_name_static">
+      <widget class="QLabel" name="label_full_name_static_edit">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1545,7 +1545,7 @@
         <string>Nombre completo:</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_document_id_static">
+      <widget class="QLabel" name="label_document_id_static_edit">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1558,7 +1558,7 @@
         <string>Cedula:</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_phone_number_static">
+      <widget class="QLabel" name="label_phone_number_static_edit">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1571,7 +1571,7 @@
         <string>Numero de telefono:</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_job_id_static">
+      <widget class="QLabel" name="label_job_id_static_edit">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1584,7 +1584,7 @@
         <string>Puesto:</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_address_static">
+      <widget class="QLabel" name="label_address_static_edit">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1597,7 +1597,7 @@
         <string>Direccion:</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_birthday_static">
+      <widget class="QLabel" name="label_birthday_static_edit">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1610,7 +1610,7 @@
         <string>Fecha de nacimeinto:</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_agre_static">
+      <widget class="QLabel" name="label_agre_static_edit">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1623,7 +1623,7 @@
         <string>Edad:</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_full_name_dynamic">
+      <widget class="QLabel" name="label_full_name_dynamic_edit">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -1645,7 +1645,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_document_id_dynamic">
+      <widget class="QLabel" name="label_document_id_dynamic_edit">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -1670,7 +1670,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_address_dynamic">
+      <widget class="QLabel" name="label_address_dynamic_edit">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -1695,7 +1695,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_phone_number_dynamic">
+      <widget class="QLabel" name="label_phone_number_dynamic_edit">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -1720,7 +1720,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_job_id_dynamic">
+      <widget class="QLabel" name="label_job_id_dynamic_edit">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -1745,7 +1745,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_birthday_dynamic">
+      <widget class="QLabel" name="label_birthday_dynamic_edit">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -1770,7 +1770,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_age_dynamic">
+      <widget class="QLabel" name="label_age_dynamic_edit">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -1997,6 +1997,9 @@
          <width>113</width>
          <height>20</height>
         </rect>
+       </property>
+       <property name="readOnly">
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QLineEdit" name="line_input_phone_number_edit">
@@ -2260,7 +2263,7 @@
         <x>489</x>
         <y>179</y>
         <width>721</width>
-        <height>281</height>
+        <height>341</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -2275,11 +2278,11 @@
          <x>120</x>
          <y>41</y>
          <width>161</width>
-         <height>211</height>
+         <height>231</height>
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_document_id_edit_2">
+      <widget class="QLabel" name="label_selection_subjects_edit">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -2300,7 +2303,7 @@
         <string>Selecciona las materias:</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_document_id_edit_3">
+      <widget class="QLabel" name="label_selections_grades_edit">
        <property name="geometry">
         <rect>
          <x>460</x>
@@ -2327,7 +2330,69 @@
          <x>470</x>
          <y>41</y>
          <width>161</width>
-         <height>211</height>
+         <height>231</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_selection_main_subject_edit">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>300</y>
+         <width>181</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>9</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Seleciona la manteria principal:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_selection_guide_grade_edit">
+       <property name="geometry">
+        <rect>
+         <x>400</x>
+         <y>300</y>
+         <width>151</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>9</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Selecciona el grado guia:</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="combobox_main_subject_edit">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>300</y>
+         <width>151</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="combobox_guide_grade_edit">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>300</y>
+         <width>121</width>
+         <height>22</height>
         </rect>
        </property>
       </widget>
@@ -2336,9 +2401,9 @@
       <property name="geometry">
        <rect>
         <x>489</x>
-        <y>459</y>
+        <y>519</y>
         <width>711</width>
-        <height>201</height>
+        <height>141</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -2379,15 +2444,453 @@
      <attribute name="title">
       <string>Eliminar Personal</string>
      </attribute>
+     <widget class="QFrame" name="frame_change_status_staff">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>-10</y>
+        <width>1211</width>
+        <height>111</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Microsoft JhengHei</family>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::WinPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="label_search_id_change_status">
+       <property name="geometry">
+        <rect>
+         <x>390</x>
+         <y>30</y>
+         <width>91</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Buscar por ID:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_search_document_id_change_status">
+       <property name="geometry">
+        <rect>
+         <x>600</x>
+         <y>30</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Buscar por Cedula:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="line_input_change_status_staff_search_id">
+       <property name="geometry">
+        <rect>
+         <x>480</x>
+         <y>30</y>
+         <width>91</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="line_input_change_status_staff_search_document_id">
+       <property name="geometry">
+        <rect>
+         <x>730</x>
+         <y>30</y>
+         <width>113</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="button_search_change_status_staff">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>70</y>
+         <width>75</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Buscar</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QFrame" name="frame_change_status_staff_outputinfo">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>100</y>
+        <width>1211</width>
+        <height>131</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Microsoft JhengHei</family>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="label_full_name_static_change_status">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Nombre completo:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_document_id_static_change_status">
+       <property name="geometry">
+        <rect>
+         <x>500</x>
+         <y>20</y>
+         <width>47</width>
+         <height>13</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Cedula:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_phone_number_static_change_status">
+       <property name="geometry">
+        <rect>
+         <x>500</x>
+         <y>50</y>
+         <width>131</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Numero de telefono:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_job_id_static_change_status">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>80</y>
+         <width>51</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Puesto:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_address_static_change_status">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>50</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Direccion:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_birthday_static_change_status">
+       <property name="geometry">
+        <rect>
+         <x>500</x>
+         <y>80</y>
+         <width>131</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Fecha de nacimeinto:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_agre_static_change_status">
+       <property name="geometry">
+        <rect>
+         <x>970</x>
+         <y>25</y>
+         <width>47</width>
+         <height>13</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Edad:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_full_name_dynamic_change_status">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>20</y>
+         <width>341</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>9</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+         <underline>true</underline>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_document_id_dynamic_change_status">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>550</x>
+         <y>20</y>
+         <width>341</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>9</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+         <underline>true</underline>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_address_dynamic_change_status">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>50</y>
+         <width>401</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>9</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+         <underline>true</underline>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_phone_number_dynamic_change_status">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>630</x>
+         <y>50</y>
+         <width>341</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>9</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+         <underline>true</underline>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_job_id_dynamic_change_status">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>80</y>
+         <width>411</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>9</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+         <underline>true</underline>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_birthday_dynamic_change_status">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>640</x>
+         <y>80</y>
+         <width>331</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>9</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+         <underline>true</underline>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_age_dynamic_change_status">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>1010</x>
+         <y>20</y>
+         <width>168</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>9</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+         <underline>true</underline>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_status_change_status">
+       <property name="geometry">
+        <rect>
+         <x>970</x>
+         <y>50</y>
+         <width>51</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;El estado determina si esta eliminado&lt;/p&gt;&lt;p&gt;Activo: No Eliminado&lt;/p&gt;&lt;p&gt;Inactivo: Eliminado&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Estado:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_status_dynamic_change_status">
+       <property name="geometry">
+        <rect>
+         <x>1020</x>
+         <y>50</y>
+         <width>171</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QFrame" name="frame_buttons_change_status">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>229</y>
+        <width>501</width>
+        <height>43</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QPushButton" name="button_chhange_status_restore">
+         <property name="text">
+          <string>Resturar</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="button_change_status_delete">
+         <property name="text">
+          <string>Eliminar</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="button_clean_information_change_status">
+         <property name="text">
+          <string>Limpiar</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QWidget" name="search_staff_widget">
      <attribute name="title">
       <string>Buscar Personal</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="show_staff">
-     <attribute name="title">
-      <string>Mostrar Personal</string>
      </attribute>
     </widget>
     <widget class="QWidget" name="impart_teacher_time">
