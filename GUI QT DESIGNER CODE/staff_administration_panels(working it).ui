@@ -67,7 +67,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>5</number>
     </property>
     <property name="documentMode">
      <bool>false</bool>
@@ -2352,7 +2352,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Seleciona la manteria principal:</string>
+        <string>Seleciona la materia principal:</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_selection_guide_grade_edit">
@@ -2887,16 +2887,735 @@
        </item>
       </layout>
      </widget>
+     <widget class="QFrame" name="frame_if_teacher_change_status_staff">
+      <property name="geometry">
+       <rect>
+        <x>-1</x>
+        <y>339</y>
+        <width>1211</width>
+        <height>321</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Microsoft JhengHei</family>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="label_change_status_note_if_teacher">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>40</y>
+         <width>461</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Nota: Al ser profesor y ser eliminado, se desasignaras los siguientes grados</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_grade_guide_change_status_if_teacher">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>80</y>
+         <width>131</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Grado Guiado libre:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_grades_assigned_change_status_if_teacher">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>80</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Grados asignados:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_grade_guide_if_teacher_change_status_dynamic">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>110</y>
+         <width>141</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>9</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QTableWidget" name="tablew_change_status_if_teacher_grades_assigned">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>110</y>
+         <width>411</width>
+         <height>192</height>
+        </rect>
+       </property>
+       <column>
+        <property name="text">
+         <string>Grado</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Materia</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Hora Inicio</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Hora Final</string>
+        </property>
+       </column>
+      </widget>
+      <widget class="QFrame" name="frame_buttons_confirm">
+       <property name="geometry">
+        <rect>
+         <x>649</x>
+         <y>109</y>
+         <width>100</width>
+         <height>76</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QPushButton" name="buttons_change_status_confirm_if_teacher">
+          <property name="text">
+           <string>Confirmar</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="button_change_status_cancel_if_teacher">
+          <property name="text">
+           <string>Cancelar</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QFrame" name="frame_buttons_confirm_change_status">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>280</y>
+        <width>251</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QPushButton" name="button_confirm_change_status">
+         <property name="text">
+          <string>Confirmar</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="button_cancel_change_status">
+         <property name="text">
+          <string>Cancelar</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QWidget" name="search_staff_widget">
      <attribute name="title">
       <string>Buscar Personal</string>
      </attribute>
+     <widget class="QFrame" name="frame_search_staff">
+      <property name="geometry">
+       <rect>
+        <x>-1</x>
+        <y>-1</y>
+        <width>1211</width>
+        <height>661</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QTableWidget" name="tablew_show_staff_registered_search_staff">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>160</y>
+         <width>1201</width>
+         <height>461</height>
+        </rect>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::SelectedClicked</set>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>false</bool>
+       </property>
+       <property name="sortingEnabled">
+        <bool>false</bool>
+       </property>
+       <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+        <bool>false</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>ID Registrado</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Nombre Completo</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Cedula</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Direccion</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Numero de Telefono</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Fecha de Nacimiento</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Edad</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Puesto</string>
+        </property>
+       </column>
+      </widget>
+      <widget class="QFrame" name="frame_details_search_staff">
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>-1</y>
+         <width>911</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLabel" name="label_first_name_search_staff">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>101</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Primer Nombre:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_second_name_search_staff">
+        <property name="geometry">
+         <rect>
+          <x>340</x>
+          <y>10</y>
+          <width>111</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Segundo Nombre:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_first_surname_search_staff">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>60</y>
+          <width>101</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Primer Apellido:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_second_surname_search_staff">
+        <property name="geometry">
+         <rect>
+          <x>340</x>
+          <y>60</y>
+          <width>111</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Segundo Apellido:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_document_id_search_staff">
+        <property name="geometry">
+         <rect>
+          <x>660</x>
+          <y>10</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Cedula:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_phone_number_search_staff">
+        <property name="geometry">
+         <rect>
+          <x>660</x>
+          <y>60</y>
+          <width>131</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Numero de Telefono:</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="line_input_first_name_search_staff">
+        <property name="geometry">
+         <rect>
+          <x>130</x>
+          <y>10</y>
+          <width>191</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="line_input_second_name_search_staff">
+        <property name="geometry">
+         <rect>
+          <x>460</x>
+          <y>10</y>
+          <width>191</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="line_input_first_surname_search_staff">
+        <property name="geometry">
+         <rect>
+          <x>130</x>
+          <y>60</y>
+          <width>191</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="line_input_second_surname_search_staff">
+        <property name="geometry">
+         <rect>
+          <x>460</x>
+          <y>60</y>
+          <width>191</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="line_input_document_id_search_staff">
+        <property name="geometry">
+         <rect>
+          <x>710</x>
+          <y>10</y>
+          <width>191</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="line_input_phone_number_search_staff">
+        <property name="geometry">
+         <rect>
+          <x>790</x>
+          <y>60</y>
+          <width>91</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_buttons_actions_search_staff">
+       <property name="geometry">
+        <rect>
+         <x>919</x>
+         <y>-1</y>
+         <width>291</width>
+         <height>161</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QPushButton" name="button_show_deailts_qtable_selected_search_staff">
+          <property name="text">
+           <string>Detalles</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="button_edit_selected_staff_search_staff">
+          <property name="text">
+           <string>Editar</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
     </widget>
     <widget class="QWidget" name="impart_teacher_time">
      <attribute name="title">
       <string>Tiempo de clases</string>
      </attribute>
+     <widget class="QFrame" name="frame_impart_teacher_time">
+      <property name="geometry">
+       <rect>
+        <x>-1</x>
+        <y>-1</y>
+        <width>1211</width>
+        <height>671</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="label_select_teacher_static_impart_tt">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>151</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Selecciona un profesor:</string>
+       </property>
+      </widget>
+      <widget class="QTableWidget" name="tablew_select_teacher_impart_tt">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>571</width>
+         <height>192</height>
+        </rect>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::SelectedClicked</set>
+       </property>
+       <column>
+        <property name="text">
+         <string>ID Profesor</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Nombre Completo</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Grado Guiado</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Materia Principal</string>
+        </property>
+       </column>
+      </widget>
+      <widget class="QListWidget" name="listw_select_grade_impart_tt">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>250</y>
+         <width>141</width>
+         <height>192</height>
+        </rect>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::DoubleClicked|QAbstractItemView::SelectedClicked</set>
+       </property>
+       <property name="viewMode">
+        <enum>QListView::ListMode</enum>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_select_grade_static_impart_tt">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>230</y>
+         <width>131</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Selecciona un grado:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_select_subject_static_impart_tt">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>450</y>
+         <width>141</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Selecciona la materia:</string>
+       </property>
+      </widget>
+      <widget class="QListWidget" name="listw_select_subject_impart_tt">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>470</y>
+         <width>141</width>
+         <height>192</height>
+        </rect>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::DoubleClicked|QAbstractItemView::SelectedClicked</set>
+       </property>
+       <property name="viewMode">
+        <enum>QListView::ListMode</enum>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_select_start_time_subject_static_impart_tt">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>230</y>
+         <width>161</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Selecciona la hora inicial:</string>
+       </property>
+      </widget>
+      <widget class="QTimeEdit" name="timeedit_select_impart_start_time_impart_tt">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>250</y>
+         <width>118</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="displayFormat">
+        <string>hh:mm a</string>
+       </property>
+       <property name="time">
+        <time>
+         <hour>6</hour>
+         <minute>0</minute>
+         <second>0</second>
+        </time>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_select_end_time_static_static_impart_tt">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>280</y>
+         <width>151</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Microsoft JhengHei</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Selecciona la hora final:</string>
+       </property>
+      </widget>
+      <widget class="QTimeEdit" name="timeedit_select_impart_end_time_impart_tt">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>300</y>
+         <width>118</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="displayFormat">
+        <string>hh:mm a</string>
+       </property>
+       <property name="time">
+        <time>
+         <hour>8</hour>
+         <minute>0</minute>
+         <second>0</second>
+        </time>
+       </property>
+      </widget>
+      <widget class="QFrame" name="frame_buttons_impart_teacher_time">
+       <property name="geometry">
+        <rect>
+         <x>170</x>
+         <y>620</y>
+         <width>231</width>
+         <height>43</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="text">
+           <string>Limpiar</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_3">
+          <property name="text">
+           <string>PushButton</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="text">
+           <string>Guardar</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
     </widget>
     <widget class="QWidget" name="new_login">
      <attribute name="title">
