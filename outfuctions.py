@@ -2,6 +2,7 @@ from datetime import datetime
 import re
 import uuid
 import bcrypt
+from Levenshtein import distance as levenshtein_distance
 
 #OutFuctions for query#
 def is_valid_username(username):
@@ -88,6 +89,21 @@ def validate_grade(grade):
     
     return True
 
+def validate_and_clean_subject_entry_query(subject):
+    if not isinstance(subject, str):
+        return False
+    
+    subject = subject.strip()
+    if len(subject) > 50:
+        subject = subject[:50]
+    
+    return subject.upper()
+
+def validate_data_entry_no_repeted(data_entry, existing_data, umbral=2):
+    for i in existing_data:
+        if levenshtein_distance(data_entry.upper(), i.upper()) <= umbral:
+            return False
+    return True
 
 #OutFuctions for fuctions.py#
 def clear_entry_data(data):

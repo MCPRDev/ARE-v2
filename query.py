@@ -1,12 +1,11 @@
 import psycopg2
+import threading
+import select
 from outfuctions import *
 
 
-#Esta query es para una base de datos en localhost (como se especifica en host)
-
-
 class Postgresqueries():
-    def __init__(self): 
+    def __init__(self, update_callback=None): 
         connection = psycopg2.connect(host="localhost", 
                               port=5432, 
                               dbname="are_v2",
@@ -14,6 +13,31 @@ class Postgresqueries():
                               password="1234")
         self.cursor = connection.cursor()
         self.connection = connection
+
+        self.connection.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+
+        self.update_callback = update_callback 
+
+        self.listen_thread = threading.Thread(target=self.listen_for_changes, daemon=True)
+        self.listen_thread.start()
+
+    def listen_for_changes(self):
+        self.cursor.execute("LISTEN subject_changes;")
+        print("📡 Recieving changes...")
+
+        while True:
+            if select.select([self.connection], [], [], 5) == ([], [], []):
+                continue
+
+            self.connection.poll()
+            while self.connection.notifies:
+                notify = self.connection.notifies.pop(0)
+                print(f"🔄 Update detected at DB: {notify.payload}")
+
+
+                if self.update_callback:
+                    self.update_callback()
+
 
     def close_connection(self):
         self.cursor.close()
@@ -400,7 +424,16 @@ class Postgresqueries():
         except Exception as e:
             self.connection.rollback()
             print(f'Error inserting student representative: {e}')
-    
+    def show_data_subjects(self):
+        try:
+            self.cursor.execute("SELECT subject_id, subject FROM subjects WHERE active = true")
+            
+            rows = self.cursor.fetchall()
+            return rows if rows else []
+        except Exception as e:
+            print(f'Error fetching data subjects: {e}')
+            return []
+        
     def show_students_by_guide_teacher(self, id_teacher):
         if not id_validation(id_teacher):
             print('Invalid ID teacher')
@@ -433,11 +466,37 @@ class Postgresqueries():
             print(f'Error querying students by guide teacher: {e}')
             return None
     
+    def insert_subject(self, subject):
+        if not validate_and_clean_subject_entry_query(subject):
+            print('Invalid subject')
+            return False
+        
+        self.cursor.execute("SELECT subject FROM subjects")
+        subjects_added = [row[0] for row in self.cursor.fetchall()]
+
+        if not validate_data_entry_no_repeted(subject, subjects_added):
+            print('This subject already exists.')
+            return False
+        
+        query = f"INSERT INTO subjects(subject) VALUES (%s)"
+
+        try:
+            self.cursor.execute(query, (subject,))
+            self.connection.commit()
+            print('Subject inserted successfully.')
+        except Exception as e:
+            self.connection.rollback()
+            print(f'Error inserting subject: {e}')
+            return False
+
+    
 
 
 
 #########################CONSOLE TEST#########################
 #pg = Postgresqueries()
+#print(pg.show_data_subjects())
+#pg.insert_subject('Matematica Oratoria')
 #pg.login('admin_basic_log_in_user', 'admin_basic_log_in_password')
 #pg.search_query('staff', None, None, None)
 #pg.search_query('student_representative', None, '123-123123-1234K', None)

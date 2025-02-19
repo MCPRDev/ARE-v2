@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from staff_administration_panels import Ui_staff_management_window
 
 class Ui_selection_management_window(object):
     def setupUi(self, selection_management_window):
@@ -26,10 +26,23 @@ class Ui_selection_management_window(object):
         self.logout_button.setObjectName("logout_button")
         selection_management_window.setCentralWidget(self.centralwidget)
 
+        self.staff_administration_window = None
 
+        self.staff_management_button.clicked.connect(self.staff_administration_window_open)
+        
         self.retranslateUi(selection_management_window)
         QtCore.QMetaObject.connectSlotsByName(selection_management_window)
-
+    
+    def staff_administration_window_open(self):
+        try:
+            if self.staff_administration_window is None:
+                self.staff_administration_window = QtWidgets.QMainWindow()
+                self.ui_staff = Ui_staff_management_window() 
+                self.ui_staff.setupUi(self.staff_administration_window)
+            self.staff_administration_window.show()  
+        except Exception as e:
+            print(f"Error al abrir ventana de administracion de personal: {str(e)}")
+        
     def retranslateUi(self, selection_management_window):
         _translate = QtCore.QCoreApplication.translate
         selection_management_window.setWindowTitle(_translate("selection_management_window", "Panel de seleccion"))
