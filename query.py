@@ -1,6 +1,7 @@
 import psycopg2
 import threading
 import select
+import time
 from outfuctions import *
 
 
@@ -18,25 +19,47 @@ class Postgresqueries():
 
         self.update_callback = update_callback 
 
-        self.listen_thread = threading.Thread(target=self.listen_for_changes, daemon=True)
+        self.listen_thread = threading.Thread(target=self.listen_for_changes_subject_changes, daemon=True)
         self.listen_thread.start()
+    
+    def reconnect(self):
+        try:
+            self.connection = psycopg2.connect(
+                host="localhost",
+                port=5432,
+                dbname="are_v2",
+                user="postgres",
+                password="1234"
+            )
+            self.cursor = self.connection.cursor()
+            self.connection.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+            self.cursor.execute("LISTEN subject_changes;")
+            print("✅ Reconecting...")
+        except Exception as e:
+            print(f"❌ Error trying to reconnect: {e}")
 
-    def listen_for_changes(self):
+    def listen_for_changes_subject_changes(self):
         self.cursor.execute("LISTEN subject_changes;")
         print("📡 Recieving changes...")
 
         while True:
-            if select.select([self.connection], [], [], 5) == ([], [], []):
-                continue
+            if self.connection.closed:
+                print("⚠️ The connection has lost...")
+                self.reconnect()
+            
+            try:
+                self.connection.poll()
+                while self.connection.notifies:
+                    notify = self.connection.notifies.pop(0)
+                    print(f"🔄 Update detected in DB: {notify.payload}")
 
-            self.connection.poll()
-            while self.connection.notifies:
-                notify = self.connection.notifies.pop(0)
-                print(f"🔄 Update detected at DB: {notify.payload}")
+                    if self.update_callback:
+                        self.update_callback()
 
+            except Exception as e:
+                print(f"❌ Error while listening: {e}")
 
-                if self.update_callback:
-                    self.update_callback()
+            time.sleep(1)
 
 
     def close_connection(self):
@@ -475,11 +498,21 @@ class Postgresqueries():
         subjects_added = [row[0] for row in self.cursor.fetchall()]
 
         if not validate_data_entry_no_repeted(subject, subjects_added):
-            print('This subject already exists.')
-            return False
+            query_active = f"SELECT active FROM subjects WHERE subject = %s"
+            self.cursor.execute(query_active, (subject,))
+            activity = self.cursor.fetchone()
+            if activity[0] == False:
+                query = f"UPDATE subjects SET active = %s WHERE subject = %s"
+                self.cursor.execute(query, (True, subject))
+                print(f'Already exits, subject {subject} activated.')
+                return True
+            else:
+                print(f'Subject {subject} already exists.')
+                return False
+
+
         
         query = f"INSERT INTO subjects(subject) VALUES (%s)"
-
         try:
             self.cursor.execute(query, (subject,))
             self.connection.commit()
@@ -488,9 +521,49 @@ class Postgresqueries():
             self.connection.rollback()
             print(f'Error inserting subject: {e}')
             return False
-
     
+    def delete_data_from_table(self, table, entry_id):
+        tables = [
+            'impart_time_teacher',
+            'login_access',
+            'login_access_type',
+            'staff',
+            'student_representative',
+            'students',
+            'subject_teacher',
+            'subjects',
+            'teacher_grade_assigned',
+            'teachers'
+        ]
+        position_table = tables.index(table)
 
+        id_tables = {
+            'impart_time_teacher' : 'itt_id',
+            'login_access' : 'access_id',
+            'login_access_type' : 'id_access_type',
+            'staff' : 'staff_id',
+            'student_representative' : 'representative_id',
+            'students' : 'register_id',
+            'subject_teacher' : 'subject_teacher_id',
+            'subjects' : 'subject_id',
+            'teacher_grade_assigned' : 'tga_id',
+            'teachers' : 'teacher_id'
+        }
+
+        table = tables[position_table]
+        id_change_status = id_tables[table]
+
+        query = f"UPDATE {table} SET active = false WHERE {id_change_status} = {entry_id}"
+
+        try:
+            self.cursor.execute(query)
+            self.connection.commit()
+            print('Data deleted successfully.')
+        except Exception as e:
+            self.connection.rollback()
+            print(f'Error deleting data: {e}')
+            return False
+        
 
 
 #########################CONSOLE TEST#########################

@@ -67,6 +67,7 @@ class Ui_staff_management_window(object):
         self.tablew_subject_show.verticalHeader().setVisible(False)
         self.tablew_subject_show.verticalHeader().setHighlightSections(True)
         self.tablew_subject_show.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.tablew_subject_show.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.label_subject_search = QtWidgets.QLabel(self.frame_subject)
         self.label_subject_search.setGeometry(QtCore.QRect(550, 10, 91, 16))
         font = QtGui.QFont()
@@ -92,10 +93,11 @@ class Ui_staff_management_window(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.button_delete_subject = QtWidgets.QPushButton(self.frame_buttons_subjects)
         self.button_delete_subject.setObjectName("button_delete_subject")
+        self.button_delete_subject.setEnabled(False)
         self.horizontalLayout.addWidget(self.button_delete_subject)
-        self.button_refresh_subjects_list = QtWidgets.QPushButton(self.frame_buttons_subjects)
-        self.button_refresh_subjects_list.setObjectName("button_refresh_subjects_list")
-        self.horizontalLayout.addWidget(self.button_refresh_subjects_list)
+        #self.button_refresh_subjects_list = QtWidgets.QPushButton(self.frame_buttons_subjects)
+        #self.button_refresh_subjects_list.setObjectName("button_refresh_subjects_list")
+        #self.horizontalLayout.addWidget(self.button_refresh_subjects_list)
         self.button_edit_subject = QtWidgets.QPushButton(self.frame_buttons_subjects)
         self.button_edit_subject.setObjectName("button_edit_subject")
         self.horizontalLayout.addWidget(self.button_edit_subject)
@@ -1640,12 +1642,16 @@ class Ui_staff_management_window(object):
         self.actionLimpiar_Datos.setObjectName("actionLimpiar_Datos")
         #############################Query##########################################
         self.query = Postgresqueries()
-        ########################Subjects############################################
+        ########################Subwindows############################################
         self.add_subject_window = None
+        ######################Buttons subjects############################################
         self.button_add_subject.clicked.connect(self.add_subject_window_emergent)
+        
+
+        ######Load data from database to show in qtablewidget############
         self.db_listener = Postgresqueries(self.load_data_subjects)
         self.load_data_subjects()
-
+        self.tablew_subject_show.cellClicked.connect(self.qtablew_row_clicked)
 
         ############################################################################
         self.retranslateUi(staff_management_window)
@@ -1661,8 +1667,8 @@ class Ui_staff_management_window(object):
 
         for row_index, row in enumerate(subject_rows):
             self.tablew_subject_show.insertRow(row_index)
-            self.tablew_subject_show.setItem(row_index, 0, QtWidgets.QTableWidgetItem(str(row[0])))
-            self.tablew_subject_show.setItem(row_index, 1, QtWidgets.QTableWidgetItem(str(row[1])))
+            self.tablew_subject_show.setItem(row_index, 0, QtWidgets.QTableWidgetItem(str(row[0]).capitalize()))
+            self.tablew_subject_show.setItem(row_index, 1, QtWidgets.QTableWidgetItem(str(row[1]).capitalize()))
         
     def add_subject_window_emergent(self):
         if self.add_subject_window is None:
@@ -1670,13 +1676,42 @@ class Ui_staff_management_window(object):
             self.ui_add_subject = Ui_add_subject_sub_window()
             self.ui_add_subject.setupUi(self.add_subject_window)
         self.add_subject_window.show()
-    
-    def load_subjects_data(self):
-        subject_rows = self.query.show_data_subjects()
-        self.tablew_subject_show.setRowCount(len(subject_rows))
-        for row_index, row in enumerate(subject_rows):
-            self.tablew_subject_show.setItem(row_index, 0, QtWidgets.QTableWidgetItem(str(row[0])))
-            self.tablew_subject_show.setItem(row_index, 1, QtWidgets.QTableWidgetItem(str(row[1])))
+
+    def qtablew_row_clicked(self, row: int, column: int):
+        id_item = self.tablew_subject_show.item(row, 0)
+
+        if id_item and id_item.text().strip():
+            self.button_delete_subject.setEnabled(True)
+            try:
+                id_value = int(id_item.text())
+                try:
+                    self.button_delete_subject.clicked.disconnect()
+                except TypeError:
+                    pass
+
+
+                self.button_delete_subject.clicked.connect(lambda: self.delete_subject_action_button(id_value))
+            except ValueError:
+                self.button_delete_subject.setEnabled(False)
+        else:
+            self.button_delete_subject.setEnabled(False)
+
+    def delete_subject_action_button(self, id_value):
+        try:
+            if id_value:
+                table = 'subjects'
+                self.query.delete_data_from_table(table, id_value)
+                self.query.show_data_subjects()
+                self.tablew_subject_show.clearSelection()
+                self.button_delete_subject.setEnabled(False)
+            
+            else:
+                return None
+        except Exception as e:
+            print(f"Error al intentar eliminar la materia: {e}")
+        
+
+
 
     def retranslateUi(self, staff_management_window):
         _translate = QtCore.QCoreApplication.translate
@@ -1688,7 +1723,7 @@ class Ui_staff_management_window(object):
         item.setText(_translate("staff_management_window", "Materia"))
         self.label_subject_search.setText(_translate("staff_management_window", "Buscar Materia"))
         self.button_delete_subject.setText(_translate("staff_management_window", "Eliminar Materia"))
-        self.button_refresh_subjects_list.setText(_translate("staff_management_window", "Refrescar Tabla"))
+        #self.button_refresh_subjects_list.setText(_translate("staff_management_window", "Refrescar Tabla"))
         self.button_edit_subject.setText(_translate("staff_management_window", "Editar Materia"))
         self.button_add_subject.setText(_translate("staff_management_window", "Agregar Materia"))
         self.label_subject_search_name.setText(_translate("staff_management_window", "Buscar Materia"))
