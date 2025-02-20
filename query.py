@@ -522,6 +522,39 @@ class Postgresqueries():
             print(f'Error inserting subject: {e}')
             return False
     
+    def edit_subject_name(self, id_subject, new_name_subject):
+        if not validate_and_clean_subject_entry_query(new_name_subject):
+            print('Invalid new subject name')
+            return False
+        
+        if not id_validation(id_subject):
+            print('Invalid ID subject')
+            return False
+        
+        self.cursor.execute("SELECT subject FROM subjects")
+        subjects_added = [row[0] for row in self.cursor.fetchall()]
+
+        if not validate_data_entry_no_repeted(new_name_subject, subjects_added):
+            print("Error, this subject already exists")
+            return False
+        
+            
+
+        try:
+            query = f"UPDATE subjects SET subject = %s WHERE subject_id = %s"
+            self.cursor.execute(query, (new_name_subject, id_subject))
+            self.connection.commit()
+            print('Subject edited successfully.')
+            return True
+        except Exception as e:
+            self.connection.rollback()
+            print(f'Error editing subject: {e}')
+            return False
+    def get_subject_id_already_exists(self, subject):
+        self.cursor.execute(f"SELECT subject_id FROM subjects WHERE subject = '{subject}'")
+        subjects_ids = [row[0] for row in self.cursor.fetchall()]
+        return subjects_ids
+    
     def delete_data_from_table(self, table, entry_id):
         tables = [
             'impart_time_teacher',

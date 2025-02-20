@@ -29,3 +29,4 @@ class subject_gui_action():
         
         self.query.show_data_subjects()
         return True
+    

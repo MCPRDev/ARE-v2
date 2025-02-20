@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QHeaderView
 from add_subject_subwindow import Ui_add_subject_sub_window
 from query import *
 import sys
+import traceback
 
 class Ui_staff_management_window(object):
     def setupUi(self, staff_management_window):
@@ -68,6 +69,7 @@ class Ui_staff_management_window(object):
         self.tablew_subject_show.verticalHeader().setHighlightSections(True)
         self.tablew_subject_show.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.tablew_subject_show.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.tablew_subject_show.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.label_subject_search = QtWidgets.QLabel(self.frame_subject)
         self.label_subject_search.setGeometry(QtCore.QRect(550, 10, 91, 16))
         font = QtGui.QFont()
@@ -101,6 +103,7 @@ class Ui_staff_management_window(object):
         self.button_edit_subject = QtWidgets.QPushButton(self.frame_buttons_subjects)
         self.button_edit_subject.setObjectName("button_edit_subject")
         self.horizontalLayout.addWidget(self.button_edit_subject)
+        self.button_edit_subject.setEnabled(False)
         self.button_add_subject = QtWidgets.QPushButton(self.frame_buttons_subjects)
         self.button_add_subject.setObjectName("button_add_subject")
         self.horizontalLayout.addWidget(self.button_add_subject)
@@ -1646,6 +1649,10 @@ class Ui_staff_management_window(object):
         self.add_subject_window = None
         ######################Buttons subjects############################################
         self.button_add_subject.clicked.connect(self.add_subject_window_emergent)
+
+        ##################search qlines subjects################################
+        self.lineedit_search_subject_name.textChanged.connect(self.filter_table_subject_name)
+        self.lineedit_search_subject_id.textChanged.connect(self.filter_table_subject_id)
         
 
         ######Load data from database to show in qtablewidget############
@@ -1661,6 +1668,23 @@ class Ui_staff_management_window(object):
     ################################
     #####Subject widget actions#####
     ################################
+    def filter_table_subject_name(self):
+        search_text = self.lineedit_search_subject_name.text().strip().lower()
+        for row in range(self.tablew_subject_show.rowCount()):
+            item = self.tablew_subject_show.item(row, 1)
+            if item and search_text in item.text().lower():
+                self.tablew_subject_show.setRowHidden(row, False)
+            else:
+                self.tablew_subject_show.setRowHidden(row, True)
+    def filter_table_subject_id(self):
+        search_text = self.lineedit_search_subject_id.text().strip().lower()
+        for row in range(self.tablew_subject_show.rowCount()):
+            item = self.tablew_subject_show.item(row, 0)
+            if item and search_text in item.text().lower():
+                self.tablew_subject_show.setRowHidden(row, False)
+            else:
+                self.tablew_subject_show.setRowHidden(row, True)
+
     def load_data_subjects(self):
         subject_rows = self.query.show_data_subjects()
         self.tablew_subject_show.setRowCount(0)
@@ -1682,19 +1706,25 @@ class Ui_staff_management_window(object):
 
         if id_item and id_item.text().strip():
             self.button_delete_subject.setEnabled(True)
+            self.button_edit_subject.setEnabled(True)
             try:
-                id_value = int(id_item.text())
+                self.id_value = int(id_item.text())
                 try:
                     self.button_delete_subject.clicked.disconnect()
                 except TypeError:
                     pass
 
 
-                self.button_delete_subject.clicked.connect(lambda: self.delete_subject_action_button(id_value))
+                self.button_delete_subject.clicked.connect(lambda: self.delete_subject_action_button(self.id_value))
+                self.button_edit_subject.clicked.connect(lambda: self.edit_subject_action_button(self.id_value))
             except ValueError:
+                self.button_edit_subject.setEnabled(False)
                 self.button_delete_subject.setEnabled(False)
         else:
+            self.button_edit_subject.setEnabled(False)
             self.button_delete_subject.setEnabled(False)
+
+
 
     def delete_subject_action_button(self, id_value):
         try:
@@ -1703,12 +1733,65 @@ class Ui_staff_management_window(object):
                 self.query.delete_data_from_table(table, id_value)
                 self.query.show_data_subjects()
                 self.tablew_subject_show.clearSelection()
+                self.id_value = None
                 self.button_delete_subject.setEnabled(False)
+                self.button_edit_subject.setEnabled(False)
             
             else:
                 return None
         except Exception as e:
             print(f"Error al intentar eliminar la materia: {e}")
+    
+    def edit_subject_action_button(self, id_value):
+        if hasattr(self, "_edit_dialog_open") and self._edit_dialog_open:
+            return
+    
+        row = self.find_row_by_id(id_value)
+        if row is None:
+            return
+        
+        current_item = self.tablew_subject_show.item(row, 1)
+        if not current_item:
+            return
+        current_name = current_item.text()
+        
+        self._edit_dialog_open = True
+        
+        new_name, ok = QtWidgets.QInputDialog.getText(
+            self.tablew_subject_show,
+            "Editar Materia",
+            "Nuevo nombre de la materia:",
+            QtWidgets.QLineEdit.Normal,
+            current_name
+        )
+        
+        self._edit_dialog_open = False
+        if ok and new_name.strip() and new_name != current_name:
+            if not self.query.edit_subject_name(id_value, new_name.strip().lower()):
+                id_subject_existing = self.query.get_subject_id_already_exists(new_name.strip().lower())
+                QtWidgets.QMessageBox.information(
+                    self.tablew_subject_show,
+                    "Error al editar",
+                    f"No se pudo editar la materia con id {id_subject_existing}. La materia ya existe con el mismo nombre."
+                )
+                self.id_value = None
+                self.tablew_subject_show.clearSelection()
+                self.button_edit_subject.setEnabled(False)
+                self.button_delete_subject.setEnabled(False)
+            else:
+                self.load_data_subjects()
+                self.id_value = None
+                self.tablew_subject_show.clearSelection()
+                self.button_edit_subject.setEnabled(False)
+                self.button_delete_subject.setEnabled(False)
+    
+    def find_row_by_id(self, id_value):
+        for row in range(self.tablew_subject_show.rowCount()):
+            item = self.tablew_subject_show.item(row, 0)
+            if item and int(item.text()) == id_value:
+                return row
+        return None
+    ########################################################################################
         
 
 
@@ -1927,3 +2010,16 @@ class Ui_staff_management_window(object):
         self.subjects_widget.setTabText(self.subjects_widget.indexOf(self.button_admin_actions), _translate("staff_management_window", "Acciones Administrativas DB"))
         self.actionLimpiar_Datos.setText(_translate("staff_management_window", "Limpiar Datos"))
 
+def log_uncaught_exceptions(exctype, value, tb):
+    """ Captura excepciones no manejadas y las muestra en la terminal """
+    error_msg = "".join(traceback.format_exception(exctype, value, tb))
+    print(f"ERROR DETECTADO:\n{error_msg}")
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    selection_management_window = QtWidgets.QMainWindow()
+    ui = Ui_staff_management_window()
+    ui.setupUi(selection_management_window)
+    selection_management_window.show()
+    sys.exit(app.exec_())
