@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QHeaderView
+from PyQt5.QtCore import QDate
 from add_subject_subwindow import Ui_add_subject_sub_window
 from query import *
 import sys
@@ -246,6 +247,7 @@ class Ui_staff_management_window(object):
         self.birthday_input_get.setObjectName("birthday_input_get")
         self.line_input_ssurname.raise_()
         self.birthday_input_get.raise_()
+        self.birthday_input_get.setDate(QDate.currentDate())
         self.label_ssurname.raise_()
         self.line_input_document_id.raise_()
         self.label_fname.raise_()
@@ -282,9 +284,9 @@ class Ui_staff_management_window(object):
         self.frame_teacher_selection = QtWidgets.QFrame(self.frame_selection_data_add_staff)
         self.frame_teacher_selection.setGeometry(QtCore.QRect(0, 60, 251, 101))
         self.frame_teacher_selection.setObjectName("frame_teacher_selection")
-        self.cb_elementary_teacher = QtWidgets.QCheckBox(self.frame_teacher_selection)
-        self.cb_elementary_teacher.setGeometry(QtCore.QRect(10, 10, 131, 17))
-        self.cb_elementary_teacher.setObjectName("cb_elementary_teacher")
+        self.cb_highschool_teacher = QtWidgets.QCheckBox(self.frame_teacher_selection)
+        self.cb_highschool_teacher.setGeometry(QtCore.QRect(10, 10, 131, 17))
+        self.cb_highschool_teacher.setObjectName("cb_highschool_teacher")
         self.cb_assign_grade = QtWidgets.QCheckBox(self.frame_teacher_selection)
         self.cb_assign_grade.setGeometry(QtCore.QRect(10, 70, 91, 17))
         self.cb_assign_grade.setObjectName("cb_assign_grade")
@@ -333,6 +335,7 @@ class Ui_staff_management_window(object):
         self.qlistw_subject_selection = QtWidgets.QListWidget(self.frame_multi_selection_subjects)
         self.qlistw_subject_selection.setGeometry(QtCore.QRect(20, 30, 191, 291))
         self.qlistw_subject_selection.setObjectName("qlistw_subject_selection")
+        self.qlistw_subject_selection.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
         self.info_subjects_selection = QtWidgets.QLabel(self.frame_multi_selection_subjects)
         self.info_subjects_selection.setGeometry(QtCore.QRect(50, 10, 141, 16))
         font = QtGui.QFont()
@@ -350,6 +353,7 @@ class Ui_staff_management_window(object):
         self.qlistw_grades_impart_selection = QtWidgets.QListWidget(self.frame_grades_assigned)
         self.qlistw_grades_impart_selection.setGeometry(QtCore.QRect(10, 30, 191, 291))
         self.qlistw_grades_impart_selection.setObjectName("qlistw_grades_impart_selection")
+        self.qlistw_grades_impart_selection.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
         self.info_grades_multiselections = QtWidgets.QLabel(self.frame_grades_assigned)
         self.info_grades_multiselections.setGeometry(QtCore.QRect(30, 10, 151, 21))
         font = QtGui.QFont()
@@ -1647,6 +1651,7 @@ class Ui_staff_management_window(object):
         self.query = Postgresqueries()
         ########################Subwindows############################################
         self.add_subject_window = None
+        #################################################################################
         ######################Buttons subjects############################################
         self.button_add_subject.clicked.connect(self.add_subject_window_emergent)
 
@@ -1655,12 +1660,30 @@ class Ui_staff_management_window(object):
         self.lineedit_search_subject_id.textChanged.connect(self.filter_table_subject_id)
         
 
-        ######Load data from database to show in qtablewidget############
-        self.db_listener = Postgresqueries(self.load_data_subjects)
-        self.load_data_subjects()
+        ######Load data from database to show in qtablewidget subject############
+        self.db_listener = Postgresqueries(self.load_data_subjects_subjects_widget)
+        self.load_data_subjects_subjects_widget()
         self.tablew_subject_show.cellClicked.connect(self.qtablew_row_clicked)
 
-        ############################################################################
+        ########################################################################
+        ########################################################################
+        #############################ADD STAFF WIDGET###########################
+        self.combox_job_id_selection.currentIndexChanged.connect(self.show_widgets_add_staff)
+        #########Frames hide###########
+        self.frame_assign_grade.hide()
+        self.frame_assign_subject.hide()
+        self.frame_multi_selection_subjects.hide()
+        self.frame_grades_assigned.hide()
+        self.frame_output_information_grade_subject.hide()
+        self.frame_output_information_will_save.hide()
+        self.frame_teacher_selection.hide()
+        ############################################################
+
+        self.cb_highschool_teacher.stateChanged.connect(self.show_widgets_add_staff)
+        self.cb_assign_subject.stateChanged.connect(self.show_widgets_add_staff)
+        self.cb_assign_grade.stateChanged.connect(self.show_widgets_add_staff)
+
+        ########################################################################
         self.retranslateUi(staff_management_window)
         self.subjects_widget.setCurrentIndex(7)
         QtCore.QMetaObject.connectSlotsByName(staff_management_window)
@@ -1685,7 +1708,7 @@ class Ui_staff_management_window(object):
             else:
                 self.tablew_subject_show.setRowHidden(row, True)
 
-    def load_data_subjects(self):
+    def load_data_subjects_subjects_widget(self):
         subject_rows = self.query.show_data_subjects()
         self.tablew_subject_show.setRowCount(0)
 
@@ -1779,7 +1802,7 @@ class Ui_staff_management_window(object):
                 self.button_edit_subject.setEnabled(False)
                 self.button_delete_subject.setEnabled(False)
             else:
-                self.load_data_subjects()
+                self.load_data_subjects_subjects_widget()
                 self.id_value = None
                 self.tablew_subject_show.clearSelection()
                 self.button_edit_subject.setEnabled(False)
@@ -1792,10 +1815,180 @@ class Ui_staff_management_window(object):
                 return row
         return None
     ########################################################################################
+
+    ################################
+    #####ADD Staff widget actions####
+    ################################
+    def add_staff_button_save_action(self):
+        first_name = str(self.line_input_fname.text())
+        second_name = str(self.line_input_sname.text())
+        first_surname = str(self.line_input_fsurname.text())
+        second_surname = str(self.line_input_ssurname.text())
+        document_id = str(self.line_input_document_id.text())
+        address = str(self.line_input_address.text())
+        phone_number = str(self.line_input_phone_number.text())
+        birthday = self.birthday_input_get().date()
+
+        if not self.validate_data_input(first_name, first_surname, document_id, address, phone_number):
+            return
+        
+        if not self.validate_input_birthday(birthday):
+            return
+
+        grade_guide = self.qlistw_grade_assign.selectedItems() if self.qlistw_grade_assign.selectedItems() else None
+        grades_assigned = self.qlistw_grades_impart_selection.selectedItems() if self.qlistw_grades_impart_selection.selectedItems() else None
+
+
+        
+    
+    #def add_staff_if_teacher(self, guide_grade, main_subject, subjects_selected, grades_selected):
+
+    
+    def validate_data_input(self, first_name, first_surname, document_id, address ,phone_number):
+        if not first_name or not first_surname or not document_id or not address or not phone_number:
+            QtWidgets.QMessageBox.warning(self, "Datos incompletos", "Todos los campos deben estar llenos.")
+            return False
+
+    def validate_input_birthday(self, birthday_date):
+        selected_date = birthday_date
+        if selected_date.year() < 1900:
+            QtWidgets.QMessageBox.warning(self, "Fecha invalida", "Debe seleccionar una fecha válida.")
+            return False
+        
+        if selected_date >= QDate.currentDate():
+            QtWidgets.QMessageBox.warning(self, "Fecha invalida", "No puede seleccionar la fecha actual.")
+            return False
+
+    def show_widgets_add_staff(self):
+        checkbox_job_id = self.combox_job_id_selection.currentIndex()
+        match checkbox_job_id: #Actualizar cuando se agregue la seleccion de lista, cuando esten inactivos los checkboxes que se deselccionen
+            case 0:
+                self.hide_all_frames_add_staff()
+
+
+            case 1:
+                self.handle_teacher_selection()
+                
+
+            case 2:
+                self.hide_all_frames_add_staff()
+
+
+    def handle_teacher_selection(self):
+        self.frame_teacher_selection.show()
+
+        if self.cb_highschool_teacher.isChecked():
+            self.frame_multi_selection_subjects.show()
+            self.frame_grades_assigned.show()
+            if not self.grades_loaded:
+                high_school_teacher = True
+                self.load_grades(high_school_teacher)
+                self.load_subject_assign_add_staff()
+                self.grades_loaded = True
+        else:
+            self.frame_multi_selection_subjects.hide()
+            self.frame_grades_assigned.hide()
+            self.qlistw_grades_impart_selection.clearSelection()
+            self.qlistw_grades_impart_selection.clear()
+            self.grades_loaded = False
+            self.qlistw_subject_selection.clearSelection()
+            self.qlistw_subject_selection.clear()
+
+        if self.cb_assign_subject.isChecked():
+            self.frame_assign_subject.show()
+            self.load_subject_main_assign_add_staff()
+
+        else:
+            self.frame_assign_subject.hide()
+            self.qlistw_subject_assign.clear()
+            self.qlistw_subject_assign.clearSelection()
+
+        if self.cb_assign_grade.isChecked():
+            self.frame_assign_grade.show()
+
+            if self.cb_highschool_teacher.isChecked():
+                if not self.grades_guide_loaded:
+                    self.qlistw_grade_assign.clearSelection()
+                    self.qlistw_grade_assign.clear()
+                    high_school_teacher = True
+                    self.load_grades_guide(high_school_teacher)
+                    self.grades_guide_loaded = True
+
+                elif self.cb_highschool_teacher.isChecked() and self.grades_guide_loaded:
+                    self.grades_guide_loaded = False
+                    self.qlistw_grade_assign.clear()
+                    self.qlistw_grade_assign.clearSelection()
+                    self.load_grades_guide(high_school_teacher)
+                    self.grades_guide_loaded = True
+                
+            elif not self.cb_highschool_teacher.isChecked() and self.grades_guide_loaded:
+                self.grades_guide_loaded = False
+                self.qlistw_grade_assign.clear()
+                self.qlistw_grade_assign.clearSelection()
+                high_school_teacher = False
+                self.load_grades_guide(high_school_teacher)
+                self.grades_guide_loaded = True
+
+
+            else:
+                if not self.grades_guide_loaded:
+                    self.qlistw_grade_assign.clearSelection()
+                    self.qlistw_grade_assign.clear()
+                    high_school_teacher = False
+                    self.load_grades_guide(high_school_teacher)
+                    self.grades_guide_loaded = True
+        else:
+            self.frame_assign_grade.hide()
+            self.qlistw_grade_assign.clearSelection()
+            self.qlistw_grade_assign.clear()
+            self.grades_guide_loaded = False
+
+    def hide_all_frames_add_staff(self):
+        self.frame_assign_grade.hide()
+        self.frame_assign_subject.hide()
+        self.frame_multi_selection_subjects.hide()
+        self.frame_grades_assigned.hide()
+        self.frame_output_information_grade_subject.hide()
+        self.frame_output_information_will_save.hide()
+        self.frame_teacher_selection.hide()
+
+    def load_grades_guide(self, high_school_teacher):
+        if self.grades_guide_loaded:
+            return
+        
+        rows = self.query.show_data_grades(high_school_teacher)
+        for row in rows:
+            self.qlistw_grade_assign.addItem(row[0])
+    
+    def load_grades(self, high_school_teacher):
+        if self.grades_loaded:
+            return
+        rows = self.query.show_data_grades(high_school_teacher)
+        for row in rows:
+            self.qlistw_grades_impart_selection.addItem(row[0])
+    
+    def load_subject_main_assign_add_staff(self):
+        rows = self.query.show_data_subjects()
+        for row in rows:
+            self.qlistw_subject_assign.addItem(row[1])
+    
+    def load_subject_assign_add_staff(self):
+        rows = self.query.show_data_subjects()
+        for row in rows:
+            self.qlistw_subject_selection.addItem(row[1])
+        
+
         
 
 
 
+
+
+
+
+
+
+    ########################################################################################
     def retranslateUi(self, staff_management_window):
         _translate = QtCore.QCoreApplication.translate
         staff_management_window.setWindowTitle(_translate("staff_management_window", "Administracion de personal"))
@@ -1825,8 +2018,8 @@ class Ui_staff_management_window(object):
         self.combox_job_id_selection.setItemText(1, _translate("staff_management_window", "Profesor"))
         self.combox_job_id_selection.setItemText(2, _translate("staff_management_window", "Tecnico en mantenimiento"))
         self.label_job_selection.setText(_translate("staff_management_window", "Seleccionar Trabajo"))
-        self.cb_elementary_teacher.setToolTip(_translate("staff_management_window", "<html><head/><body><p>Marque la casilla si el profesor es de primaria</p></body></html>"))
-        self.cb_elementary_teacher.setText(_translate("staff_management_window", "Profesor de Secundaria"))
+        self.cb_highschool_teacher.setToolTip(_translate("staff_management_window", "<html><head/><body><p>Marque la casilla si el profesor es de primaria</p></body></html>"))
+        self.cb_highschool_teacher.setText(_translate("staff_management_window", "Profesor de Secundaria"))
         self.cb_assign_grade.setToolTip(_translate("staff_management_window", "<html><head/><body><p>Asignarle un grado guiado</p></body></html>"))
         self.cb_assign_grade.setText(_translate("staff_management_window", "Asignar grado"))
         self.cb_assign_subject.setText(_translate("staff_management_window", "Asignar Materia Principal"))
@@ -2009,11 +2202,6 @@ class Ui_staff_management_window(object):
         self.button_open_allperms_admin.setText(_translate("staff_management_window", "Mostrar Consola / Abrir Ventana de Controles"))
         self.subjects_widget.setTabText(self.subjects_widget.indexOf(self.button_admin_actions), _translate("staff_management_window", "Acciones Administrativas DB"))
         self.actionLimpiar_Datos.setText(_translate("staff_management_window", "Limpiar Datos"))
-
-def log_uncaught_exceptions(exctype, value, tb):
-    """ Captura excepciones no manejadas y las muestra en la terminal """
-    error_msg = "".join(traceback.format_exception(exctype, value, tb))
-    print(f"ERROR DETECTADO:\n{error_msg}")
 
 if __name__ == "__main__":
     import sys
