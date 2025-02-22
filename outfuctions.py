@@ -29,6 +29,14 @@ def document_id_validation(document):
     else:
         return False
 
+def rewrite_document_id(document_id):
+    if len(document_id) != 14:
+        return "Formato inválido"
+
+    document_id = document_id[:-1] + document_id[-1].upper()
+
+    return f"{document_id[:3]}-{document_id[3:9]}-{document_id[9:]}"
+
 def id_validation(id):
     if not isinstance(id, int):
         return False
@@ -52,11 +60,34 @@ def student_code_validation(student_code):
     return re.match(patron, student_code) is not None
 
 def phone_number_validation(phone_number):
-    patron = r"^\d{4}-\d{4}"
+    if not isinstance(phone_number, str):
+        return False
+    
+    patron = r"^\d{8}"
+
     if re.match(patron, phone_number): 
         return True
     else:
         return False
+    
+def string_input_data_validator(data):
+    if not isinstance(data, str) or not data.isalpha():
+        if data is None:
+            return True
+        return False
+    return True
+
+def age_validator(age):
+    if not isinstance(age, int) or age < 18 or age > 90:
+        return False
+    return True
+
+
+def rewrite_phone_number(phone_number: str) -> str:
+    if len(phone_number) != 8:
+        return False
+    
+    return f"{phone_number[:4]}-{phone_number[4:]}"
 
 def code_center_generator(student_code, student_total):
     try:

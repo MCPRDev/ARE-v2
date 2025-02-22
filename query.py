@@ -121,6 +121,95 @@ class Postgresqueries():
             self.cursor.execute(query_insert_staff, (first_name, middle_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthday))
             self.connection.commit()
             print("Staff record inserted successfully!")
+            return True
+
+        except psycopg2.errors.ForeignKeyViolation as e:
+             self.connection.rollback()
+             print(f"Error: {e}")
+             return False
+
+        except Exception as e:
+             self.connection.rollback()
+             print(f'Error: {e}')
+             return False
+    
+    def insert_staff_if_teacher(self, first_name, middle_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthday, grade_guide, grades_assigned, subjects_impart, main_subject): #Custom staff insert on the table if is a teacher
+
+        if document_id_validation(document_id):
+             pass
+        else:
+             print("Invalid document id. Please try again.")
+             return
+        
+        if phone_number_validation(phone_number):
+             pass
+        else:
+             print("Invalid phone number. Please try again.")
+             return
+        
+
+        query_check_document_id = "SELECT COUNT(*) FROM staff WHERE document_id = %s"
+        self.cursor.execute(query_check_document_id, (document_id,))
+        count = self.cursor.fetchone()[0]
+
+        if count > 0:
+            print(f"The register with the document id {document_id} already exist.")
+            return 
+        
+        middle_name = middle_name if middle_name else None
+        second_surname = second_surname if second_surname else None
+        grade_guide = grade_guide if grade_guide else None 
+        grades_assigned = grades_assigned if grades_assigned else None
+        subjects_impart = subjects_impart if subjects_impart else None
+        main_subject = main_subject if main_subject else None
+
+        query_insert_staff = "INSERT INTO staff (first_name, middle_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthday) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        
+        try:
+            self.cursor.execute(query_insert_staff, (first_name, middle_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthday))
+            self.connection.commit()
+            print("Staff record inserted successfully!")
+            self.cursor.execute(f"SELECT staff_id FROM staff WHERE document_id = '{document_id}'")
+            get_id_staff_teacher = int(self.cursor.fetchone()[0])
+            self.connection.commit()
+            
+            if grade_guide is not None:
+                self.cursor.execute(f"SELECT education_level_id FROM grades WHERE grade = '{grade_guide}'")
+                primary_teacher_bool = "true" if int(self.cursor.fetchone()[0]) == 1 else "false"
+                self.cursor.execute(f"SELECT grade_id FROM grades WHERE grade = '{grade_guide}'")
+                grade_guide_id = int(self.cursor.fetchone()[0])
+            else:
+                primary_teacher_bool = None
+                grade_guide_id = None
+
+            if main_subject is not None:
+                self.cursor.execute(f"SELECT subject_id FROM subjects WHERE subject = '{main_subject}'")
+                main_subject_id = int(self.cursor.fetchone()[0])
+            else:
+                main_subject_id = None
+            
+            query_insert_teacher = "INSERT INTO teachers (staff_id, primary_teacher, guide_grade_id, main_subject) VALUES (%s, %s, %s, %s)"
+            self.cursor.execute(query_insert_teacher, (get_id_staff_teacher, primary_teacher_bool ,grade_guide_id, main_subject_id))
+            self.connection.commit()
+
+            self.cursor.execute(f"SELECT teacher_id FROM teachers WHERE staff_id = {get_id_staff_teacher}")
+            teacher_id = int(self.cursor.fetchone()[0])
+            if grades_assigned is not None:
+                for grades in grades_assigned:
+                    self.cursor.execute(f"SELECT grade_id FROM grades WHERE grade = '{grades}'")
+                    grade_id = int(self.cursor.fetchone()[0])
+                    self.cursor.execute(f"INSERT INTO teacher_grade_assigned (teacher_id, grade_id) VALUES ({teacher_id}, {grade_id})")
+                    self.connection.commit()
+            
+            if subjects_impart is not None:
+                for subjects in subjects_impart:
+                    self.cursor.execute(f"SELECT subject_id FROM subjects WHERE subject = '{subjects}'")
+                    subject_id = int(self.cursor.fetchone()[0])
+                    self.cursor.execute(f"INSERT INTO subject_teacher (teacher_id, subject_id) VALUES ({teacher_id}, {subject_id})")
+                    self.connection.commit()
+            
+            return True
+
 
         except psycopg2.errors.ForeignKeyViolation as e:
              self.connection.rollback()
@@ -129,6 +218,7 @@ class Postgresqueries():
         except Exception as e:
              self.connection.rollback()
              print(f'Error: {e}')
+
     def search_query(self, table, register_id, document_id, student_code): #Search query to get any information and use it for other functions
         table_columns = {
             'staff': ('staff_id', 'document_id'),

@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QHeaderView
 from PyQt5.QtCore import QDate
 from add_subject_subwindow import Ui_add_subject_sub_window
 from query import *
+from outfuctions import *
 import sys
 import traceback
 
@@ -229,25 +230,25 @@ class Ui_staff_management_window(object):
         self.line_input_address = QtWidgets.QLineEdit(self.frame_entry_data_add_staff)
         self.line_input_address.setGeometry(QtCore.QRect(480, 50, 181, 20))
         self.line_input_address.setObjectName("line_input_address")
-        self.label_birthday = QtWidgets.QLabel(self.frame_entry_data_add_staff)
-        self.label_birthday.setGeometry(QtCore.QRect(340, 110, 131, 20))
+        self.label_birthdate = QtWidgets.QLabel(self.frame_entry_data_add_staff)
+        self.label_birthdate.setGeometry(QtCore.QRect(340, 110, 131, 20))
         font = QtGui.QFont()
         font.setFamily("Microsoft JhengHei")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
-        self.label_birthday.setFont(font)
-        self.label_birthday.setObjectName("label_birthday")
-        self.birthday_input_get = QtWidgets.QDateEdit(self.frame_entry_data_add_staff)
-        self.birthday_input_get.setGeometry(QtCore.QRect(480, 110, 110, 22))
-        self.birthday_input_get.setContextMenuPolicy(QtCore.Qt.PreventContextMenu)
-        self.birthday_input_get.setLocale(QtCore.QLocale(QtCore.QLocale.Spanish, QtCore.QLocale.Nicaragua))
-        self.birthday_input_get.setCurrentSection(QtWidgets.QDateTimeEdit.YearSection)
-        self.birthday_input_get.setCalendarPopup(True)
-        self.birthday_input_get.setObjectName("birthday_input_get")
+        self.label_birthdate.setFont(font)
+        self.label_birthdate.setObjectName("label_birthdate")
+        self.birthdate_input_get = QtWidgets.QDateEdit(self.frame_entry_data_add_staff)
+        self.birthdate_input_get.setGeometry(QtCore.QRect(480, 110, 110, 22))
+        self.birthdate_input_get.setContextMenuPolicy(QtCore.Qt.PreventContextMenu)
+        self.birthdate_input_get.setLocale(QtCore.QLocale(QtCore.QLocale.Spanish, QtCore.QLocale.Nicaragua))
+        self.birthdate_input_get.setCurrentSection(QtWidgets.QDateTimeEdit.YearSection)
+        self.birthdate_input_get.setCalendarPopup(True)
+        self.birthdate_input_get.setObjectName("birthdate_input_get")
         self.line_input_ssurname.raise_()
-        self.birthday_input_get.raise_()
-        self.birthday_input_get.setDate(QDate.currentDate())
+        self.birthdate_input_get.raise_()
+        self.birthdate_input_get.setDate(QDate.currentDate())
         self.label_ssurname.raise_()
         self.line_input_document_id.raise_()
         self.label_fname.raise_()
@@ -257,7 +258,7 @@ class Ui_staff_management_window(object):
         self.line_input_address.raise_()
         self.label_phone.raise_()
         self.label_sname.raise_()
-        self.label_birthday.raise_()
+        self.label_birthdate.raise_()
         self.line_input_fsurname.raise_()
         self.label_fsurname.raise_()
         self.line_input_sname.raise_()
@@ -269,6 +270,7 @@ class Ui_staff_management_window(object):
         self.combox_job_id_selection = QtWidgets.QComboBox(self.frame_selection_data_add_staff)
         self.combox_job_id_selection.setGeometry(QtCore.QRect(10, 40, 131, 22))
         self.combox_job_id_selection.setObjectName("combox_job_id_selection")
+        self.combox_job_id_selection.addItem("")
         self.combox_job_id_selection.addItem("")
         self.combox_job_id_selection.addItem("")
         self.combox_job_id_selection.addItem("")
@@ -438,15 +440,15 @@ class Ui_staff_management_window(object):
         font.setWeight(75)
         self.phone_number_output_info.setFont(font)
         self.phone_number_output_info.setObjectName("phone_number_output_info")
-        self.birthday_output_info = QtWidgets.QLabel(self.frame_output_information_will_save)
-        self.birthday_output_info.setGeometry(QtCore.QRect(390, 70, 131, 16))
+        self.birthdate_output_info = QtWidgets.QLabel(self.frame_output_information_will_save)
+        self.birthdate_output_info.setGeometry(QtCore.QRect(390, 70, 131, 16))
         font = QtGui.QFont()
         font.setFamily("Microsoft JhengHei")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
-        self.birthday_output_info.setFont(font)
-        self.birthday_output_info.setObjectName("birthday_output_info")
+        self.birthdate_output_info.setFont(font)
+        self.birthdate_output_info.setObjectName("birthdate_output_info")
         self.edad_output_info = QtWidgets.QLabel(self.frame_output_information_will_save)
         self.edad_output_info.setGeometry(QtCore.QRect(390, 100, 41, 16))
         font = QtGui.QFont()
@@ -494,10 +496,10 @@ class Ui_staff_management_window(object):
         self.label_phone_number_output.setGeometry(QtCore.QRect(540, 40, 161, 16))
         self.label_phone_number_output.setText("")
         self.label_phone_number_output.setObjectName("label_phone_number_output")
-        self.label_birthday_output = QtWidgets.QLabel(self.frame_output_information_will_save)
-        self.label_birthday_output.setGeometry(QtCore.QRect(540, 70, 161, 16))
-        self.label_birthday_output.setText("")
-        self.label_birthday_output.setObjectName("label_birthday_output")
+        self.label_birthdate_output = QtWidgets.QLabel(self.frame_output_information_will_save)
+        self.label_birthdate_output.setGeometry(QtCore.QRect(540, 70, 161, 16))
+        self.label_birthdate_output.setText("")
+        self.label_birthdate_output.setObjectName("label_birthdate_output")
         self.label_age_output = QtWidgets.QLabel(self.frame_output_information_will_save)
         self.label_age_output.setGeometry(QtCore.QRect(440, 100, 91, 16))
         self.label_age_output.setText("")
@@ -602,9 +604,9 @@ class Ui_staff_management_window(object):
         self.label_address_static_edit = QtWidgets.QLabel(self.frame_edit_staff)
         self.label_address_static_edit.setGeometry(QtCore.QRect(10, 90, 71, 16))
         self.label_address_static_edit.setObjectName("label_address_static_edit")
-        self.label_birthday_static_edit = QtWidgets.QLabel(self.frame_edit_staff)
-        self.label_birthday_static_edit.setGeometry(QtCore.QRect(10, 180, 131, 16))
-        self.label_birthday_static_edit.setObjectName("label_birthday_static_edit")
+        self.label_birthdate_static_edit = QtWidgets.QLabel(self.frame_edit_staff)
+        self.label_birthdate_static_edit.setGeometry(QtCore.QRect(10, 180, 131, 16))
+        self.label_birthdate_static_edit.setObjectName("label_birthdate_static_edit")
         self.label_agre_static_edit = QtWidgets.QLabel(self.frame_edit_staff)
         self.label_agre_static_edit.setGeometry(QtCore.QRect(10, 210, 47, 13))
         self.label_agre_static_edit.setObjectName("label_agre_static_edit")
@@ -667,18 +669,18 @@ class Ui_staff_management_window(object):
         self.label_job_id_dynamic_edit.setFont(font)
         self.label_job_id_dynamic_edit.setText("")
         self.label_job_id_dynamic_edit.setObjectName("label_job_id_dynamic_edit")
-        self.label_birthday_dynamic_edit = QtWidgets.QLabel(self.frame_edit_staff)
-        self.label_birthday_dynamic_edit.setEnabled(True)
-        self.label_birthday_dynamic_edit.setGeometry(QtCore.QRect(150, 180, 331, 16))
+        self.label_birthdate_dynamic_edit = QtWidgets.QLabel(self.frame_edit_staff)
+        self.label_birthdate_dynamic_edit.setEnabled(True)
+        self.label_birthdate_dynamic_edit.setGeometry(QtCore.QRect(150, 180, 331, 16))
         font = QtGui.QFont()
         font.setFamily("Microsoft JhengHei")
         font.setPointSize(9)
         font.setBold(False)
         font.setUnderline(True)
         font.setWeight(50)
-        self.label_birthday_dynamic_edit.setFont(font)
-        self.label_birthday_dynamic_edit.setText("")
-        self.label_birthday_dynamic_edit.setObjectName("label_birthday_dynamic_edit")
+        self.label_birthdate_dynamic_edit.setFont(font)
+        self.label_birthdate_dynamic_edit.setText("")
+        self.label_birthdate_dynamic_edit.setObjectName("label_birthdate_dynamic_edit")
         self.label_age_dynamic_edit = QtWidgets.QLabel(self.frame_edit_staff)
         self.label_age_dynamic_edit.setEnabled(True)
         self.label_age_dynamic_edit.setGeometry(QtCore.QRect(50, 205, 168, 21))
@@ -840,15 +842,15 @@ class Ui_staff_management_window(object):
         self.date_edit_staff.setCurrentSection(QtWidgets.QDateTimeEdit.YearSection)
         self.date_edit_staff.setCalendarPopup(True)
         self.date_edit_staff.setObjectName("date_edit_staff")
-        self.label_birthday_edit = QtWidgets.QLabel(self.frame_edit_info)
-        self.label_birthday_edit.setGeometry(QtCore.QRect(590, 80, 111, 16))
+        self.label_birthdate_edit = QtWidgets.QLabel(self.frame_edit_info)
+        self.label_birthdate_edit.setGeometry(QtCore.QRect(590, 80, 111, 16))
         font = QtGui.QFont()
         font.setFamily("Microsoft JhengHei")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
-        self.label_birthday_edit.setFont(font)
-        self.label_birthday_edit.setObjectName("label_birthday_edit")
+        self.label_birthdate_edit.setFont(font)
+        self.label_birthdate_edit.setObjectName("label_birthdate_edit")
         self.checkbox_if_teacher_edit_subjects_assigned = QtWidgets.QCheckBox(self.frame_edit_info)
         self.checkbox_if_teacher_edit_subjects_assigned.setGeometry(QtCore.QRect(150, 150, 141, 17))
         self.checkbox_if_teacher_edit_subjects_assigned.setObjectName("checkbox_if_teacher_edit_subjects_assigned")
@@ -974,9 +976,9 @@ class Ui_staff_management_window(object):
         self.label_address_static_change_status = QtWidgets.QLabel(self.frame_change_status_staff_outputinfo)
         self.label_address_static_change_status.setGeometry(QtCore.QRect(10, 50, 71, 16))
         self.label_address_static_change_status.setObjectName("label_address_static_change_status")
-        self.label_birthday_static_change_status = QtWidgets.QLabel(self.frame_change_status_staff_outputinfo)
-        self.label_birthday_static_change_status.setGeometry(QtCore.QRect(500, 80, 131, 16))
-        self.label_birthday_static_change_status.setObjectName("label_birthday_static_change_status")
+        self.label_birthdate_static_change_status = QtWidgets.QLabel(self.frame_change_status_staff_outputinfo)
+        self.label_birthdate_static_change_status.setGeometry(QtCore.QRect(500, 80, 131, 16))
+        self.label_birthdate_static_change_status.setObjectName("label_birthdate_static_change_status")
         self.label_agre_static_change_status = QtWidgets.QLabel(self.frame_change_status_staff_outputinfo)
         self.label_agre_static_change_status.setGeometry(QtCore.QRect(970, 25, 47, 13))
         self.label_agre_static_change_status.setObjectName("label_agre_static_change_status")
@@ -1039,18 +1041,18 @@ class Ui_staff_management_window(object):
         self.label_job_id_dynamic_change_status.setFont(font)
         self.label_job_id_dynamic_change_status.setText("")
         self.label_job_id_dynamic_change_status.setObjectName("label_job_id_dynamic_change_status")
-        self.label_birthday_dynamic_change_status = QtWidgets.QLabel(self.frame_change_status_staff_outputinfo)
-        self.label_birthday_dynamic_change_status.setEnabled(True)
-        self.label_birthday_dynamic_change_status.setGeometry(QtCore.QRect(640, 80, 331, 16))
+        self.label_birthdate_dynamic_change_status = QtWidgets.QLabel(self.frame_change_status_staff_outputinfo)
+        self.label_birthdate_dynamic_change_status.setEnabled(True)
+        self.label_birthdate_dynamic_change_status.setGeometry(QtCore.QRect(640, 80, 331, 16))
         font = QtGui.QFont()
         font.setFamily("Microsoft JhengHei")
         font.setPointSize(9)
         font.setBold(False)
         font.setUnderline(True)
         font.setWeight(50)
-        self.label_birthday_dynamic_change_status.setFont(font)
-        self.label_birthday_dynamic_change_status.setText("")
-        self.label_birthday_dynamic_change_status.setObjectName("label_birthday_dynamic_change_status")
+        self.label_birthdate_dynamic_change_status.setFont(font)
+        self.label_birthdate_dynamic_change_status.setText("")
+        self.label_birthdate_dynamic_change_status.setObjectName("label_birthdate_dynamic_change_status")
         self.label_age_dynamic_change_status = QtWidgets.QLabel(self.frame_change_status_staff_outputinfo)
         self.label_age_dynamic_change_status.setEnabled(True)
         self.label_age_dynamic_change_status.setGeometry(QtCore.QRect(1010, 20, 168, 21))
@@ -1678,7 +1680,10 @@ class Ui_staff_management_window(object):
         self.frame_output_information_will_save.hide()
         self.frame_teacher_selection.hide()
         ############################################################
+        self.button_save_information_add_staff.clicked.connect(self.save_button_add_staff)
 
+        self.button_clean_information.clicked.connect(self.clear_information_add_staff)
+        ############################################################
         self.cb_highschool_teacher.stateChanged.connect(self.show_widgets_add_staff)
         self.cb_assign_subject.stateChanged.connect(self.show_widgets_add_staff)
         self.cb_assign_grade.stateChanged.connect(self.show_widgets_add_staff)
@@ -1819,58 +1824,271 @@ class Ui_staff_management_window(object):
     ################################
     #####ADD Staff widget actions####
     ################################
-    def add_staff_button_save_action(self):
-        first_name = str(self.line_input_fname.text())
-        second_name = str(self.line_input_sname.text())
-        first_surname = str(self.line_input_fsurname.text())
-        second_surname = str(self.line_input_ssurname.text())
-        document_id = str(self.line_input_document_id.text())
-        address = str(self.line_input_address.text())
-        phone_number = str(self.line_input_phone_number.text())
-        birthday = self.birthday_input_get().date()
+    def calculate_age(self, birthdate):
+        today = QDate.currentDate()
+        age = today.year() - birthdate.year()
+        if today.month() < birthdate.month() or (today.month() == birthdate.month() and today.day() < birthdate.day()):
+            age -= 1
+        
+        return age
+    
+    def save_button_add_staff(self):
+        first_name = str(self.line_input_fname.text()).strip().capitalize()
+        second_name = str(self.line_input_sname.text()).strip().capitalize()
+        first_surname = str(self.line_input_fsurname.text()).strip().capitalize()
+        second_surname = str(self.line_input_ssurname.text()).strip().capitalize()
+        document_id = str(self.line_input_document_id.text()).strip().capitalize()
+        address = str(self.line_input_address.text()).strip().capitalize()
+        job_id = int(self.combox_job_id_selection.currentIndex())
+        phone_number = str(self.line_input_phone_number.text()).strip()
+        birthdate = self.birthdate_input_get.date()
+        age = self.calculate_age(birthdate)
 
+        second_name = second_name if second_name else None
+        second_surname = second_name if second_name else None
+        data_entry = [first_name, second_name, first_surname, second_surname]
+        for i in range(len(data_entry)):
+            if not string_input_data_validator(data_entry[i]):
+                QtWidgets.QMessageBox.information(None, "Error", f"Donde ingreso la siguiente informacion, solo se admiten letras: {data_entry[i]}")
+                return
+        
+        if not age_validator(age):
+            QtWidgets.QMessageBox.information(None, "Error", "Edad invalida, debe ser mayor a 18 años")
+            return
+
+
+        if self.combox_job_id_selection.currentIndex() == 0:
+            QtWidgets.QMessageBox.information(None, "Error", "Debe seleccionar un puesto de trabajo")
+            return
+        
+        if not document_id_validation(document_id):
+            self.new_document_id = rewrite_document_id(document_id)
+            if not document_id_validation(self.new_document_id):
+                QtWidgets.QMessageBox.information(None, "Error al agregar la cedula", "Formato de cedula erroneo, utiliza el siguiente formato XXX-XXXXXX-XXXXA o 1234567891234A")
+                print(document_id, self.new_document_id)
+                return
+        document_id = self.new_document_id
+        
         if not self.validate_data_input(first_name, first_surname, document_id, address, phone_number):
             return
         
-        if not self.validate_input_birthday(birthday):
+        if not phone_number_validation(phone_number):
+            QtWidgets.QMessageBox.information(None, "Error al agregar el numero de telefono", "Formato de numero de telefono erroneo, utiliza el siguiente formato 12345678")
             return
 
-        grade_guide = self.qlistw_grade_assign.selectedItems() if self.qlistw_grade_assign.selectedItems() else None
-        grades_assigned = self.qlistw_grades_impart_selection.selectedItems() if self.qlistw_grades_impart_selection.selectedItems() else None
+        if not self.validate_input_birthdate(birthdate):
+            return
+        
+        birthdate = birthdate.toString("yyyy-MM-dd")
+
+        self.frame_output_information_will_save.show()
+        phone_number = rewrite_phone_number(phone_number)
+        self.label_name_output.setText(first_name + " " + second_name)
+        self.label_surname_output.setText(first_surname + " " + second_surname)
+        self.label_address_output.setText(address)
+        self.label_document_id_output.setText(document_id)
+        self.label_phone_number_output.setText(phone_number)
+        self.label_birthdate_output.setText(birthdate)
+        self.label_age_output.setText(str(age))
+
+        self.subject_assign_output_info.hide()
+        self.grade_assign_output_info.hide()
+
+        if job_id == 2:
+            self.subject_assign_output_info.show()
+            self.grade_assign_output_info.show()
+            self.frame_output_information_grade_subject.show()
+
+            grade_guide = self.qlistw_grade_assign.selectedItems()[0].text() if self.qlistw_grade_assign.selectedItems() else None
+            grades_assigned = [item.text() for item in self.qlistw_grades_impart_selection.selectedItems()] if self.qlistw_grades_impart_selection.selectedItems() else None
+            subjects_selected = [item.text() for item in self.qlistw_subject_selection.selectedItems()] if self.qlistw_subject_selection.selectedItems() else None
+            main_subject_assigned = self.qlistw_subject_assign.selectedItems()[0].text() if self.qlistw_subject_assign.selectedItems() else None
+
+            self.label_subject_assign_output.setText(main_subject_assigned)
+            self.label_grade_assign_output.setText(grade_guide)
+            if subjects_selected is not None:
+                for i in range(len(subjects_selected)):
+                    self.qlistw_selected_subjects.addItem(subjects_selected[i])
+            
+            if grades_assigned is not None:
+                for i in range(len(grades_assigned)):
+                    self.qlistw_selected_grade.addItem(grades_assigned[i])
+        
+        self.frame_confirmation_buttons.show()
+
+        self.frame_buttons.setEnabled(False)
+        self.frame_selection_data_add_staff.setEnabled(False)
+        self.frame_entry_data_add_staff.setEnabled(False)
+
+        self.button_confirm_information_add_staff.clicked.connect(self.add_staff_button_save_action)
+        self.button_cancelar_information_add_staff.clicked.connect(self.cancel_button_add_staff)
+
+
+    def cancel_button_add_staff(self):
+        self.frame_output_information_will_save.hide()
+        self.frame_output_information_grade_subject.hide()
+        self.frame_buttons.setEnabled(True)
+        self.frame_selection_data_add_staff.setEnabled(True)
+        self.frame_entry_data_add_staff.setEnabled(True)
+
+    def clear_information_add_staff(self):
+        self.line_input_fname.clear()
+        self.line_input_sname.clear()
+        self.line_input_fsurname.clear()
+        self.line_input_ssurname.clear()
+        self.line_input_document_id.clear()
+        self.line_input_address.clear()
+        self.combox_job_id_selection.setCurrentIndex(0)
+        self.line_input_phone_number.clear()
+        self.birthdate_input_get.setDate(QDate.currentDate())
+    def add_staff_button_save_action(self):
+        first_name = str(self.line_input_fname.text()).strip().lower()
+        second_name = str(self.line_input_sname.text()).strip().lower()
+        first_surname = str(self.line_input_fsurname.text()).strip().lower()
+        second_surname = str(self.line_input_ssurname.text()).strip().lower()
+        document_id = self.new_document_id
+        address = str(self.line_input_address.text()).strip().lower()
+        job_id = int(self.combox_job_id_selection.currentIndex())
+        phone_number = str(self.line_input_phone_number.text()).strip()
+        birthdate = self.birthdate_input_get.date()
+        
+
+        birthdate = birthdate.toString("yyyy-MM-dd")
+        if job_id == 2:
+
+            grade_guide = self.qlistw_grade_assign.selectedItems()[0].text() if self.qlistw_grade_assign.selectedItems() else None
+            grades_assigned = [item.text() for item in self.qlistw_grades_impart_selection.selectedItems()] if self.qlistw_grades_impart_selection.selectedItems() else None
+            subjects_selected = [item.text() for item in self.qlistw_subject_selection.selectedItems()] if self.qlistw_subject_selection.selectedItems() else None
+            main_subject_assigned = self.qlistw_subject_assign.selectedItems()[0].text() if self.qlistw_subject_assign.selectedItems() else None
+            
+            self.add_staff_query_if_teacher(first_name, second_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthdate, grade_guide, grades_assigned, subjects_selected, main_subject_assigned)
+            QtWidgets.QMessageBox.information(None, "Profesor agregado", "El profesor fue agregado a la base de datos con exito")
+        else:
+            
+            self.add_staff_query(first_name, second_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthdate)
+            QtWidgets.QMessageBox.information(None, "Personal agregado", "El personal fue agregado a la base de datos con exito")
 
 
         
-    
-    #def add_staff_if_teacher(self, guide_grade, main_subject, subjects_selected, grades_selected):
+    def add_staff_query(self, first_name, second_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthdate):
+        try:
+            if self.query.insert_staff(first_name, second_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthdate):
+                self.line_input_fname.clear()
+                self.line_input_sname.clear()
+                self.line_input_fsurname.clear()
+                self.line_input_ssurname.clear()
+                self.line_input_document_id.clear()
+                self.line_input_address.clear()
+                self.line_input_phone_number.clear()
 
-    
-    def validate_data_input(self, first_name, first_surname, document_id, address ,phone_number):
-        if not first_name or not first_surname or not document_id or not address or not phone_number:
-            QtWidgets.QMessageBox.warning(self, "Datos incompletos", "Todos los campos deben estar llenos.")
+                self.combox_job_id_selection.setCurrentIndex(0)
+
+                self.cancel_button_add_staff()
+                return True
+
+        except Exception as e:
+            print(f"Error al intentar agregar al personal: {e}")
+            return False
+    def add_staff_query_if_teacher(self, first_name, second_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthdate ,guide_grade, grades_selected ,subjects_selected, main_subject_assigned): #Specific fuctions and query for insert staff if is teahcer
+        try:
+            if self.query.insert_staff_if_teacher(first_name, second_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthdate ,guide_grade, grades_selected, subjects_selected, main_subject_assigned):
+                self.line_input_fname.clear()
+                self.line_input_sname.clear()
+                self.line_input_fsurname.clear()
+                self.line_input_ssurname.clear()
+                self.line_input_document_id.clear()
+                self.line_input_address.clear()
+                self.line_input_phone_number.clear()
+
+                self.combox_job_id_selection.setCurrentIndex(0)
+
+                self.frame_teacher_selection.hide()
+                self.cb_assign_grade.setChecked(False)
+                self.cb_assign_subject.setChecked(False)
+                self.cb_highschool_teacher.setChecked(False)
+
+                self.frame_assign_grade.hide()
+                self.qlistw_grade_assign.clear()
+                self.qlistw_grade_assign.clearSelection()
+
+                self.frame_assign_subject.hide()
+                self.qlistw_subject_assign.clear()
+                self.qlistw_subject_assign.clearSelection()
+
+                self.frame_multi_selection_subjects.hide()
+                self.qlistw_subject_selection.clear()
+                self.qlistw_subject_selection.clearSelection()
+
+                self.frame_grades_assigned.hide()
+                self.qlistw_grades_impart_selection.clear()
+                self.qlistw_grades_impart_selection.clearSelection()
+
+                self.cancel_button_add_staff()
+                return True
+
+        except Exception as e:
+            print(f"Error al intentar agregar al personal como profesor: {e}")
             return False
 
-    def validate_input_birthday(self, birthday_date):
-        selected_date = birthday_date
-        if selected_date.year() < 1900:
-            QtWidgets.QMessageBox.warning(self, "Fecha invalida", "Debe seleccionar una fecha válida.")
+
+    
+    def validate_data_input(self, first_name, first_surname, document_id, address, phone_number):
+        if not self.validate_data_input_required(first_name, first_surname, document_id, address, phone_number):
+            return False
+
+
+        if not phone_number.isdigit():
+            QtWidgets.QMessageBox.warning(None, "Formato incorrecto", "El teléfono debe contener solo números.")
+            return False
+
+        return True
+    
+    def validate_data_input_required(self, first_name, first_surname, document_id, address, phone_number):
+
+        campos = [
+            ("Primer Nombre", first_name),
+            ("Primer Apellido", first_surname),
+            ("Cedula", document_id),
+            ("Direccion", address),
+            ("Numero de telefono", phone_number)
+        ]
+        
+
+        campos_faltantes = [nombre for nombre, valor in campos if not valor]
+        
+
+        if campos_faltantes:
+            mensaje = "Los siguientes campos son obligatorios:\n\n" + "\n".join(campos_faltantes)
+            QtWidgets.QMessageBox.warning(None, "Datos incompletos", mensaje)
+            return False
+        
+        return True
+    
+
+
+    def validate_input_birthdate(self, birthdate_date):
+        selected_date = birthdate_date
+        if birthdate_date.year() < 1900:
+            QtWidgets.QMessageBox.warning(None, "Fecha invalida", "Debe seleccionar una fecha válida.")
             return False
         
         if selected_date >= QDate.currentDate():
-            QtWidgets.QMessageBox.warning(self, "Fecha invalida", "No puede seleccionar la fecha actual.")
+            QtWidgets.QMessageBox.warning(None, "Fecha invalida", "No puede seleccionar la fecha actual.")
             return False
+        return True
 
     def show_widgets_add_staff(self):
-        checkbox_job_id = self.combox_job_id_selection.currentIndex()
-        match checkbox_job_id: #Actualizar cuando se agregue la seleccion de lista, cuando esten inactivos los checkboxes que se deselccionen
-            case 0:
+        self.combo_box_job_id = self.combox_job_id_selection.currentIndex()
+        match self.combo_box_job_id:
+            case 1:
                 self.hide_all_frames_add_staff()
 
 
-            case 1:
+            case 2:
                 self.handle_teacher_selection()
                 
 
-            case 2:
+            case 3:
                 self.hide_all_frames_add_staff()
 
 
@@ -1895,13 +2113,17 @@ class Ui_staff_management_window(object):
             self.qlistw_subject_selection.clear()
 
         if self.cb_assign_subject.isChecked():
-            self.frame_assign_subject.show()
-            self.load_subject_main_assign_add_staff()
+            if not self.load_main_subject_teacher:
+                self.frame_assign_subject.show()
+                self.load_subject_main_assign_add_staff()
+                self.load_main_subject_teacher = True
+
 
         else:
             self.frame_assign_subject.hide()
             self.qlistw_subject_assign.clear()
             self.qlistw_subject_assign.clearSelection()
+            self.load_main_subject_teacher = False
 
         if self.cb_assign_grade.isChecked():
             self.frame_assign_grade.show()
@@ -1918,6 +2140,7 @@ class Ui_staff_management_window(object):
                     self.grades_guide_loaded = False
                     self.qlistw_grade_assign.clear()
                     self.qlistw_grade_assign.clearSelection()
+                    high_school_teacher = True
                     self.load_grades_guide(high_school_teacher)
                     self.grades_guide_loaded = True
                 
@@ -1951,6 +2174,7 @@ class Ui_staff_management_window(object):
         self.frame_output_information_grade_subject.hide()
         self.frame_output_information_will_save.hide()
         self.frame_teacher_selection.hide()
+        self.frame_confirmation_buttons.hide()
 
     def load_grades_guide(self, high_school_teacher):
         if self.grades_guide_loaded:
@@ -1968,6 +2192,8 @@ class Ui_staff_management_window(object):
             self.qlistw_grades_impart_selection.addItem(row[0])
     
     def load_subject_main_assign_add_staff(self):
+        if self.load_main_subject_teacher:
+            return
         rows = self.query.show_data_subjects()
         for row in rows:
             self.qlistw_subject_assign.addItem(row[1])
@@ -2012,11 +2238,11 @@ class Ui_staff_management_window(object):
         self.label_document_id.setText(_translate("staff_management_window", "Cedula"))
         self.label_address.setText(_translate("staff_management_window", "Direccion"))
         self.label_phone.setText(_translate("staff_management_window", "Numero Telefonico"))
-        self.label_birthday.setText(_translate("staff_management_window", "Fecha de Nacimeinto"))
-        self.birthday_input_get.setDisplayFormat(_translate("staff_management_window", "yyyy-MM-dd"))
-        self.combox_job_id_selection.setItemText(0, _translate("staff_management_window", "Administrativo"))
-        self.combox_job_id_selection.setItemText(1, _translate("staff_management_window", "Profesor"))
-        self.combox_job_id_selection.setItemText(2, _translate("staff_management_window", "Tecnico en mantenimiento"))
+        self.label_birthdate.setText(_translate("staff_management_window", "Fecha de Nacimeinto"))
+        self.birthdate_input_get.setDisplayFormat(_translate("staff_management_window", "yyyy-MM-dd"))
+        self.combox_job_id_selection.setItemText(1, _translate("staff_management_window", "Administrativo"))
+        self.combox_job_id_selection.setItemText(2, _translate("staff_management_window", "Profesor"))
+        self.combox_job_id_selection.setItemText(3, _translate("staff_management_window", "Tecnico en mantenimiento"))
         self.label_job_selection.setText(_translate("staff_management_window", "Seleccionar Trabajo"))
         self.cb_highschool_teacher.setToolTip(_translate("staff_management_window", "<html><head/><body><p>Marque la casilla si el profesor es de primaria</p></body></html>"))
         self.cb_highschool_teacher.setText(_translate("staff_management_window", "Profesor de Secundaria"))
@@ -2039,7 +2265,7 @@ class Ui_staff_management_window(object):
         self.document_id_output_info.setText(_translate("staff_management_window", "Cedula:"))
         self.address_output_info.setText(_translate("staff_management_window", "Direccion:"))
         self.phone_number_output_info.setText(_translate("staff_management_window", "Numero de telefono:"))
-        self.birthday_output_info.setText(_translate("staff_management_window", "Fecha de nacimiento:"))
+        self.birthdate_output_info.setText(_translate("staff_management_window", "Fecha de nacimiento:"))
         self.edad_output_info.setText(_translate("staff_management_window", "Edad:"))
         self.grade_assign_output_info.setText(_translate("staff_management_window", "Grado asignado:"))
         self.subject_assign_output_info.setText(_translate("staff_management_window", "Materia Principal:"))
@@ -2056,7 +2282,7 @@ class Ui_staff_management_window(object):
         self.label_phone_number_static_edit.setText(_translate("staff_management_window", "Numero de telefono:"))
         self.label_job_id_static_edit.setText(_translate("staff_management_window", "Puesto:"))
         self.label_address_static_edit.setText(_translate("staff_management_window", "Direccion:"))
-        self.label_birthday_static_edit.setText(_translate("staff_management_window", "Fecha de nacimeinto:"))
+        self.label_birthdate_static_edit.setText(_translate("staff_management_window", "Fecha de nacimeinto:"))
         self.label_agre_static_edit.setText(_translate("staff_management_window", "Edad:"))
         self.label_if_teacher_main_subject_static.setText(_translate("staff_management_window", "Materia prinpical:"))
         self.label_if_teacher_assigned_grade_static.setText(_translate("staff_management_window", "Grado Guiado:"))
@@ -2073,7 +2299,7 @@ class Ui_staff_management_window(object):
         self.label_phone_number_edit.setText(_translate("staff_management_window", "Numero de telefono"))
         self.label_job_id_edit.setText(_translate("staff_management_window", "Puesto"))
         self.date_edit_staff.setDisplayFormat(_translate("staff_management_window", "yyyy-MM-dd"))
-        self.label_birthday_edit.setText(_translate("staff_management_window", "Birthday"))
+        self.label_birthdate_edit.setText(_translate("staff_management_window", "birthdate"))
         self.checkbox_if_teacher_edit_subjects_assigned.setText(_translate("staff_management_window", "Editar materias asignadas"))
         self.checkbox_if_teacher_edit_grades_assigned.setText(_translate("staff_management_window", "Editar grados asignados"))
         self.label_selection_subjects_edit.setText(_translate("staff_management_window", "Selecciona las materias:"))
@@ -2091,7 +2317,7 @@ class Ui_staff_management_window(object):
         self.label_phone_number_static_change_status.setText(_translate("staff_management_window", "Numero de telefono:"))
         self.label_job_id_static_change_status.setText(_translate("staff_management_window", "Puesto:"))
         self.label_address_static_change_status.setText(_translate("staff_management_window", "Direccion:"))
-        self.label_birthday_static_change_status.setText(_translate("staff_management_window", "Fecha de nacimeinto:"))
+        self.label_birthdate_static_change_status.setText(_translate("staff_management_window", "Fecha de nacimeinto:"))
         self.label_agre_static_change_status.setText(_translate("staff_management_window", "Edad:"))
         self.label_status_change_status.setToolTip(_translate("staff_management_window", "<html><head/><body><p>El estado determina si esta eliminado</p><p>Activo: No Eliminado</p><p>Inactivo: Eliminado</p></body></html>"))
         self.label_status_change_status.setText(_translate("staff_management_window", "Estado:"))
