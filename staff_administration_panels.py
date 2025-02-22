@@ -1651,6 +1651,8 @@ class Ui_staff_management_window(object):
         self.actionLimpiar_Datos.setObjectName("actionLimpiar_Datos")
         #############################Query##########################################
         self.query = Postgresqueries()
+        ###############################################################################
+        #################################Subjects Widget#############################
         ########################Subwindows############################################
         self.add_subject_window = None
         #################################################################################
@@ -1668,8 +1670,17 @@ class Ui_staff_management_window(object):
         self.tablew_subject_show.cellClicked.connect(self.qtablew_row_clicked)
 
         ########################################################################
+
+
+
+
+
+
+
+
         ########################################################################
         #############################ADD STAFF WIDGET###########################
+        #####################################################################
         self.combox_job_id_selection.currentIndexChanged.connect(self.show_widgets_add_staff)
         #########Frames hide###########
         self.frame_assign_grade.hide()
@@ -1687,6 +1698,29 @@ class Ui_staff_management_window(object):
         self.cb_highschool_teacher.stateChanged.connect(self.show_widgets_add_staff)
         self.cb_assign_subject.stateChanged.connect(self.show_widgets_add_staff)
         self.cb_assign_grade.stateChanged.connect(self.show_widgets_add_staff)
+
+
+
+
+
+        ########################################################################
+
+
+
+
+
+
+        
+        ########################################################################
+        ###################Edit staff widget####################################
+
+
+
+
+
+
+
+
 
         ########################################################################
         self.retranslateUi(staff_management_window)
@@ -1822,7 +1856,7 @@ class Ui_staff_management_window(object):
     ########################################################################################
 
     ################################
-    #####ADD Staff widget actions####
+    ####ADD Staff widget actions####
     ################################
     def calculate_age(self, birthdate):
         today = QDate.currentDate()
@@ -2202,7 +2236,9 @@ class Ui_staff_management_window(object):
         rows = self.query.show_data_subjects()
         for row in rows:
             self.qlistw_subject_selection.addItem(row[1])
-        
+
+    ###########################################
+    #######Edit_staff_widget actions###########
 
         
 
