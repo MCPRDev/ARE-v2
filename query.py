@@ -264,7 +264,7 @@ class Postgresqueries():
             return False
         
         if result:
-            print(f"Query result: {result}")
+            #print(f"Query result: {result}")
             self.query_search_results = result
             self.table_search_results = result[-1]
             self.id_search_results = result[0]
@@ -549,7 +549,7 @@ class Postgresqueries():
     
     def show_data_grades(self, high_school_teacher):
         if high_school_teacher == True:
-            query = """SELECT grade FROM grades WHERE education_level_id = 2"""
+            query = """SELECT g.grade FROM grades g LEFT JOIN teachers t ON g.grade_id = t.guide_grade_id WHERE t.guide_grade_id IS NULL AND g.education_level_id = 2"""
             try:
                 self.cursor.execute(query)
                 rows = self.cursor.fetchall()
@@ -559,7 +559,7 @@ class Postgresqueries():
                 return []
         else:
             try:
-                    self.cursor.execute("SELECT grade FROM grades WHERE education_level_id = 1")
+                    self.cursor.execute("SELECT g.grade FROM grades g LEFT JOIN teachers t ON g.grade_id = t.guide_grade_id WHERE t.guide_grade_id IS NULL AND g.education_level_id = 1")
                     
                     rows = self.cursor.fetchall()
                     return rows if rows else []

@@ -4,6 +4,8 @@ from PyQt5.QtCore import QDate
 from add_subject_subwindow import Ui_add_subject_sub_window
 from query import *
 from outfuctions import *
+from functions import *
+from datetime import date
 import sys
 import traceback
 
@@ -1713,9 +1715,18 @@ class Ui_staff_management_window(object):
         
         ########################################################################
         ###################Edit staff widget####################################
+        self.hide_edit_staff_widget()
+        self.connect_signals()
+
+        self.initial_date = self.date_edit_staff.date()
+        self.initial_index = self.combobox_job_id_edit.currentIndex()
+        ##################BUTTONS###########################
+        self.button_search_edit_staff.clicked.connect(self.search_staff_button)
 
 
-
+        ########Checkbox###############
+        self.checkbox_if_teacher_edit_subjects_assigned.stateChanged.connect(self.show_data_teacher_editable)
+        self.checkbox_if_teacher_edit_grades_assigned.stateChanged.connect(self.show_data_teacher_editable)
 
 
 
@@ -1856,7 +1867,7 @@ class Ui_staff_management_window(object):
     ########################################################################################
 
     ################################
-    ####ADD Staff widget actions####
+    ####ADD Staff widget actions#################Realizar funcion para verificar si un maestro ya tiene un grado guiado o mostrar los grados que no tienen maestros guias
     ################################
     def calculate_age(self, birthdate):
         today = QDate.currentDate()
@@ -1881,11 +1892,15 @@ class Ui_staff_management_window(object):
         second_name = second_name if second_name else None
         second_surname = second_name if second_name else None
         data_entry = [first_name, second_name, first_surname, second_surname]
+        wrong_data = ("Primer Nombre", "Segundo Nombre", "Primer Apellido", "Segundo Apellido")
         for i in range(len(data_entry)):
             if not string_input_data_validator(data_entry[i]):
-                QtWidgets.QMessageBox.information(None, "Error", f"Donde ingreso la siguiente informacion, solo se admiten letras: {data_entry[i]}")
+                QtWidgets.QMessageBox.information(None, "Error", f"En este campo solo se admiten letras (Sin simbolos, espacios, caracteres especiales o numeros): {wrong_data[i]}")
                 return
         
+        second_name = second_name if second_name else ""
+        second_surname = second_name if second_name else ""
+
         if not age_validator(age):
             QtWidgets.QMessageBox.information(None, "Error", "Edad invalida, debe ser mayor a 18 años")
             return
@@ -1899,10 +1914,15 @@ class Ui_staff_management_window(object):
             self.new_document_id = rewrite_document_id(document_id)
             if not document_id_validation(self.new_document_id):
                 QtWidgets.QMessageBox.information(None, "Error al agregar la cedula", "Formato de cedula erroneo, utiliza el siguiente formato XXX-XXXXXX-XXXXA o 1234567891234A")
-                print(document_id, self.new_document_id)
                 return
         document_id = self.new_document_id
+
+        saa = staff_add_action()
+        if not saa.validate_document_id_repeated(document_id):
+            QtWidgets.QMessageBox.information(None, "Error al agregar la cedula", "La cedula ya se encuentra registrada en la base de datos")
+            return
         
+
         if not self.validate_data_input(first_name, first_surname, document_id, address, phone_number):
             return
         
@@ -2237,8 +2257,221 @@ class Ui_staff_management_window(object):
         for row in rows:
             self.qlistw_subject_selection.addItem(row[1])
 
-    ###########################################
+    ###############################################
     #######Edit_staff_widget actions###########
+    def search_staff_button(self):
+        try:
+            id_search = int(self.line_input_edit_staff_search_id.text()) if self.line_input_edit_staff_search_id.text() else None
+            document_id_search = str(self.line_input_edit_staff_search_document_id.text()) if self.line_input_edit_staff_search_document_id.text() else None
+
+            if document_id_search is not None:
+                if not document_id_validation(document_id_search):
+                    document_id_search = rewrite_document_id(document_id_search)
+                    if not document_id_validation(document_id_search):
+                        self.clear_label_output_edit()
+                        QtWidgets.QMessageBox.information(None, "Error Cedula", "Formato de cedula ingresado es erroneo, utiliza el siguiente formato XXX-XXXXXX-XXXXA o 1234567891234A")
+                        return
+            sega = staff_edit_gui_action()
+            self.results = sega.entry_data_search_query(id_search, document_id_search)
+
+            if not self.results:
+                QtWidgets.QMessageBox.information(None, "Error", "No se encontraron resultados para la busqueda")
+                self.clear_label_output_edit()
+                return
+            
+
+            
+
+
+
+            first_name = self.results[1]
+            second_name = self.results[2]
+            first_surname = self.results[3]
+            second_surname = self.results[4]
+
+            split_name = [first_name, second_name, first_surname, second_surname]
+            split_name = [name for name in split_name if name is not None]
+            full_name = " ".join(split_name)
+
+            staff_id_registered = self.results[0]
+            document_id = self.results[5]
+            address = self.results[6]
+
+            phone_number = self.results[9]
+            phone_number = rewrite_phone_number(phone_number)
+
+            birthdate = self.results[10]
+            show_birthdate = birthdate.strftime('%d-%m-%Y')
+
+            job_id = self.results[7]
+            job_position = sega.job_position_get(staff_id_registered)
+
+            age = str(self.calculate_age_edit_staff(birthdate))
+
+            self.label_full_name_dynamic_edit.setText(full_name)
+            self.label_document_id_dynamic_edit.setText(document_id)
+            self.label_address_dynamic_edit.setText(address)
+            self.label_phone_number_dynamic_edit.setText(phone_number)
+            self.label_job_id_dynamic_edit.setText(job_position)
+            self.label_birthdate_dynamic_edit.setText(show_birthdate)
+            self.label_age_dynamic_edit.setText(age)
+
+            if job_id == 2:
+                self.frame_if_teacher.show()
+                self.checkbox_if_teacher_edit_grades_assigned.show()
+                self.checkbox_if_teacher_edit_subjects_assigned.show()
+                self.show_data_teacher_editable()
+
+                main_subject, main_grade = sega.main_teacher_has(staff_id_registered)
+
+                self.label_if_teacher_main_subject_dynamic.setText(main_subject)
+                self.label_if_teacher_assigned_grade_dynamic.setText(main_grade)
+
+                subjects_assigned = sega.impart_subjects(staff_id_registered)
+                grades_assigned = sega.grades_assigned(staff_id_registered)
+
+                subject_count = self.qlist_if_teacher_subjects_assigned.count()
+                grade_count = self.qlist_if_teacher_grades_assigned.count()
+                
+                if subject_count > 0:
+                    self.qlist_if_teacher_subjects_assigned.clear()
+
+                for subject in subjects_assigned:
+                    self.qlist_if_teacher_subjects_assigned.addItem(subject)
+                
+                if grade_count > 0:
+                    self.qlist_if_teacher_grades_assigned.clear()
+
+                for grade in grades_assigned:
+                    self.qlist_if_teacher_grades_assigned.addItem(grade)
+
+
+
+            else:
+                self.frame_if_teacher.hide()
+                self.checkbox_if_teacher_edit_grades_assigned.hide()
+                self.checkbox_if_teacher_edit_subjects_assigned.hide()
+
+                self.label_if_teacher_main_subject_dynamic.clear()
+                self.label_if_teacher_assigned_grade_dynamic.clear()
+                self.qlist_if_teacher_subjects_assigned.clear()
+                self.qlist_if_teacher_grades_assigned.clear()
+            
+            self.frame_edit_info.show()
+        except Exception as e:
+            print(f"Error al cargar los datos: {e}")
+            QtWidgets.QMessageBox.information(None, "Error", "Error al cargar los datos")
+        
+    def clear_label_output_edit(self):
+        self.label_full_name_dynamic_edit.clear()
+        self.label_document_id_dynamic_edit.clear()
+        self.label_address_dynamic_edit.clear()
+        self.label_phone_number_dynamic_edit.clear()
+        self.label_job_id_dynamic_edit.clear()
+        self.label_birthdate_dynamic_edit.clear()
+        self.label_age_dynamic_edit.clear()
+
+        self.frame_if_teacher.hide()
+
+        self.label_if_teacher_main_subject_dynamic.clear()
+        self.label_if_teacher_assigned_grade_dynamic.clear()
+        self.qlist_if_teacher_subjects_assigned.clear()
+        self.qlist_if_teacher_grades_assigned.clear()
+
+
+    def calculate_age_edit_staff(self, birthdate):
+        today = date.today()
+        age = today.year - birthdate.year
+
+        if (today.month, today.day) < (birthdate.month, birthdate.day):
+            age -= 1
+        return age
+    
+    def hide_edit_staff_widget(self):
+        self.frame_if_teacher.hide()
+        self.frame_edit_info.hide()
+        self.frame_if_edit_subject_or_grades.hide()
+        self.frame_buttons_edit.hide()
+        self.checkbox_if_teacher_edit_subjects_assigned.hide()
+        self.checkbox_if_teacher_edit_grades_assigned.hide()
+        self.label_selections_grades_edit.hide()
+        self.listw_input_grades_edit.hide()
+        self.listw_input_subjects_edit.hide()
+        self.label_selection_subjects_edit.hide()
+        self.label_selection_main_subject_edit.hide()
+        self.combobox_main_subject_edit.hide()
+        self.label_selection_guide_grade_edit.hide()
+        self.combobox_guide_grade_edit.hide()
+    
+    def show_data_teacher_editable(self):
+        if self.checkbox_if_teacher_edit_subjects_assigned.isChecked():
+            self.frame_if_edit_subject_or_grades.show()
+            self.label_selection_subjects_edit.show()
+            self.listw_input_subjects_edit.show()
+            self.label_selection_main_subject_edit.show()
+            self.combobox_main_subject_edit.show()
+        else:
+            self.label_selection_subjects_edit.hide()
+            self.listw_input_subjects_edit.hide()
+            self.label_selection_main_subject_edit.hide()
+            self.combobox_main_subject_edit.hide()
+
+        if self.checkbox_if_teacher_edit_grades_assigned.isChecked():
+            self.frame_if_edit_subject_or_grades.show()
+            self.label_selections_grades_edit.show()
+            self.listw_input_grades_edit.show()
+            self.label_selection_guide_grade_edit.show()
+            self.combobox_guide_grade_edit.show()
+        else:
+            self.label_selections_grades_edit.hide()
+            self.listw_input_grades_edit.hide()
+            self.label_selection_guide_grade_edit.hide()
+            self.combobox_guide_grade_edit.hide()
+    
+    def enable_buttons_edit(self):
+        fields_changed = [
+            self.line_input_first_name_edit.text(),
+            self.line_input_second_name_edit.text(),
+            self.line_input_first_surname_edit.text(),
+            self.line_input_second_surname.text(),
+            self.line_input_document_id_edit.text(),
+            self.line_input_phone_number_edit.text()
+        ]
+
+        date_changed = self.date_edit_staff.date() != self.initial_date
+        index_changed = self.combobox_job_id_edit.currentIndex() != self.initial_index
+
+        if any(fields_changed) or index_changed or date_changed:
+            self.frame_buttons_edit.show()
+        else:
+            self.frame_buttons_edit.hide()
+        
+
+    def connect_signals(self):
+        self.line_input_first_name_edit.textChanged.connect(self.enable_buttons_edit)
+        self.line_input_second_name_edit.textChanged.connect(self.enable_buttons_edit)
+        self.line_input_first_surname_edit.textChanged.connect(self.enable_buttons_edit)
+        self.line_input_second_surname.textChanged.connect(self.enable_buttons_edit)
+        self.line_input_document_id_edit.textChanged.connect(self.enable_buttons_edit)
+        self.line_input_phone_number_edit.textChanged.connect(self.enable_buttons_edit)
+
+        self.combobox_job_id_edit.currentIndexChanged.connect(self.enable_buttons_edit)
+
+        self.date_edit_staff.dateChanged.connect(self.enable_buttons_edit)
+
+
+
+
+
+
+
+            
+        
+
+
+
+
+
 
         
 
