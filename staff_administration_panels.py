@@ -867,6 +867,7 @@ class Ui_staff_management_window(object):
         self.listw_input_subjects_edit = QtWidgets.QListWidget(self.frame_if_edit_subject_or_grades)
         self.listw_input_subjects_edit.setGeometry(QtCore.QRect(120, 41, 161, 231))
         self.listw_input_subjects_edit.setObjectName("listw_input_subjects_edit")
+        self.listw_input_subjects_edit.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
         self.label_selection_subjects_edit = QtWidgets.QLabel(self.frame_if_edit_subject_or_grades)
         self.label_selection_subjects_edit.setGeometry(QtCore.QRect(130, 10, 141, 16))
         font = QtGui.QFont()
@@ -888,6 +889,7 @@ class Ui_staff_management_window(object):
         self.listw_input_grades_edit = QtWidgets.QListWidget(self.frame_if_edit_subject_or_grades)
         self.listw_input_grades_edit.setGeometry(QtCore.QRect(470, 41, 161, 231))
         self.listw_input_grades_edit.setObjectName("listw_input_grades_edit")
+        self.listw_input_grades_edit.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
         self.label_selection_main_subject_edit = QtWidgets.QLabel(self.frame_if_edit_subject_or_grades)
         self.label_selection_main_subject_edit.setGeometry(QtCore.QRect(10, 300, 181, 16))
         font = QtGui.QFont()
@@ -1725,8 +1727,8 @@ class Ui_staff_management_window(object):
 
 
         ########Checkbox###############
-        self.checkbox_if_teacher_edit_subjects_assigned.stateChanged.connect(self.show_data_teacher_editable)
-        self.checkbox_if_teacher_edit_grades_assigned.stateChanged.connect(self.show_data_teacher_editable)
+        self.checkbox_if_teacher_edit_subjects_assigned.stateChanged.connect(self.show_data_subjects_teacher_editable)
+        self.checkbox_if_teacher_edit_grades_assigned.stateChanged.connect(self.show_data_grades_teacher_editable)
 
 
 
@@ -1973,6 +1975,10 @@ class Ui_staff_management_window(object):
         self.frame_buttons.setEnabled(False)
         self.frame_selection_data_add_staff.setEnabled(False)
         self.frame_entry_data_add_staff.setEnabled(False)
+        self.frame_assign_grade.setEnabled(False)
+        self.frame_assign_subject.setEnabled(False)
+        self.frame_multi_selection_subjects.setEnabled(False)
+        self.frame_grades_assigned.setEnabled(False)
 
         self.button_confirm_information_add_staff.clicked.connect(self.add_staff_button_save_action)
         self.button_cancelar_information_add_staff.clicked.connect(self.cancel_button_add_staff)
@@ -1984,6 +1990,10 @@ class Ui_staff_management_window(object):
         self.frame_buttons.setEnabled(True)
         self.frame_selection_data_add_staff.setEnabled(True)
         self.frame_entry_data_add_staff.setEnabled(True)
+        self.frame_assign_grade.setEnabled(True)
+        self.frame_assign_subject.setEnabled(True)
+        self.frame_multi_selection_subjects.setEnabled(True)
+        self.frame_grades_assigned.setEnabled(True)
 
     def clear_information_add_staff(self):
         self.line_input_fname.clear()
@@ -2234,14 +2244,14 @@ class Ui_staff_management_window(object):
         if self.grades_guide_loaded:
             return
         
-        rows = self.query.show_data_grades(high_school_teacher)
+        rows = self.query.show_data_grades_guide(high_school_teacher)
         for row in rows:
             self.qlistw_grade_assign.addItem(row[0])
     
     def load_grades(self, high_school_teacher):
         if self.grades_loaded:
             return
-        rows = self.query.show_data_grades(high_school_teacher)
+        rows = self.query.show_data_grades_all(high_school_teacher)
         for row in rows:
             self.qlistw_grades_impart_selection.addItem(row[0])
     
@@ -2271,8 +2281,8 @@ class Ui_staff_management_window(object):
                         self.clear_label_output_edit()
                         QtWidgets.QMessageBox.information(None, "Error Cedula", "Formato de cedula ingresado es erroneo, utiliza el siguiente formato XXX-XXXXXX-XXXXA o 1234567891234A")
                         return
-            sega = staff_edit_gui_action()
-            self.results = sega.entry_data_search_query(id_search, document_id_search)
+            self.sega = staff_edit_gui_action()
+            self.results = self.sega.entry_data_search_query(id_search, document_id_search)
 
             if not self.results:
                 QtWidgets.QMessageBox.information(None, "Error", "No se encontraron resultados para la busqueda")
@@ -2283,14 +2293,14 @@ class Ui_staff_management_window(object):
             
 
 
-
+            self.staff_id_edit_staff = self.results[0]
             first_name = self.results[1]
             second_name = self.results[2]
             first_surname = self.results[3]
             second_surname = self.results[4]
 
             split_name = [first_name, second_name, first_surname, second_surname]
-            split_name = [name for name in split_name if name is not None]
+            split_name = [name.capitalize() for name in split_name if name is not None]
             full_name = " ".join(split_name)
 
             staff_id_registered = self.results[0]
@@ -2304,7 +2314,7 @@ class Ui_staff_management_window(object):
             show_birthdate = birthdate.strftime('%d-%m-%Y')
 
             job_id = self.results[7]
-            job_position = sega.job_position_get(staff_id_registered)
+            job_position = self.sega.job_position_get(staff_id_registered)
 
             age = str(self.calculate_age_edit_staff(birthdate))
 
@@ -2320,15 +2330,17 @@ class Ui_staff_management_window(object):
                 self.frame_if_teacher.show()
                 self.checkbox_if_teacher_edit_grades_assigned.show()
                 self.checkbox_if_teacher_edit_subjects_assigned.show()
-                self.show_data_teacher_editable()
+                self.show_data_subjects_teacher_editable()
+                self.show_data_grades_teacher_editable()
 
-                main_subject, main_grade = sega.main_teacher_has(staff_id_registered)
+
+                main_subject, main_grade = self.sega.main_teacher_has(staff_id_registered)
 
                 self.label_if_teacher_main_subject_dynamic.setText(main_subject)
                 self.label_if_teacher_assigned_grade_dynamic.setText(main_grade)
 
-                subjects_assigned = sega.impart_subjects(staff_id_registered)
-                grades_assigned = sega.grades_assigned(staff_id_registered)
+                subjects_assigned = self.sega.impart_subjects(staff_id_registered)
+                grades_assigned = self.sega.grades_assigned(staff_id_registered)
 
                 subject_count = self.qlist_if_teacher_subjects_assigned.count()
                 grade_count = self.qlist_if_teacher_grades_assigned.count()
@@ -2403,30 +2415,47 @@ class Ui_staff_management_window(object):
         self.label_selection_guide_grade_edit.hide()
         self.combobox_guide_grade_edit.hide()
     
-    def show_data_teacher_editable(self):
+    def show_data_subjects_teacher_editable(self):
         if self.checkbox_if_teacher_edit_subjects_assigned.isChecked():
             self.frame_if_edit_subject_or_grades.show()
             self.label_selection_subjects_edit.show()
             self.listw_input_subjects_edit.show()
             self.label_selection_main_subject_edit.show()
             self.combobox_main_subject_edit.show()
+            if not self.load_subjects_options_flag:
+                self.load_all_subjects_options_edit_staff()
+                self.load_subjects_options_flag = True
+
         else:
+            self.listw_input_subjects_edit.clear()
+            self.listw_input_subjects_edit.clearSelection()
             self.label_selection_subjects_edit.hide()
             self.listw_input_subjects_edit.hide()
             self.label_selection_main_subject_edit.hide()
             self.combobox_main_subject_edit.hide()
+            self.load_subjects_options_flag = False
 
+    def show_data_grades_teacher_editable(self):
         if self.checkbox_if_teacher_edit_grades_assigned.isChecked():
             self.frame_if_edit_subject_or_grades.show()
             self.label_selections_grades_edit.show()
             self.listw_input_grades_edit.show()
             self.label_selection_guide_grade_edit.show()
             self.combobox_guide_grade_edit.show()
+            high_school_teacher = self.sega.primary_teacher_bool(self.staff_id_edit_staff)
+            old_id = self.staff_id_edit_staff
+            if not self.load_grades_options_flag:
+                self.load_all_grades_options_edit_staff(high_school_teacher)
+                self.load_grades_options_flag = True
+
         else:
+            self.listw_input_grades_edit.clear()
+            self.listw_input_grades_edit.clearSelection()
             self.label_selections_grades_edit.hide()
             self.listw_input_grades_edit.hide()
             self.label_selection_guide_grade_edit.hide()
             self.combobox_guide_grade_edit.hide()
+            self.load_grades_options_flag = False
     
     def enable_buttons_edit(self):
         fields_changed = [
@@ -2446,7 +2475,6 @@ class Ui_staff_management_window(object):
         else:
             self.frame_buttons_edit.hide()
         
-
     def connect_signals(self):
         self.line_input_first_name_edit.textChanged.connect(self.enable_buttons_edit)
         self.line_input_second_name_edit.textChanged.connect(self.enable_buttons_edit)
@@ -2458,15 +2486,78 @@ class Ui_staff_management_window(object):
         self.combobox_job_id_edit.currentIndexChanged.connect(self.enable_buttons_edit)
 
         self.date_edit_staff.dateChanged.connect(self.enable_buttons_edit)
+    def load_all_grades_options_edit_staff(self, high_school_bool):
+        try:
+            if self.load_grades_options_flag:
+                return
+            self.load_grades_edit_staff(high_school_bool)
+            self.load_combobox_options_grade_guide(high_school_bool)
+        except Exception as e:
+            print(f"Error al cargar los datos: {e}")
+            QtWidgets.QMessageBox.information(None, "Error", "Error al cargar los datos")
+
+    def load_grades_edit_staff(self, high_school_teacher):
+        try:
+            results = self.query.show_data_grades_all(high_school_teacher)
+
+            if results and results[0] is not None:
+                for result in results:
+                    self.listw_input_grades_edit.addItems([result[0]])
+            else:
+                self.listw_input_grades_edit.addItems(["Sin Resultados"])
+        except Exception as e:
+            print(f"Error al cargar los datos: {e}")
+            QtWidgets.QMessageBox.information(None, "Error", "Error al cargar los datos")
+    
+    def load_subjects_edit_staff(self):
+        try:
+            results = self.query.show_data_subjects()
+
+            if results and results[1] is not None:
+                for result in results:
+                    self.listw_input_subjects_edit.addItem(result[1])
+            else:
+                self.listw_input_subjects_edit.addItems(["Sin Resultados"])
+        except Exception as e:
+            print(f"Error al cargar los datos: {e}")
+            QtWidgets.QMessageBox.information(None, "Error", "Error al cargar los datos")
+    def load_all_subjects_options_edit_staff(self):
+        try:
+            if self.load_subjects_options_flag:
+                return
+            self.load_subjects_edit_staff()
+            self.load_combobox_options_main_subject()
+        except Exception as e:
+            print(f"Error al cargar los datos: {e}")
+            QtWidgets.QMessageBox.information(None, "Error", "Error al cargar los datos")
+    def load_combobox_options_grade_guide(self, high_school_teacher):
+        try:
+            results = self.query.show_data_grades_guide(high_school_teacher)
+
+            if results and results[0] is not None:
+                for result in results:
+                    self.combobox_guide_grade_edit.addItem(result[0])
+
+            else:
+                self.combobox_guide_grade_edit.addItem("Sin Resultados")
+        except Exception as e:
+            print(f"Error al cargar los datos: {e}")
+            QtWidgets.QMessageBox.information(None, "Error", "Error al cargar los datos")
+
+    def load_combobox_options_main_subject(self):
+        try:
+            results = self.query.show_data_subjects()
+            if results and results[1] is not None:
+                for result in results:
+                    self.combobox_main_subject_edit.addItem(result[1])
+            else:
+                self.combobox_main_subject_edit.addItem("Sin Resultados")
+        except Exception as e:
+            print(f"Error al cargar los datos: {e}")
+            QtWidgets.QMessageBox.information(None, "Error", "Error al cargar los datos")
 
 
 
-
-
-
-
-            
-        
 
 
 

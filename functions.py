@@ -120,3 +120,17 @@ class staff_edit_gui_action():
             return grades_assigned
         else:
             return ["Sin Asignar",]
+    
+    def primary_teacher_bool(self, staff_id):
+        query = "SELECT primary_teacher FROM teachers WHERE staff_id = %s"
+        self.query.cursor.execute(query, (staff_id,))
+        result = self.query.cursor.fetchone()
+        
+        if result and result[0] is not None:
+            primary_teacher_bool = result[0]
+            if primary_teacher_bool == True:
+                return False
+            else:
+                return True
+        else:
+            return ["No Results Found"]

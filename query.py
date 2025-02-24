@@ -547,7 +547,7 @@ class Postgresqueries():
             print(f'Error fetching data subjects: {e}')
             return []
     
-    def show_data_grades(self, high_school_teacher):
+    def show_data_grades_guide(self, high_school_teacher):
         if high_school_teacher == True:
             query = """SELECT g.grade FROM grades g LEFT JOIN teachers t ON g.grade_id = t.guide_grade_id WHERE t.guide_grade_id IS NULL AND g.education_level_id = 2"""
             try:
@@ -562,6 +562,28 @@ class Postgresqueries():
                     self.cursor.execute("SELECT g.grade FROM grades g LEFT JOIN teachers t ON g.grade_id = t.guide_grade_id WHERE t.guide_grade_id IS NULL AND g.education_level_id = 1")
                     
                     rows = self.cursor.fetchall()
+                    return rows if rows else []
+            except Exception as e:
+                    print(f'Error fetching data grades: {e}')
+                    return []
+    
+    def show_data_grades_all(self, high_school_teacher):
+        if high_school_teacher == True:
+            query = "SELECT grade FROM grades WHERE education_level_id = 2"
+            try:
+                self.cursor.execute(query)
+                rows = self.cursor.fetchall()
+
+                return rows if rows else []
+            except Exception as e:
+                print(f'Error fetching data grades high school teacher: {e}')
+                return []
+            
+        else:
+            try:
+                    self.cursor.execute("SELECT grade FROM grades WHERE education_level_id = 1")
+                    rows = self.cursor.fetchall()
+
                     return rows if rows else []
             except Exception as e:
                     print(f'Error fetching data grades: {e}')
