@@ -60,11 +60,19 @@ class staff_edit_gui_action():
         return results
     
     def job_position_get(self, staff_id_registered):
-        self.query.cursor.execute(f"SELECT jp.job_position FROM staff st INNER JOIN job_position jp ON st.job_id = jp.job_id WHERE staff_id = {staff_id_registered}")
+        self.query.cursor.execute(f"SELECT jp.job_id FROM staff st INNER JOIN job_position jp ON st.job_id = jp.job_id WHERE staff_id = {staff_id_registered}")
         result = self.query.cursor.fetchone()
         if result and result[0] is not None:
-            job_position = result[0].capitalize()
-            return job_position
+            job_position = result[0]
+            match job_position:
+                case 1:
+                    return "Administrador"
+                case 2:
+                    return "Profesor"
+                case 3:
+                    return "Tecnico en mantenimiento"
+                case _:
+                    return "Sin registro"
         else:
             return "Sin Asignar"
 

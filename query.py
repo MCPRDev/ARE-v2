@@ -537,6 +537,7 @@ class Postgresqueries():
         except Exception as e:
             self.connection.rollback()
             print(f'Error inserting student representative: {e}')
+
     def show_data_subjects(self):
         try:
             self.cursor.execute("SELECT subject_id, subject FROM subjects WHERE active = true")
@@ -682,6 +683,7 @@ class Postgresqueries():
             self.connection.rollback()
             print(f'Error editing subject: {e}')
             return False
+        
     def get_subject_id_already_exists(self, subject):
         self.cursor.execute(f"SELECT subject_id FROM subjects WHERE subject = '{subject}'")
         subjects_ids = [row[0] for row in self.cursor.fetchall()]
