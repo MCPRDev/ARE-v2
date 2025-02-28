@@ -136,6 +136,29 @@ def validate_data_entry_no_repeted(data_entry, existing_data, umbral=2):
             return False
     return True
 
+
+#############Specific Edit staff widget fuctions########
+def verify_date_edit(date):
+    date = datetime.strptime(date, "%Y-%m-%d").date()
+    minimun_date = datetime(1900, 1, 1).date()
+    current_date = datetime.today().date()
+
+    if date < minimun_date:
+        return False
+    
+    if date == current_date:
+        return False
+    
+    return True
+
+def calculate_age_edited(date):
+    fecha_nacimiento = datetime.strptime(date, "%Y-%m-%d").date()
+    hoy = datetime.today().date()
+    
+    edad = hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
+    
+    return edad
+
 #OutFuctions for fuctions.py#
 def clear_entry_data(data):
     if not isinstance(data, str):

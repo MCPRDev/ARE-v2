@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QHeaderView
-from PyQt5.QtCore import QDate
+from PyQt5.QtWidgets import QHeaderView, QApplication, QMainWindow, QPushButton, QDialog, QVBoxLayout, QLabel, QLineEdit, QHBoxLayout, QWidget
+from PyQt5.QtCore import QDate, Qt
 from add_subject_subwindow import Ui_add_subject_sub_window
 from query import *
 from outfuctions import *
@@ -860,6 +860,18 @@ class Ui_staff_management_window(object):
         self.checkbox_if_teacher_edit_grades_assigned = QtWidgets.QCheckBox(self.frame_edit_info)
         self.checkbox_if_teacher_edit_grades_assigned.setGeometry(QtCore.QRect(500, 150, 141, 17))
         self.checkbox_if_teacher_edit_grades_assigned.setObjectName("checkbox_if_teacher_edit_grades_assigned")
+        self.label_address_edit = QtWidgets.QLabel(self.frame_edit_info)
+        self.label_address_edit.setGeometry(QtCore.QRect(360, 130, 61, 16))
+        font = QtGui.QFont()
+        font.setFamily("Microsoft JhengHei")
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_address_edit.setFont(font)
+        self.label_address_edit.setObjectName("label_address_edit")
+        self.line_input_address_edit = QtWidgets.QLineEdit(self.frame_edit_info)
+        self.line_input_address_edit.setGeometry(QtCore.QRect(330, 150, 113, 20))
+        self.line_input_address_edit.setObjectName("line_input_address_edit")
         self.frame_if_edit_subject_or_grades = QtWidgets.QFrame(self.edit_staff_widget)
         self.frame_if_edit_subject_or_grades.setGeometry(QtCore.QRect(489, 179, 721, 341))
         self.frame_if_edit_subject_or_grades.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -1664,6 +1676,7 @@ class Ui_staff_management_window(object):
         ######################Buttons subjects############################################
         self.button_add_subject.clicked.connect(self.add_subject_window_emergent)
 
+        self.button_save_edit_staff.clicked.connect(self.get_data_update_edit_staff)
         ##################search qlines subjects################################
         self.lineedit_search_subject_name.textChanged.connect(self.filter_table_subject_name)
         self.lineedit_search_subject_id.textChanged.connect(self.filter_table_subject_id)
@@ -2361,6 +2374,18 @@ class Ui_staff_management_window(object):
                 self.qlist_if_teacher_subjects_assigned.clear()
                 self.qlist_if_teacher_grades_assigned.clear()
             
+            self.old_data_edit = {
+            'first_name' : first_name, 
+            'middle_name' : second_name, 
+            'first_surname' : first_surname, 
+            'second_surname' : second_surname, 
+            'document_id' : document_id, 
+            'address' : address, 
+            'job_id' : job_position, 
+            'phone_number' : phone_number, 
+            'birthday' : show_birthdate
+            }
+
             self.frame_edit_info.show()
         except Exception as e:
             print(f"Error al cargar los datos: {e}")
@@ -2460,14 +2485,13 @@ class Ui_staff_management_window(object):
             self.line_input_first_surname_edit.text(),
             self.line_input_second_surname_edit.text(),
             self.line_input_document_id_edit.text(),
-            self.line_input_phone_number_edit.text()
+            self.line_input_phone_number_edit.text(),
+            self.line_input_address_edit.text()
         ]
 
         date_changed = self.date_edit_staff.date() != self.initial_date
         index_changed = self.combobox_job_id_edit.currentIndex() != self.results[7] if self.results else 0
-        print(date_changed)
-        print(self.date_edit_staff.date())
-        print(self.initial_date)
+
         if any(fields_changed) or index_changed or date_changed or self.checkbox_if_teacher_edit_grades_assigned.isChecked() or self.checkbox_if_teacher_edit_subjects_assigned.isChecked():
             self.frame_buttons_edit.show()
         else:
@@ -2480,6 +2504,7 @@ class Ui_staff_management_window(object):
         self.line_input_second_surname_edit.textChanged.connect(self.enable_buttons_edit)
         self.line_input_document_id_edit.textChanged.connect(self.enable_buttons_edit)
         self.line_input_phone_number_edit.textChanged.connect(self.enable_buttons_edit)
+        self.line_input_address_edit.textChanged.connect(self.enable_buttons_edit)
 
         self.checkbox_if_teacher_edit_grades_assigned.stateChanged.connect(self.enable_buttons_edit)
         self.checkbox_if_teacher_edit_subjects_assigned.stateChanged.connect(self.enable_buttons_edit)
@@ -2539,6 +2564,7 @@ class Ui_staff_management_window(object):
             results = self.query.show_data_grades_guide(high_school_teacher)
 
             if results and results[0] is not None:
+                self.combobox_guide_grade_edit.addItem("")
                 for result in results:
                     self.combobox_guide_grade_edit.addItem(result[0])
 
@@ -2552,6 +2578,7 @@ class Ui_staff_management_window(object):
         try:
             results = self.query.show_data_subjects()
             if results and results[1] is not None:
+                self.combobox_main_subject_edit.addItem("")
                 for result in results:
                     self.combobox_main_subject_edit.addItem(result[1])
             else:
@@ -2567,6 +2594,7 @@ class Ui_staff_management_window(object):
         self.line_input_second_surname_edit.clear()
         self.line_input_document_id_edit.clear()
         self.line_input_phone_number_edit.clear()
+        self.line_input_address_edit.clear()
         self.combobox_job_id_edit.setCurrentIndex(0)
 
         self.checkbox_if_teacher_edit_subjects_assigned.setChecked(False)
@@ -2577,15 +2605,75 @@ class Ui_staff_management_window(object):
         second_name = str(self.line_input_second_name_edit.text()) if self.line_input_second_name_edit.text() else None
         first_surname = str(self.line_input_first_surname_edit.text()) if self.line_input_first_surname_edit.text() else None
         second_surname = str(self.line_input_second_surname_edit.text()) if self.line_input_second_surname_edit.text() else None
+        address = str(self.line_input_address_edit.text()) if self.line_input_address_edit.text() else None
+
+        data_entry_update = [first_name, second_name, first_surname, second_surname]
+        wrong_data = ("Primer Nombre", "Segundo Nombre", "Primer Apellido", "Segundo Apellido")
+        for i in range(len(data_entry_update)):
+            if not string_input_data_validator(data_entry_update[i]):
+                QtWidgets.QMessageBox.information(None, "Error", f"En este campo solo se admiten letras (Sin simbolos, espacios, caracteres especiales o numeros): {wrong_data[i]}")
+                return
+
+        document_id = str(self.line_input_document_id_edit.text()) if self.line_input_document_id_edit.text() else None
+        if document_id is not None:
+            if not document_id_validation(document_id):
+                new_document_id = rewrite_document_id(document_id)
+                document_id = new_document_id 
+                if not document_id_validation(document_id):
+                    QtWidgets.QMessageBox.information(None, "Error al guardar la cedula", "Formato de cedula erroneo, utiliza el siguiente formato XXX-XXXXXX-XXXXA o 1234567891234A")
+                    return
+            
+            saa = staff_add_action()
+            if not saa.validate_document_id_repeated(document_id):
+                QtWidgets.QMessageBox.information(None, "Error al guardar", "La cedula ya se encuentra registrada en la base de datos")
+                return
+        
+        phone_number = str(self.line_input_phone_number_edit.text()) if self.line_input_phone_number_edit.text() else None
+        if phone_number is not None:
+            if not phone_number_validation(phone_number):
+                QtWidgets.QMessageBox.information(None, "Error al guardar el numero de telefono", "Formato de numero de telefono erroneo, utiliza el siguiente formato 12345678")
+                return
 
         new_job_position = self.combobox_job_id_edit.currentIndex() if self.results[7] != self.combobox_job_id_edit.currentIndex() else self.results[7]
 
         new_birthdate = self.date_edit_staff.date() if self.date_edit_staff.date() != self.initial_date else self.initial_date
-        new_birthdate = new_birthdate.ToString('yyyy-MM-dd')
-
-        new_subjects_assigned = [item.text() for item in self.listw_input_subjects_edit.selectedItems()] if self.listw_input_subjects_edit.selectedItems() else None
-        new_grades_assigned = [item.text() for item in self.listw_input_grades_edit.selectedItems()] if self.listw_input_grades_edit.selectedItems() else None
+        if isinstance (new_birthdate, QDate):
+            if not self.validate_input_birthdate(new_birthdate): #Fuction in line #1937
+                return
+            new_birthdate = new_birthdate.toString('yyyy-MM-dd')
         
+        age = calculate_age_edited(new_birthdate)
+
+        if age < 18:
+            QtWidgets.QMessageBox.information(None, "Edad Invalida", "Debe ser mayor de 18")
+
+        if new_job_position == 2 and self.checkbox_if_teacher_edit_subjects_assigned.isChecked():
+            new_subjects_assigned = [item.text() for item in self.listw_input_subjects_edit.selectedItems()] if self.listw_input_subjects_edit.selectedItems() else None
+            new_subject_main_assigned = self.combobox_main_subject_edit.currentText() if self.combobox_main_subject_edit.currentText() else None
+        
+        if new_job_position == 2 and self.checkbox_if_teacher_edit_grades_assigned.isChecked():
+            new_grades_assigned = [item.text() for item in self.listw_input_grades_edit.selectedItems()] if self.listw_input_grades_edit.selectedItems() else None
+            new_grade_guide_assigned = self.combobox_guide_grade_edit.currentText() if self.combobox_guide_grade_edit.currentText() else None
+
+        new_values = {
+            'first_name' : first_name, 
+            'middle_name' : second_name, 
+            'first_surname' : first_surname, 
+            'second_surname' : second_surname, 
+            'document_id' : document_id, 
+            'address' : address, 
+            'job_id' : new_job_position, 
+            'phone_number' : phone_number, 
+            'birthday' : new_birthdate
+        }
+
+        dialog = EditDialog(self.old_data_edit,new_values , None)
+        result = dialog.exec_()
+        if result == QDialog.Accepted:
+            print("Cambios guardados")
+        else:
+            print("Cambios cancelados")
+
 
 
 
@@ -2632,6 +2720,7 @@ class Ui_staff_management_window(object):
         self.combox_job_id_selection.setItemText(1, _translate("staff_management_window", "Administrativo"))
         self.combox_job_id_selection.setItemText(2, _translate("staff_management_window", "Profesor"))
         self.combox_job_id_selection.setItemText(3, _translate("staff_management_window", "Tecnico en mantenimiento"))
+        self.label_address_edit.setText(_translate("staff_management_window", "Direccion"))
         self.label_job_selection.setText(_translate("staff_management_window", "Seleccionar Trabajo"))
         self.cb_highschool_teacher.setToolTip(_translate("staff_management_window", "<html><head/><body><p>Marque la casilla si el profesor es de primaria</p></body></html>"))
         self.cb_highschool_teacher.setText(_translate("staff_management_window", "Profesor de Secundaria"))
@@ -2817,6 +2906,62 @@ class Ui_staff_management_window(object):
         self.button_open_allperms_admin.setText(_translate("staff_management_window", "Mostrar Consola / Abrir Ventana de Controles"))
         self.subjects_widget.setTabText(self.subjects_widget.indexOf(self.button_admin_actions), _translate("staff_management_window", "Acciones Administrativas DB"))
         self.actionLimpiar_Datos.setText(_translate("staff_management_window", "Limpiar Datos"))
+    
+
+class EditDialog(QDialog):
+    def __init__(self, old_data, new_data, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Confirmar Cambios")
+        self.setModal(True)
+        self.resize(400, 300)
+        
+        layout = QVBoxLayout()
+
+        field_mapping = {
+            "Primer Nombre": "first_name",
+            "Segundo Nombre": "middle_name",
+            "Primer Apellido": "first_surname",
+            "Segundo Apellido": "second_surname",
+            "Cedula": "document_id",
+            "Direccion": "address",
+            "Puesto": "job_id",
+            "Numero de telefono": "phone_number",
+            "Fecha de nacimiento": "birthday"
+        }
+
+        fields = [
+            "Primer Nombre", "Segundo Nombre", "Primer Apellido", "Segundo Apellido",
+            "Cedula", "Direccion", "Puesto", "Numero de telefono", "Fecha de nacimiento"
+        ]
+        
+        for field in fields:
+            key = field_mapping.get(field, field)
+
+            old_value = old_data.get(key)
+            new_value = new_data.get(key)
+
+            old_value = "Sin Registrar" if old_value is None else old_value
+            new_value = "Sin Cambios" if new_value is None else new_value
+            print(old_value)
+            print(new_data)
+            label_text = f"{field}: {old_value} ➜ {new_value}"
+            label = QLabel(label_text)
+            layout.addWidget(label)
+
+        # Botones Guardar y Cancelar
+        button_layout = QHBoxLayout()
+        self.save_button = QPushButton("Guardar")
+        self.cancel_button = QPushButton("Cancelar")
+
+        button_layout.addWidget(self.save_button)
+        button_layout.addWidget(self.cancel_button)
+        layout.addLayout(button_layout)
+
+        # Conectar los botones a sus slots
+        self.save_button.clicked.connect(self.accept)
+        self.cancel_button.clicked.connect(self.reject)
+
+        self.setLayout(layout)
 
 if __name__ == "__main__":
     import sys
