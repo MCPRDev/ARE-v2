@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QHeaderView, QApplication, QMainWindow, QPushButton, QDialog, QVBoxLayout, QLabel, QLineEdit, QHBoxLayout, QWidget
+from PyQt5.QtWidgets import QHeaderView, QApplication, QMainWindow, QPushButton, QDialog, QVBoxLayout, QLabel, QLineEdit, QHBoxLayout, QWidget, QListWidget
 from PyQt5.QtCore import QDate, Qt
 from add_subject_subwindow import Ui_add_subject_sub_window
 from query import *
@@ -2361,6 +2361,8 @@ class Ui_staff_management_window(object):
 
                 for grade in grades_assigned:
                     self.qlist_if_teacher_grades_assigned.addItem(grade)
+                
+                self.teacher_data_grades_and_subjects_edit = [main_subject, main_grade, subjects_assigned, grades_assigned]
 
 
 
@@ -2644,16 +2646,24 @@ class Ui_staff_management_window(object):
         
         age = calculate_age_edited(new_birthdate)
 
+
         if age < 18:
             QtWidgets.QMessageBox.information(None, "Edad Invalida", "Debe ser mayor de 18")
 
         if new_job_position == 2 and self.checkbox_if_teacher_edit_subjects_assigned.isChecked():
             new_subjects_assigned = [item.text() for item in self.listw_input_subjects_edit.selectedItems()] if self.listw_input_subjects_edit.selectedItems() else None
             new_subject_main_assigned = self.combobox_main_subject_edit.currentText() if self.combobox_main_subject_edit.currentText() else None
+        else:
+            new_subjects_assigned = self.teacher_data_grades_and_subjects_edit[2]
+            new_subject_main_assigned = self.teacher_data_grades_and_subjects_edit[0]
         
         if new_job_position == 2 and self.checkbox_if_teacher_edit_grades_assigned.isChecked():
             new_grades_assigned = [item.text() for item in self.listw_input_grades_edit.selectedItems()] if self.listw_input_grades_edit.selectedItems() else None
             new_grade_guide_assigned = self.combobox_guide_grade_edit.currentText() if self.combobox_guide_grade_edit.currentText() else None
+        else:
+            new_grades_assigned =  self.teacher_data_grades_and_subjects_edit[3]
+            new_grade_guide_assigned = self.teacher_data_grades_and_subjects_edit[1]
+        
 
         new_values = {
             'first_name' : first_name, 
@@ -2667,8 +2677,13 @@ class Ui_staff_management_window(object):
             'birthday' : new_birthdate
         }
 
-        dialog = EditDialog(self.old_data_edit,new_values , None)
-        result = dialog.exec_()
+        if new_job_position == 2:
+            dialog_show_subjects_and_grades_saved = TeacherAssignmentDialog(new_subject_main_assigned, new_grade_guide_assigned, new_subjects_assigned, new_grades_assigned, None)
+            dialog_show_subjects_and_grades_saved.exec_()
+        
+        dialog_show_data_saved = EditDialog(self.old_data_edit,new_values , None)
+        
+        result = dialog_show_data_saved.exec_()
         if result == QDialog.Accepted:
             print("Cambios guardados")
         else:
@@ -2939,16 +2954,25 @@ class EditDialog(QDialog):
 
             old_value = old_data.get(key)
             new_value = new_data.get(key)
-
+            
             old_value = "Sin Registrar" if old_value is None else old_value
             new_value = "Sin Cambios" if new_value is None else new_value
-            print(old_value)
-            print(new_data)
+            
+            if isinstance(new_value, int):
+                match new_value:
+                    case 1:
+                        new_value = "Administrativo"
+                    case 2:
+                        new_value = "Profesor"
+                    case 3:
+                        new_value = "Tecnico en mantenimiento"
+                    case _:
+                        new_value = "Puesto no reconocido"
+
             label_text = f"{field}: {old_value} ➜ {new_value}"
             label = QLabel(label_text)
             layout.addWidget(label)
 
-        # Botones Guardar y Cancelar
         button_layout = QHBoxLayout()
         self.save_button = QPushButton("Guardar")
         self.cancel_button = QPushButton("Cancelar")
@@ -2957,9 +2981,52 @@ class EditDialog(QDialog):
         button_layout.addWidget(self.cancel_button)
         layout.addLayout(button_layout)
 
-        # Conectar los botones a sus slots
         self.save_button.clicked.connect(self.accept)
         self.cancel_button.clicked.connect(self.reject)
+
+        self.setLayout(layout)
+
+class TeacherAssignmentDialog(QDialog):
+    def __init__(self, main_subject, guided_grade, subjects_list, grades_list, parent=None):
+        super().__init__(parent) 
+        self.main_subject = main_subject if main_subject is not None else "No asignado"
+        self.guided_grade = guided_grade if guided_grade is not None else "No asignado"
+        self.subjects_list = subjects_list if subjects_list is not None else ["No asignados", "Se desasignaran los grados relacionados con este profesor despues de guardar"]
+        self.grades_list = grades_list if grades_list is not None else ["No asignados", "Se desasignaran los grados relacionados con este profesor despues de guardar"]
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle("Asignación del Maestro")
+        self.resize(400, 300)
+
+        layout = QVBoxLayout()
+
+        main_subject_label = QLabel(f"Materia Principal: {self.main_subject}")
+        layout.addWidget(main_subject_label)
+
+
+        guided_grade_label = QLabel(f"Grado Guiado: {self.guided_grade}")
+        layout.addWidget(guided_grade_label)
+
+        subjects_label = QLabel("Materias Asignadas:")
+        layout.addWidget(subjects_label)
+
+        self.subjects_list_widget = QListWidget()
+        for subject in self.subjects_list:
+            self.subjects_list_widget.addItem(subject)
+        layout.addWidget(self.subjects_list_widget)
+
+        grades_label = QLabel("Grados Asignados:")
+        layout.addWidget(grades_label)
+
+        self.grades_list_widget = QListWidget()
+        for grade in self.grades_list:
+            self.grades_list_widget.addItem(grade)
+        layout.addWidget(self.grades_list_widget)
+
+        self.close_button = QPushButton("Cerrar")
+        self.close_button.clicked.connect(self.close)
+        layout.addWidget(self.close_button)
 
         self.setLayout(layout)
 
