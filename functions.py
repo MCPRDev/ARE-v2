@@ -50,7 +50,8 @@ class staff_edit_gui_action():
         self.query = query.Postgresqueries()
     
     def entry_data_search_query(self, search_id, search_document_id):
-        if not isinstance(search_id, int) or not isinstance(search_document_id, (str, type(None))):
+        if not isinstance(search_id, (int, type(None))) or not isinstance(search_document_id, (str, type(None))):
+            print(search_document_id)
             return False
         
         results = self.query.search_query("staff", search_id, search_document_id, None)
@@ -142,3 +143,32 @@ class staff_edit_gui_action():
                 return True
         else:
             return ["No Results Found"]
+    
+    def change_primary_teacher_state(self, bool, staff_id):
+        if bool:
+            query = f"UPDATE teachers SET primary_teacher = false WHERE staff_id = %s"
+            try:
+                self.query.cursor.execute(query,(staff_id,))
+                self.query.connection.commit()
+            except Exception as e:
+                print(f"Error changing bool primary_teacher: {e}")
+                self.query.connection.rollback()
+        else:
+            query = f"UPDATE teachers SET primary_teacher = false WHERE staff_id = %s"
+            try:
+                self.query.cursor.execute(query,(staff_id,))
+                self.query.connection.commit()
+            except Exception as e:
+                print(f"Error changing bool primary_teacher: {e}")
+                self.query.connection.rollback()
+    
+    def get_bool_primary_teacher(self, staff_id):
+        query = f"SELECT primary_teacher FROM teachers WHERE staff_id = %s"
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            self.query.connection.commit()
+            result = self.query.cursor.fetchone()
+            return result[0]
+        except Exception as e:
+            print(f"Error changing bool primary_teacher: {e}")
+            self.query.connection.rollback()

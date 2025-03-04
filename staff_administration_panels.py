@@ -860,6 +860,9 @@ class Ui_staff_management_window(object):
         self.checkbox_if_teacher_edit_grades_assigned = QtWidgets.QCheckBox(self.frame_edit_info)
         self.checkbox_if_teacher_edit_grades_assigned.setGeometry(QtCore.QRect(500, 150, 141, 17))
         self.checkbox_if_teacher_edit_grades_assigned.setObjectName("checkbox_if_teacher_edit_grades_assigned")
+        self.checkbox_if_high_school_teacher_edit_staff = QtWidgets.QCheckBox(self.frame_edit_info)
+        self.checkbox_if_high_school_teacher_edit_staff.setGeometry(QtCore.QRect(10, 150, 121, 17))
+        self.checkbox_if_high_school_teacher_edit_staff.setObjectName("checkbox_if_high_school_teacher_edit_staff")
         self.label_address_edit = QtWidgets.QLabel(self.frame_edit_info)
         self.label_address_edit.setGeometry(QtCore.QRect(360, 130, 61, 16))
         font = QtGui.QFont()
@@ -1737,6 +1740,7 @@ class Ui_staff_management_window(object):
         ########Checkbox###############
         self.checkbox_if_teacher_edit_subjects_assigned.stateChanged.connect(self.show_data_subjects_teacher_editable)
         self.checkbox_if_teacher_edit_grades_assigned.stateChanged.connect(self.show_data_grades_teacher_editable)
+        self.checkbox_if_high_school_teacher_edit_staff.stateChanged.connect(self.show_data_grades_teacher_editable)
 
         ########################################################################
         self.retranslateUi(staff_management_window)
@@ -2335,6 +2339,7 @@ class Ui_staff_management_window(object):
                 self.frame_if_teacher.show()
                 self.checkbox_if_teacher_edit_grades_assigned.show()
                 self.checkbox_if_teacher_edit_subjects_assigned.show()
+                self.checkbox_if_high_school_teacher_edit_staff.show()
                 self.show_data_subjects_teacher_editable()
                 self.show_data_grades_teacher_editable()
 
@@ -2364,12 +2369,16 @@ class Ui_staff_management_window(object):
                 
                 self.teacher_data_grades_and_subjects_edit = [main_subject, main_grade, subjects_assigned, grades_assigned]
 
+                high_school_teacher_state = self.sega.get_bool_primary_teacher(self.results[0])
+                self.checkbox_if_high_school_teacher_edit_staff.setChecked(high_school_teacher_state)
+
 
 
             else:
                 self.frame_if_teacher.hide()
                 self.checkbox_if_teacher_edit_grades_assigned.hide()
                 self.checkbox_if_teacher_edit_subjects_assigned.hide()
+                self.checkbox_if_high_school_teacher_edit_staff.hide()
 
                 self.label_if_teacher_main_subject_dynamic.clear()
                 self.label_if_teacher_assigned_grade_dynamic.clear()
@@ -2465,10 +2474,33 @@ class Ui_staff_management_window(object):
             self.listw_input_grades_edit.show()
             self.label_selection_guide_grade_edit.show()
             self.combobox_guide_grade_edit.show()
-            high_school_teacher = self.sega.primary_teacher_bool(self.staff_id_edit_staff)
-            if not self.load_grades_options_flag:
+            
+            if self.checkbox_if_high_school_teacher_edit_staff.isChecked():
+                high_school_teacher = True
+                if not self.load_grades_options_flag:
+                    self.clear_grades_and_combobox_edit_staff()
+                    self.load_all_grades_options_edit_staff(high_school_teacher)
+                    self.load_grades_options_flag = True
+                
+                elif self.load_grades_options_flag:
+                    self.load_grades_options_flag = False
+                    self.clear_grades_and_combobox_edit_staff()
+                    self.load_all_grades_options_edit_staff(high_school_teacher)
+                    self.load_grades_options_flag = True
+            
+            elif not self.checkbox_if_high_school_teacher_edit_staff.isChecked() and self.load_grades_options_flag:
+                self.load_grades_options_flag = False
+                self.clear_grades_and_combobox_edit_staff()
+                high_school_teacher = False
                 self.load_all_grades_options_edit_staff(high_school_teacher)
                 self.load_grades_options_flag = True
+            
+            else:
+                if not self.load_grades_options_flag:
+                    high_school_teacher = False
+                    self.clear_grades_and_combobox_edit_staff()
+                    self.load_all_grades_options_edit_staff(high_school_teacher)
+                    self.load_grades_options_flag = True
 
         else:
             self.listw_input_grades_edit.clear()
@@ -2538,6 +2570,13 @@ class Ui_staff_management_window(object):
             print(f"Error al cargar los datos: {e}")
             QtWidgets.QMessageBox.information(None, "Error", "Error al cargar los datos")
     
+    def clear_grades_and_combobox_edit_staff(self):
+        self.listw_input_grades_edit.clear()
+        self.listw_input_grades_edit.clearSelection()
+
+        self.combobox_guide_grade_edit.clear()
+        self.combobox_guide_grade_edit.setCurrentIndex(0)
+
     def load_subjects_edit_staff(self):
         try:
             results = self.query.show_data_subjects()
@@ -2603,11 +2642,11 @@ class Ui_staff_management_window(object):
         self.checkbox_if_teacher_edit_grades_assigned.setChecked(False)
 
     def get_data_update_edit_staff(self):
-        first_name = str(self.line_input_first_name_edit.text()) if self.line_input_first_name_edit.text() else None
-        second_name = str(self.line_input_second_name_edit.text()) if self.line_input_second_name_edit.text() else None
-        first_surname = str(self.line_input_first_surname_edit.text()) if self.line_input_first_surname_edit.text() else None
-        second_surname = str(self.line_input_second_surname_edit.text()) if self.line_input_second_surname_edit.text() else None
-        address = str(self.line_input_address_edit.text()) if self.line_input_address_edit.text() else None
+        first_name = str(self.line_input_first_name_edit.text()) if self.line_input_first_name_edit.text().strip() else None
+        second_name = str(self.line_input_second_name_edit.text()) if self.line_input_second_name_edit.text().strip() else None
+        first_surname = str(self.line_input_first_surname_edit.text()) if self.line_input_first_surname_edit.text().strip() else None
+        second_surname = str(self.line_input_second_surname_edit.text()) if self.line_input_second_surname_edit.text().strip() else None
+        address = str(self.line_input_address_edit.text()) if self.line_input_address_edit.text().strip() else None
 
         data_entry_update = [first_name, second_name, first_surname, second_surname]
         wrong_data = ("Primer Nombre", "Segundo Nombre", "Primer Apellido", "Segundo Apellido")
@@ -2644,26 +2683,37 @@ class Ui_staff_management_window(object):
                 return
             new_birthdate = new_birthdate.toString('yyyy-MM-dd')
         
+
         age = calculate_age_edited(new_birthdate)
 
 
         if age < 18:
             QtWidgets.QMessageBox.information(None, "Edad Invalida", "Debe ser mayor de 18")
-
-        if new_job_position == 2 and self.checkbox_if_teacher_edit_subjects_assigned.isChecked():
-            new_subjects_assigned = [item.text() for item in self.listw_input_subjects_edit.selectedItems()] if self.listw_input_subjects_edit.selectedItems() else None
-            new_subject_main_assigned = self.combobox_main_subject_edit.currentText() if self.combobox_main_subject_edit.currentText() else None
-        else:
-            new_subjects_assigned = self.teacher_data_grades_and_subjects_edit[2]
-            new_subject_main_assigned = self.teacher_data_grades_and_subjects_edit[0]
+            return
         
-        if new_job_position == 2 and self.checkbox_if_teacher_edit_grades_assigned.isChecked():
-            new_grades_assigned = [item.text() for item in self.listw_input_grades_edit.selectedItems()] if self.listw_input_grades_edit.selectedItems() else None
-            new_grade_guide_assigned = self.combobox_guide_grade_edit.currentText() if self.combobox_guide_grade_edit.currentText() else None
-        else:
-            new_grades_assigned =  self.teacher_data_grades_and_subjects_edit[3]
-            new_grade_guide_assigned = self.teacher_data_grades_and_subjects_edit[1]
-        
+        if new_job_position == 2:
+            if self.checkbox_if_teacher_edit_subjects_assigned.isChecked():
+                new_subjects_assigned = [item.text() for item in self.listw_input_subjects_edit.selectedItems()] if self.listw_input_subjects_edit.selectedItems() else None
+                new_subject_main_assigned = self.combobox_main_subject_edit.currentText() if self.combobox_main_subject_edit.currentText() else None
+            else:
+                if hasattr(self, 'teacher_data_grades_and_subjects_edit') and self.teacher_data_grades_and_subjects_edit:
+                    new_subjects_assigned = self.teacher_data_grades_and_subjects_edit[2]
+                    new_subject_main_assigned = self.teacher_data_grades_and_subjects_edit[0]
+                else:
+                    new_subjects_assigned = None
+                    new_subject_main_assigned = None
+            
+            if self.checkbox_if_teacher_edit_grades_assigned.isChecked():
+                new_grades_assigned = [item.text() for item in self.listw_input_grades_edit.selectedItems()] if self.listw_input_grades_edit.selectedItems() else None
+                new_grade_guide_assigned = self.combobox_guide_grade_edit.currentText() if self.combobox_guide_grade_edit.currentText() else None
+            else:
+                if hasattr(self, 'teacher_data_grades_and_subjects_edit') and self.teacher_data_grades_and_subjects_edit:
+                    new_grades_assigned =  self.teacher_data_grades_and_subjects_edit[3]
+                    new_grade_guide_assigned = self.teacher_data_grades_and_subjects_edit[1]
+                else:
+                    new_grades_assigned = None
+                    new_grade_guide_assigned = None
+            
 
         new_values = {
             'first_name' : first_name, 
@@ -2685,7 +2735,36 @@ class Ui_staff_management_window(object):
         
         result = dialog_show_data_saved.exec_()
         if result == QDialog.Accepted:
-            print("Cambios guardados")
+            try:
+                new_values_cleaned = {}
+                for key, value in new_values.items():
+                    if value is not None:
+                        new_values_cleaned[key] = value
+
+                        if value == self.results[7]:
+                            new_values_cleaned.pop('job_id')
+                        
+                        if value == self.results[10]:
+                            new_values_cleaned.pop('birthday')
+                        
+                if new_job_position == 2:
+                    staff_id = self.results[0]
+                    if self.checkbox_if_teacher_edit_subjects_assigned.isChecked():
+
+                        self.query.edit_subjects_teacher_assigned(new_subject_main_assigned, new_subjects_assigned, staff_id)
+                    
+                    if self.checkbox_if_teacher_edit_grades_assigned.isChecked():
+
+                        self.query.edit_grades_teacher_assigned(new_grade_guide_assigned, new_grades_assigned, staff_id)
+
+                        
+                self.query.search_query('staff', self.results[0], None, None)
+                self.query.edit_multiple_columns(new_values_cleaned)
+                QtWidgets.QMessageBox.information(None, "Datos actualizados", "Los datos han sido actualizados")
+                self.clear_label_output_edit()
+                self.search_staff_button()
+            except Exception as e:
+                print(f'Error: {e}')
         else:
             print("Cambios cancelados")
 
@@ -2788,6 +2867,7 @@ class Ui_staff_management_window(object):
         self.combobox_job_id_edit.setItemText(1, _translate("staff_management_window", "Administrativo"))
         self.combobox_job_id_edit.setItemText(2, _translate("staff_management_window", "Profesor"))
         self.combobox_job_id_edit.setItemText(3, _translate("staff_management_window", "Tecnico en mantenimiento"))
+        self.checkbox_if_high_school_teacher_edit_staff.setText(_translate("staff_management_window", "Profesor Secundaria"))
         self.label_document_id_edit.setText(_translate("staff_management_window", "Cedula"))
         self.label_phone_number_edit.setText(_translate("staff_management_window", "Numero de telefono"))
         self.label_job_id_edit.setText(_translate("staff_management_window", "Puesto"))

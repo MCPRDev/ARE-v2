@@ -1,8 +1,9 @@
-from datetime import datetime
+from datetime import datetime, date
 import re
 import uuid
 import bcrypt
 from Levenshtein import distance as levenshtein_distance
+
 
 #OutFuctions for query#
 def is_valid_username(username):
@@ -151,13 +152,21 @@ def verify_date_edit(date):
     
     return True
 
-def calculate_age_edited(date):
-    fecha_nacimiento = datetime.strptime(date, "%Y-%m-%d").date()
-    hoy = datetime.today().date()
+def calculate_age_edited(date_input):
+
+    if isinstance(date_input, str):
+        birthdate = datetime.strptime(date_input, "%Y-%m-%d").date()
+
+    elif isinstance(date_input, date):
+        birthdate = date_input
+    else:
+        raise TypeError("El argumento debe ser una cadena de texto en formato 'YYYY-MM-DD' o un objeto datetime.date")
     
-    edad = hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
+    today = datetime.today().date()
     
-    return edad
+    age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+    
+    return age
 
 #OutFuctions for fuctions.py#
 def clear_entry_data(data):

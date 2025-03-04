@@ -327,6 +327,96 @@ class Postgresqueries():
         
         return True
     
+    def edit_subjects_teacher_assigned(self, main_subject, subjects, staff_id):
+
+        if main_subject is not None:
+            query = f"UPDATE teachers SET main_subject = (SELECT subject_id FROM subjects WHERE subject = %s) WHERE staff_id = %s"
+            try:
+                self.cursor.execute(query,(main_subject, staff_id,))
+                self.cursor.commit()
+                print("Main Subject has Changed Success")
+            except Exception as e:
+                print(f"Error inserting {e} new main subject")
+                self.connection.rollback()
+        else:
+            query = f"UPDATE teachers SET main_subject = NULL WHERE staff_id = %s"
+            
+            try:
+                self.cursor.execute(query,(staff_id,))
+                self.cursor.commit()
+                print("Main Subject has Changed to Null")
+            except Exception as e:
+                print(f"Error inserting {e} new main subject")
+                self.connection.rollback()
+        
+        if subjects is not None:
+            query = f"""INSERT INTO subject_teacher (teacher_id, subject_id)
+                        VALUES (
+                        (SELECT teacher_id FROM teachers WHERE staff_id = %s), 
+                        (SELECT subject_id FROM subjects WHERE subject = %s))
+                        ON CONFLICT (teacher_id , subject_id)
+                        DO UPDATE SET
+                            active = true;"""
+            for subject in subjects:
+                try:
+                    self.cursor.execute(query,(staff_id, subject,))
+                    self.connection.commit()
+                    
+                except Exception as e:
+                    print(f"Error inserting or updating subjects related with the teacher, Errir {e}")
+                    self.connection.rollback()
+        else:
+            query = f"UPDATE subject_teacher SET active = false WHERE teacher_id = (SELECT teacher_id FROM teachers WHERE staff_id = %s)"
+            try:
+                self.cursor.execute(query,(staff_id,))
+                self.connection.commit()
+            except Exception as e:
+                print(f"Error inserting or updating subjects related with the teacher, Errir {e}")
+                self.connection.rollback()
+    
+    def edit_grades_teacher_assigned(self, guide_grade, grades, staff_id):
+        if guide_grade is not None:
+            query = f"UPDATE teachers SET guide_grade_id = (SELECT grade_id FROM grades WHERE grade = %s) WHERE staff_id = %s"
+            try:
+                self.cursor.execute(query, (guide_grade, staff_id,))
+                self.connection.commit()
+            except Exception as e:
+                print(f"Error updating guide grade: {e}")
+                self.connection.rollback()
+        else:
+            query = f"UPDATE teachers SET guide_grade_id = NULL where staff_id = %s"
+            try:
+                self.cursor.execute(query, (staff_id,))
+                self.connection.commit()
+            except Exception as e:
+                print(f"Error updating guide grade: {e}")
+        
+        if grades is not None:
+            query = f"""
+                        INSERT INTO teacher_grade_assigned (teacher_id, grade_id)
+                        VALUES (
+                        (SELECT teacher_id FROM teachers WHERE staff_id = %s), 
+                        (SELECT grade_id FROM grades WHERE grade = %s))
+                        ON CONFLICT (teacher_id , grade_id)
+                        DO UPDATE SET
+                            active = true;
+                            """
+            for grade in grades:
+                try:
+                    self.cursor.execute(query,(staff_id, grade,))
+                    self.connection.commit()
+                except Exception as e:
+                    print(f"Error updating or inserting grades: {e}")
+                    self.connection.rollback()
+        else:
+            query = f"UPDATE teacher_grade_assigned SET active = NULL WHERE teacher_id = (SELECT teacher_id FROM teachers WHERE staff_id = %s)"
+            try:
+                self.cursor.execute(query, (staff_id,))
+                self.connection.commit()
+            except Exception as e:
+                print(f"Error updating grades: {e}")
+                self.connection.rollback()
+
     def edit_record(self, table, record_id, column_to_edit, new_value): #This function works with edit_multi_record, validate_value, get_editable_columns and search query
         if not self.search_results_validator():
             print("search_results_validator didn't detect a search")
@@ -367,10 +457,13 @@ class Postgresqueries():
         record_id = self.id_search_results
 
         for column, new_value in updates.items():
-            success = self.edit_record(table, record_id, column, new_value)
-            if not success:
-                print(f"Error updating column '{column}'. No further updates were performed.")
-                return False
+            if new_value is not None:
+                success = self.edit_record(table, record_id, column, new_value)
+                if not success:
+                    print(f"Error updating column '{column}'. No further updates were performed.")
+                    return False
+            else:
+                print('valor none: ', new_value)
         print("All updates were performed correctly.")
         return True
     
@@ -738,7 +831,7 @@ class Postgresqueries():
 #print(pg.show_data_subjects())
 #pg.insert_subject('Matematica Oratoria')
 #pg.login('admin_basic_log_in_user', 'admin_basic_log_in_password')
-#pg.search_query('staff', None, None, None)
+#print(pg.search_query('staff', 42, None, None))
 #pg.search_query('student_representative', None, '123-123123-1234K', None)
 #datos = pg.search_query('students', 1, None, None)
 #print(datos[-1])
