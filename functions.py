@@ -162,7 +162,23 @@ class staff_edit_gui_action():
                 print(f"Error changing bool primary_teacher: {e}")
                 self.query.connection.rollback()
     
-    def get_bool_primary_teacher(self, staff_id):
+    def get_bool_primary_teacher(self, staff_id): #For the design of the table in the database I had to change te result 
+        query = f"SELECT primary_teacher FROM teachers WHERE staff_id = %s"#the column "primary_teacher" must be high_school_teacher to avoid confussions
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            self.query.connection.commit()
+            result = self.query.cursor.fetchone()
+            if result[0] == True: #This means in the table "teachers" is a primary_teacher
+                result = False #so the result must be false to put in the checkbox in "staff_administration_panels" to show the grades associates with
+                return result #high school grades
+            else:
+                result = True 
+                return result
+        except Exception as e:
+            print(f"Error changing bool primary_teacher: {e}")
+            self.query.connection.rollback()
+    
+    def get_bool_primary_teacher_compare(self, staff_id): 
         query = f"SELECT primary_teacher FROM teachers WHERE staff_id = %s"
         try:
             self.query.cursor.execute(query,(staff_id,))
@@ -172,3 +188,15 @@ class staff_edit_gui_action():
         except Exception as e:
             print(f"Error changing bool primary_teacher: {e}")
             self.query.connection.rollback()
+
+    def verify_and_change_primary_teacher_bool(self, primary_bool, staff_id):
+        default_bool = self.get_bool_primary_teacher_compare(staff_id)
+        if primary_bool != default_bool:
+            print("Here 1")
+            query = f"UPDATE teachers SET primary_teacher = %s WHERE staff_id = %s"
+            try:
+                self.query.cursor.execute(query,(primary_bool, staff_id,))
+                self.query.connection.commit()
+            except Exception as e:
+                print(f"Error in functions: verify_and_change_primary_teacher_bool: {e}")
+        print("default:", default_bool, "=", "primary:", primary_bool)

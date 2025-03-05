@@ -2369,8 +2369,8 @@ class Ui_staff_management_window(object):
                 
                 self.teacher_data_grades_and_subjects_edit = [main_subject, main_grade, subjects_assigned, grades_assigned]
 
-                high_school_teacher_state = self.sega.get_bool_primary_teacher(self.results[0])
-                self.checkbox_if_high_school_teacher_edit_staff.setChecked(high_school_teacher_state)
+                high_school_teacher_state_edit_staff = self.sega.get_bool_primary_teacher(self.results[0])
+                self.checkbox_if_high_school_teacher_edit_staff.setChecked(high_school_teacher_state_edit_staff)
 
 
 
@@ -2455,7 +2455,6 @@ class Ui_staff_management_window(object):
             if not self.load_subjects_options_flag:
                 self.load_all_subjects_options_edit_staff()
                 self.load_subjects_options_flag = True
-
         else:
             self.listw_input_subjects_edit.clear()
             self.listw_input_subjects_edit.clearSelection()
@@ -2542,6 +2541,7 @@ class Ui_staff_management_window(object):
 
         self.checkbox_if_teacher_edit_grades_assigned.stateChanged.connect(self.enable_buttons_edit)
         self.checkbox_if_teacher_edit_subjects_assigned.stateChanged.connect(self.enable_buttons_edit)
+        self.checkbox_if_high_school_teacher_edit_staff.stateChanged.connect(self.enable_buttons_edit)
 
         self.combobox_job_id_edit.currentIndexChanged.connect(self.enable_buttons_edit)
 
@@ -2756,6 +2756,14 @@ class Ui_staff_management_window(object):
                     if self.checkbox_if_teacher_edit_grades_assigned.isChecked():
 
                         self.query.edit_grades_teacher_assigned(new_grade_guide_assigned, new_grades_assigned, staff_id)
+                    
+                    if self.checkbox_if_high_school_teacher_edit_staff.isChecked():
+                        print('hola')
+                        high_school_teacher = False
+                        self.sega.verify_and_change_primary_teacher_bool(high_school_teacher, self.results[0])
+                    else:
+                        high_school_teacher = True
+                        self.sega.verify_and_change_primary_teacher_bool(high_school_teacher, self.results[0])
 
                         
                 self.query.search_query('staff', self.results[0], None, None)
