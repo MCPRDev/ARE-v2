@@ -1,11 +1,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QHeaderView, QApplication, QMainWindow, QPushButton, QDialog, QVBoxLayout, QLabel, QLineEdit, QHBoxLayout, QWidget, QListWidget
+from PyQt5.QtWidgets import QHeaderView, QApplication, QMainWindow, QPushButton, QDialog, QVBoxLayout, QLabel, QLineEdit, QHBoxLayout, QWidget, QListWidget, QMessageBox
 from PyQt5.QtCore import QDate, Qt
 from add_subject_subwindow import Ui_add_subject_sub_window
 from query import *
 from outfuctions import *
 from functions import *
-from datetime import date
+from datetime import date, time
 import sys
 import traceback
 
@@ -1692,13 +1692,6 @@ class Ui_staff_management_window(object):
 
         ########################################################################
 
-
-
-
-
-
-
-
         ########################################################################
         #############################ADD STAFF WIDGET###########################
         #####################################################################
@@ -1735,14 +1728,32 @@ class Ui_staff_management_window(object):
 
         #self.initial_date = self.date_edit_staff.date()
         ##################BUTTONS###########################
-        self.button_search_edit_staff.clicked.connect(self.search_staff_button)
+        self.button_search_edit_staff.clicked.connect(self.search_staff_button_edit_staff)
 
         ########Checkbox###############
         self.checkbox_if_teacher_edit_subjects_assigned.stateChanged.connect(self.show_data_subjects_teacher_editable)
         self.checkbox_if_teacher_edit_grades_assigned.stateChanged.connect(self.show_data_grades_teacher_editable)
         self.checkbox_if_high_school_teacher_edit_staff.stateChanged.connect(self.show_data_grades_teacher_editable)
+        ########################################################################
+        ########################################################################
+        ########################################################################
+        ########################################################################
+
 
         ########################################################################
+        ###################LOGICAL DELETE STAFF#################################
+        ########################################################################
+        self.hide_frames_logical_delete_staff()
+
+        ##################BUTTONS###############################################
+        self.button_search_change_status_staff.clicked.connect(self.search_staff_button_logical_delete)
+        self.button_change_status_delete.clicked.connect(self.logical_delete_button)
+        self.button_chhange_status_restore.clicked.connect(self.logical_restore_button)
+
+
+
+
+
         self.retranslateUi(staff_management_window)
         self.subjects_widget.setCurrentIndex(7)
         QtCore.QMetaObject.connectSlotsByName(staff_management_window)
@@ -2271,7 +2282,7 @@ class Ui_staff_management_window(object):
     ###############################################
     #######Edit_staff_widget actions###############
     ###############################################
-    def search_staff_button(self):
+    def search_staff_button_edit_staff(self):
         try:
             id_search = int(self.line_input_edit_staff_search_id.text()) if self.line_input_edit_staff_search_id.text() else None
             document_id_search = str(self.line_input_edit_staff_search_document_id.text()) if self.line_input_edit_staff_search_document_id.text() else None
@@ -2758,7 +2769,6 @@ class Ui_staff_management_window(object):
                         self.query.edit_grades_teacher_assigned(new_grade_guide_assigned, new_grades_assigned, staff_id)
                     
                     if self.checkbox_if_high_school_teacher_edit_staff.isChecked():
-                        print('hola')
                         high_school_teacher = False
                         self.sega.verify_and_change_primary_teacher_bool(high_school_teacher, self.results[0])
                     else:
@@ -2770,30 +2780,158 @@ class Ui_staff_management_window(object):
                 self.query.edit_multiple_columns(new_values_cleaned)
                 QtWidgets.QMessageBox.information(None, "Datos actualizados", "Los datos han sido actualizados")
                 self.clear_label_output_edit()
-                self.search_staff_button()
+                self.search_staff_button_edit_staff()
             except Exception as e:
                 print(f'Error: {e}')
         else:
             print("Cambios cancelados")
 
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
     ########################################################################################
+    ########################################################################################
+    ################################LOGICAL DELETE STAFF####################################
+    ########################################################################################
+    def search_staff_button_logical_delete(self):
+        try:
+            id_search = int(self.line_input_change_status_staff_search_id.text()) if self.line_input_change_status_staff_search_id.text() else None
+            document_id_search = str(self.line_input_change_status_staff_search_document_id.text()) if self.line_input_change_status_staff_search_document_id.text() else None
+
+            if document_id_search is not None:
+                if not document_id_validation(document_id_search):
+                    document_id_search = rewrite_document_id(document_id_search)
+                    if not document_id_validation(document_id_search):
+                        QtWidgets.QMessageBox.information(None, "Error Cedula", "Formato de cedula ingresado es erroneo, utiliza el siguiente formato XXX-XXXXXX-XXXXA o 1234567891234A")
+                        return
+                    
+            self.lds = logical_delete_staff()
+            results = self.lds.entry_data_search_query_lds(id_search, document_id_search)
+
+            if not results:
+                QtWidgets.QMessageBox.information(None, "Error", "No se encontraron resultados para la busqueda")
+                return
+            
+
+            
+            self.lds_staff_id = results[0]
+            first_name = results[1]
+            second_name = results[2]
+            first_surname = results[3]
+            second_surname = results[4]
+
+            split_name = [first_name, second_name, first_surname, second_surname]
+            split_name = [name.capitalize() for name in split_name if name is not None]
+            full_name = " ".join(split_name)
+
+            staff_id_registered = results[0]
+            document_id = results[5]
+            address = results[6]
+
+            phone_number = results[9]
+            phone_number = rewrite_phone_number(phone_number)
+
+            birthdate = results[10]
+            show_birthdate = birthdate.strftime('%d-%m-%Y')
+
+            job_id = results[7]
+
+            job_position = self.lds.job_position_get_lds(staff_id_registered)
+
+            age = str(self.calculate_age_edit_staff(birthdate))
+
+            self.label_full_name_dynamic_change_status.setText(full_name)
+            self.label_document_id_dynamic_change_status.setText(document_id)
+            self.label_address_dynamic_change_status.setText(address)
+            self.label_phone_number_dynamic_change_status.setText(phone_number)
+            self.label_job_id_dynamic_change_status.setText(job_position)
+            self.label_birthdate_dynamic_change_status.setText(show_birthdate)
+            self.label_age_dynamic_change_status.setText(age)
+
+            status_lds = self.lds.get_status(self.lds_staff_id)
+            self.label_status_dynamic_change_status.setText(status_lds)
+            
+            self.frame_change_status_staff_outputinfo.show()
+
+            if job_id == 2:
+                self.frame_if_teacher_change_status_staff.show()
+
+                guide_grade = self.lds.get_grade_guide(self.lds_staff_id)
+
+                impart_time_teacher = self.lds.get_info_impart_time_teacher(self.lds_staff_id)
+
+                self.tablew_change_status_if_teacher_grades_assigned.setRowCount(len(impart_time_teacher))
+
+                for row_index, row_data in enumerate(impart_time_teacher):
+                    for col_index, cell_data in enumerate(row_data):
+
+                        if isinstance(cell_data, time):
+                            cell_data = cell_data.strftime("%H:%M")
+                        elif cell_data is None:
+                            cell_data = "N/A"
+
+                        item = QtWidgets.QTableWidgetItem(str(cell_data))
+                        self.tablew_change_status_if_teacher_grades_assigned.setItem(row_index, col_index, item)
+                self.tablew_change_status_if_teacher_grades_assigned.resizeColumnsToContents()
+                self.label_grade_guide_if_teacher_change_status_dynamic.setText(guide_grade)
+
+
+
+
+            else:
+                self.frame_if_teacher_change_status_staff.hide()
+                self.tablew_change_status_if_teacher_grades_assigned.clear()
+                self.tablew_change_status_if_teacher_grades_assigned.clearSelection()
+
+            self.frame_buttons_change_status.show()
+        except Exception as e:
+            print(f"Error al cargar los datos: {e}")
+            QtWidgets.QMessageBox.information(None, "Error", "Error al cargar los datos")
+    
+    def hide_frames_logical_delete_staff(self):
+        self.frame_change_status_staff_outputinfo.hide()
+        self.frame_if_teacher_change_status_staff.hide()
+        self.frame_buttons_change_status.hide()
+        self.frame_buttons_confirm_change_status.hide()
+        self.buttons_change_status_confirm_if_teacher.hide()
+        self.button_change_status_cancel_if_teacher.hide()
+
+    def logical_delete_button(self):
+        delete_message = "¿Estás seguro de que deseas eliminar este registro?"
+
+        reply = QMessageBox.question(
+            None,
+            "Confirmar Acción",
+            delete_message,
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            activate_bool = False
+            self.lds.logical_delete_staff_action(self.lds_staff_id, activate_bool)
+            QtWidgets.QMessageBox.information(None, "Cambios Realizados", "El empleado seleccionado ha sido eliminado y desasignado de los demas registros, puede volver a restaurarlo \npero tendra que reasignarle las demas tareas.")
+        else:
+            QtWidgets.QMessageBox.information(None, "Se ha cancelado", "No se ha eliminado el registro del empleado")
+
+    def logical_restore_button(self):
+        delete_message = "¿Estás seguro de que deseas restaurar este registro?"
+
+        reply = QMessageBox.question(
+            None,
+            "Confirmar Acción",
+            delete_message,
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            activate_bool = True
+            self.lds.logical_delete_staff_action(self.lds_staff_id, activate_bool)
+            QtWidgets.QMessageBox.information(None, "Cambios Realizados", "El empleado seleccionado ha sido restaurado, en caso de tener grados o materias asignadas, debes volver a asignarlos")
+        else:
+            QtWidgets.QMessageBox.information(None, "Se ha cancelado", "No se ha restaurado el registro del empleado")
+
+
+
+
     def retranslateUi(self, staff_management_window):
         _translate = QtCore.QCoreApplication.translate
         staff_management_window.setWindowTitle(_translate("staff_management_window", "Administracion de personal"))

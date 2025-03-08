@@ -44,21 +44,38 @@ class staff_add_action():
         
         return True
 
-
 class staff_edit_gui_action():
     def __init__(self):
         self.query = query.Postgresqueries()
     
+    def get_status_edit_staff(self, staff_id):
+        query = f"SELECT active FROM staff WHERE staff_id = %s"
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            result = self.query.cursor.fetchone()
+            result = result[0]
+            if result:
+                return "Activo"
+            else:
+                return "Inactivo"
+        except Exception as e:
+            print(f"Error lds: get_status: {e}")
+
     def entry_data_search_query(self, search_id, search_document_id):
         if not isinstance(search_id, (int, type(None))) or not isinstance(search_document_id, (str, type(None))):
             print(search_document_id)
             return False
         
         results = self.query.search_query("staff", search_id, search_document_id, None)
+        
         if not results:
             return False
-        
-        return results
+        status = self.get_status_edit_staff(results[0])
+        if status == "Activo":
+            return results
+        else:
+            return False
+
     
     def job_position_get(self, staff_id_registered):
         self.query.cursor.execute(f"SELECT jp.job_id FROM staff st INNER JOIN job_position jp ON st.job_id = jp.job_id WHERE staff_id = {staff_id_registered}")
@@ -192,11 +209,143 @@ class staff_edit_gui_action():
     def verify_and_change_primary_teacher_bool(self, primary_bool, staff_id):
         default_bool = self.get_bool_primary_teacher_compare(staff_id)
         if primary_bool != default_bool:
-            print("Here 1")
             query = f"UPDATE teachers SET primary_teacher = %s WHERE staff_id = %s"
             try:
                 self.query.cursor.execute(query,(primary_bool, staff_id,))
                 self.query.connection.commit()
             except Exception as e:
                 print(f"Error in functions: verify_and_change_primary_teacher_bool: {e}")
-        print("default:", default_bool, "=", "primary:", primary_bool)
+
+class logical_delete_staff():
+    def __init__(self):
+        self.query = query.Postgresqueries()
+    
+    def entry_data_search_query_lds(self, search_id, search_document_id):
+        if not isinstance(search_id, (int, type(None))) or not isinstance(search_document_id, (str, type(None))):
+            print(search_document_id)
+            return False
+        
+        results = self.query.search_query("staff", search_id, search_document_id, None)
+        if not results:
+            return False
+        
+        return results
+    
+    def job_position_get_lds(self, staff_id_registered):
+        self.query.cursor.execute(f"SELECT jp.job_id FROM staff st INNER JOIN job_position jp ON st.job_id = jp.job_id WHERE staff_id = {staff_id_registered}")
+        result = self.query.cursor.fetchone()
+        if result and result[0] is not None:
+            job_position = result[0]
+            match job_position:
+                case 1:
+                    return "Administrador"
+                case 2:
+                    return "Profesor"
+                case 3:
+                    return "Tecnico en mantenimiento"
+                case _:
+                    return "Sin registro"
+        else:
+            return "Sin Asignar"
+    
+    def get_status(self, staff_id):
+        query = f"SELECT active FROM staff WHERE staff_id = %s"
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            result = self.query.cursor.fetchone()
+            result = result[0]
+            if result:
+                return "Activo"
+            else:
+                return "Inactivo"
+        except Exception as e:
+            print(f"Error lds: get_status: {e}")
+    
+    def get_grade_guide(self, staff_id):
+        query = f"""SELECT 
+                    g.grade 
+                    FROM teachers th 
+                    INNER JOIN grades g ON th.guide_grade_id = g.grade_id 
+                    WHERE staff_id = %s"""
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            result = self.query.cursor.fetchone()
+            if result and result is not None:
+                return result[0]
+            else:
+                return "Sin Asignar"
+        except Exception as e:
+            print(f"Error lsd: get_grade_guide: {e}")
+    
+    def get_info_impart_time_teacher(self, staff_id):
+        query = f"""
+                    SELECT
+                        g.grade,
+                        sb.subject,
+                        itt.impart_time_start,
+                        itt.impart_time_end
+                    FROM impart_time_teacher itt
+                    INNER JOIN teacher_grade_assigned tga ON itt.teacher_grade_assigned_id = tga.tga_id
+                    INNER JOIN subject_teacher sbt ON itt.subject_teacher_id = sbt.subject_teacher_id
+
+                    INNER JOIN grades g ON tga.grade_id = g.grade_id
+                    INNER JOIN subjects sb ON sbt.subject_id = sb.subject_id
+
+                    WHERE 
+                        EXISTS (
+                            SELECT 1 
+                            FROM teacher_grade_assigned tga2 
+                            INNER JOIN subject_teacher sbt2 
+                                ON tga2.teacher_id = sbt2.teacher_id
+                            WHERE tga2.teacher_id = (SELECT teacher_id FROM teachers WHERE staff_id = %s)
+                            AND tga2.tga_id = itt.teacher_grade_assigned_id
+                            AND sbt2.subject_teacher_id = itt.subject_teacher_id
+                        );
+                       """
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            results = self.query.cursor.fetchall()
+            if results and results is not None:
+                return results
+            else:
+                return [("Sin asignar","Sin asignar","Sin asignar","Sin asignar")]
+        except Exception as e:
+            print(f"Error lds: get_info_impart_time_teacher: {e}")
+            return ["Error", "Error", "Error", "Error"]
+    
+    def detect_current_active_lds(self, staff_id, active_change):
+        query = f"SELECT active FROM staff WHERE staff_id = %s"
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            active = self.query.cursor.fetchone()
+            if active[0] != active_change:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(f"Error lds: detect_current_active_lds: {e}")
+
+    def logical_delete_staff_action(self, staff_id, active_change):
+        if not active_change:
+            if not self.detect_current_active_lds(staff_id, active_change):
+                return
+            
+            query = f"SELECT deactivate_staff_and_teachers(%s)"
+            try:
+                self.query.cursor.execute(query,(staff_id,))
+                self.query.connection.commit()
+            except Exception as e:
+                print(f"Error LDS: logical_delete_staff_deactivate: {e}")
+                self.query.connection.rollback()
+       
+        if active_change:
+            if not self.detect_current_active_lds(staff_id, active_change):
+                return
+            
+            query = f"SELECT activate_staff_and_teachers(%s)"
+            try:
+                self.query.cursor.execute(query,(staff_id,))
+                self.query.connection.commit()
+            except Exception as e:
+                print(f"Error LDS: logical_delete_staff_deactivate: {e}")
+                self.query.connection.rollback()
