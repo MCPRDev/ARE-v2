@@ -2954,22 +2954,24 @@ class Ui_staff_management_window(object):
         self.ssw = search_staff_widget()
         rows_staff = self.ssw.load_staff_table()
         self.tablew_show_staff_registered_search_staff.setRowCount(0)
+        if rows_staff is not None:
+            header = self.tablew_show_staff_registered_search_staff.horizontalHeader()
+            header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+            header.setStretchLastSection(True)
 
-        header = self.tablew_show_staff_registered_search_staff.horizontalHeader()
-        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
-        header.setStretchLastSection(True)
+            for row_index, row in enumerate(rows_staff):
+                self.tablew_show_staff_registered_search_staff.insertRow(row_index)
 
-        for row_index, row in enumerate(rows_staff):
-            self.tablew_show_staff_registered_search_staff.insertRow(row_index)
+                for col_index, value in enumerate(row):
+                    item = QtWidgets.QTableWidgetItem(str(value))
+                    item.setToolTip(str(value))
+                    item.setFlags(item.flags() | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
+                    item.setTextAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+                    self.tablew_show_staff_registered_search_staff.setItem(row_index, col_index, item)
 
-            for col_index, value in enumerate(row):
-                item = QtWidgets.QTableWidgetItem(str(value))
-                item.setToolTip(str(value))
-                item.setFlags(item.flags() | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
-                item.setTextAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-                self.tablew_show_staff_registered_search_staff.setItem(row_index, col_index, item)
-
-        self.tablew_show_staff_registered_search_staff.resizeRowsToContents()
+            self.tablew_show_staff_registered_search_staff.resizeRowsToContents()
+        else:
+            pass
 
     def filter_search_staff(self):
         search_full_name = self.line_input_full_name_search_staff.text().strip().lower()

@@ -384,6 +384,7 @@ class search_staff_widget():
             results = self.query.cursor.fetchall()
             if results and results is not None:
                 new_results = list()
+                job_position_translate = ["Administrador", "Profesor", "Tecnico en Mantenimiento"]
                 for values in results:
                     values = list(values)
                     if values[5] is not None:
@@ -392,7 +393,13 @@ class search_staff_widget():
                         values.insert(6, age)
                         status = self.get_status(values[0])
                         values.insert(len(values), status)
+
+                        values = [job_position_translate[0] if x == 'Administrator' else x for x in values]
+                        values = [job_position_translate[1] if x == 'Teacher' else x for x in values]
+                        values = [job_position_translate[2] if x == 'Technical Maintenance' else x for x in values]
+                        
                         new_results.append(values)
+
                 return new_results
             else:
                 return None
