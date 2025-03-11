@@ -26,21 +26,21 @@ class Ui_staff_management_window(object):
         staff_management_window.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(staff_management_window)
         self.centralwidget.setObjectName("centralwidget")
-        self.subjects_widget = QtWidgets.QTabWidget(self.centralwidget)
-        self.subjects_widget.setGeometry(QtCore.QRect(0, 0, 1215, 690))
+        self.main_central_widget = QtWidgets.QTabWidget(self.centralwidget)
+        self.main_central_widget.setGeometry(QtCore.QRect(0, 0, 1215, 690))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.subjects_widget.sizePolicy().hasHeightForWidth())
-        self.subjects_widget.setSizePolicy(sizePolicy)
-        self.subjects_widget.setMinimumSize(QtCore.QSize(1215, 690))
-        self.subjects_widget.setMaximumSize(QtCore.QSize(1215, 690))
-        self.subjects_widget.setTabShape(QtWidgets.QTabWidget.Rounded)
-        self.subjects_widget.setDocumentMode(False)
-        self.subjects_widget.setTabsClosable(False)
-        self.subjects_widget.setMovable(False)
-        self.subjects_widget.setTabBarAutoHide(False)
-        self.subjects_widget.setObjectName("subjects_widget")
+        sizePolicy.setHeightForWidth(self.main_central_widget.sizePolicy().hasHeightForWidth())
+        self.main_central_widget.setSizePolicy(sizePolicy)
+        self.main_central_widget.setMinimumSize(QtCore.QSize(1215, 690))
+        self.main_central_widget.setMaximumSize(QtCore.QSize(1215, 690))
+        self.main_central_widget.setTabShape(QtWidgets.QTabWidget.Rounded)
+        self.main_central_widget.setDocumentMode(False)
+        self.main_central_widget.setTabsClosable(False)
+        self.main_central_widget.setMovable(False)
+        self.main_central_widget.setTabBarAutoHide(False)
+        self.main_central_widget.setObjectName("main_central_widget")
         self.Materias = QtWidgets.QWidget()
         self.Materias.setObjectName("Materias")
         self.frame_subject = QtWidgets.QFrame(self.Materias)
@@ -101,9 +101,6 @@ class Ui_staff_management_window(object):
         self.button_delete_subject.setObjectName("button_delete_subject")
         self.button_delete_subject.setEnabled(False)
         self.horizontalLayout.addWidget(self.button_delete_subject)
-        #self.button_refresh_subjects_list = QtWidgets.QPushButton(self.frame_buttons_subjects)
-        #self.button_refresh_subjects_list.setObjectName("button_refresh_subjects_list")
-        #self.horizontalLayout.addWidget(self.button_refresh_subjects_list)
         self.button_edit_subject = QtWidgets.QPushButton(self.frame_buttons_subjects)
         self.button_edit_subject.setObjectName("button_edit_subject")
         self.horizontalLayout.addWidget(self.button_edit_subject)
@@ -136,7 +133,7 @@ class Ui_staff_management_window(object):
         font.setWeight(75)
         self.label_subject_search_name_2.setFont(font)
         self.label_subject_search_name_2.setObjectName("label_subject_search_name_2")
-        self.subjects_widget.addTab(self.Materias, "")
+        self.main_central_widget.addTab(self.Materias, "")
         self.add_staff_widget = QtWidgets.QWidget()
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
@@ -544,7 +541,7 @@ class Ui_staff_management_window(object):
         self.label_output_grades = QtWidgets.QLabel(self.frame_output_information_grade_subject)
         self.label_output_grades.setGeometry(QtCore.QRect(220, 10, 111, 20))
         self.label_output_grades.setObjectName("label_output_grades")
-        self.subjects_widget.addTab(self.add_staff_widget, "")
+        self.main_central_widget.addTab(self.add_staff_widget, "")
         self.edit_staff_widget = QtWidgets.QWidget()
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
@@ -941,7 +938,7 @@ class Ui_staff_management_window(object):
         self.button_clean_information_2 = QtWidgets.QPushButton(self.frame_buttons_edit)
         self.button_clean_information_2.setGeometry(QtCore.QRect(500, 70, 111, 41))
         self.button_clean_information_2.setObjectName("button_clean_information_2")
-        self.subjects_widget.addTab(self.edit_staff_widget, "")
+        self.main_central_widget.addTab(self.edit_staff_widget, "")
         self.change_status_staff_widget = QtWidgets.QWidget()
         self.change_status_staff_widget.setObjectName("change_status_staff_widget")
         self.frame_change_status_staff = QtWidgets.QFrame(self.change_status_staff_widget)
@@ -1180,7 +1177,7 @@ class Ui_staff_management_window(object):
         self.button_cancel_change_status = QtWidgets.QPushButton(self.frame_buttons_confirm_change_status)
         self.button_cancel_change_status.setObjectName("button_cancel_change_status")
         self.horizontalLayout_3.addWidget(self.button_cancel_change_status)
-        self.subjects_widget.addTab(self.change_status_staff_widget, "")
+        self.main_central_widget.addTab(self.change_status_staff_widget, "")
         self.search_staff_widget = QtWidgets.QWidget()
         self.search_staff_widget.setObjectName("search_staff_widget")
         self.frame_search_staff = QtWidgets.QFrame(self.search_staff_widget)
@@ -1194,8 +1191,9 @@ class Ui_staff_management_window(object):
         self.tablew_show_staff_registered_search_staff.setEditTriggers(QtWidgets.QAbstractItemView.SelectedClicked)
         self.tablew_show_staff_registered_search_staff.setAlternatingRowColors(False)
         self.tablew_show_staff_registered_search_staff.setObjectName("tablew_show_staff_registered_search_staff")
-        self.tablew_show_staff_registered_search_staff.setColumnCount(8)
+        self.tablew_show_staff_registered_search_staff.setColumnCount(9)
         self.tablew_show_staff_registered_search_staff.setRowCount(0)
+        self.tablew_show_staff_registered_search_staff.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         item = QtWidgets.QTableWidgetItem()
         self.tablew_show_staff_registered_search_staff.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -1212,7 +1210,10 @@ class Ui_staff_management_window(object):
         self.tablew_show_staff_registered_search_staff.setHorizontalHeaderItem(6, item)
         item = QtWidgets.QTableWidgetItem()
         self.tablew_show_staff_registered_search_staff.setHorizontalHeaderItem(7, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tablew_show_staff_registered_search_staff.setHorizontalHeaderItem(8, item)
         self.tablew_show_staff_registered_search_staff.verticalHeader().setSortIndicatorShown(False)
+        self.tablew_show_staff_registered_search_staff.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         self.frame_details_search_staff = QtWidgets.QFrame(self.frame_search_staff)
         self.frame_details_search_staff.setGeometry(QtCore.QRect(9, -1, 911, 91))
         font = QtGui.QFont()
@@ -1222,41 +1223,23 @@ class Ui_staff_management_window(object):
         self.frame_details_search_staff.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_details_search_staff.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_details_search_staff.setObjectName("frame_details_search_staff")
-        self.label_first_name_search_staff = QtWidgets.QLabel(self.frame_details_search_staff)
-        self.label_first_name_search_staff.setGeometry(QtCore.QRect(10, 10, 101, 16))
-        self.label_first_name_search_staff.setObjectName("label_first_name_search_staff")
-        self.label_second_name_search_staff = QtWidgets.QLabel(self.frame_details_search_staff)
-        self.label_second_name_search_staff.setGeometry(QtCore.QRect(340, 10, 111, 16))
-        self.label_second_name_search_staff.setObjectName("label_second_name_search_staff")
-        self.label_first_surname_search_staff = QtWidgets.QLabel(self.frame_details_search_staff)
-        self.label_first_surname_search_staff.setGeometry(QtCore.QRect(10, 60, 101, 16))
-        self.label_first_surname_search_staff.setObjectName("label_first_surname_search_staff")
-        self.label_second_surname_search_staff = QtWidgets.QLabel(self.frame_details_search_staff)
-        self.label_second_surname_search_staff.setGeometry(QtCore.QRect(340, 60, 111, 16))
-        self.label_second_surname_search_staff.setObjectName("label_second_surname_search_staff")
+        self.label_full_name_search_staff = QtWidgets.QLabel(self.frame_details_search_staff)
+        self.label_full_name_search_staff.setGeometry(QtCore.QRect(10, 10, 121, 16))
+        self.label_full_name_search_staff.setObjectName("label_full_name_search_staff")
         self.label_document_id_search_staff = QtWidgets.QLabel(self.frame_details_search_staff)
-        self.label_document_id_search_staff.setGeometry(QtCore.QRect(660, 10, 51, 16))
+        self.label_document_id_search_staff.setGeometry(QtCore.QRect(640, 10, 51, 16))
         self.label_document_id_search_staff.setObjectName("label_document_id_search_staff")
         self.label_phone_number_search_staff = QtWidgets.QLabel(self.frame_details_search_staff)
-        self.label_phone_number_search_staff.setGeometry(QtCore.QRect(660, 60, 131, 16))
+        self.label_phone_number_search_staff.setGeometry(QtCore.QRect(10, 50, 131, 16))
         self.label_phone_number_search_staff.setObjectName("label_phone_number_search_staff")
-        self.line_input_first_name_search_staff = QtWidgets.QLineEdit(self.frame_details_search_staff)
-        self.line_input_first_name_search_staff.setGeometry(QtCore.QRect(130, 10, 191, 20))
-        self.line_input_first_name_search_staff.setObjectName("line_input_first_name_search_staff")
-        self.line_input_second_name_search_staff = QtWidgets.QLineEdit(self.frame_details_search_staff)
-        self.line_input_second_name_search_staff.setGeometry(QtCore.QRect(460, 10, 191, 20))
-        self.line_input_second_name_search_staff.setObjectName("line_input_second_name_search_staff")
-        self.line_input_first_surname_search_staff = QtWidgets.QLineEdit(self.frame_details_search_staff)
-        self.line_input_first_surname_search_staff.setGeometry(QtCore.QRect(130, 60, 191, 20))
-        self.line_input_first_surname_search_staff.setObjectName("line_input_first_surname_search_staff")
-        self.line_input_second_surname_search_staff = QtWidgets.QLineEdit(self.frame_details_search_staff)
-        self.line_input_second_surname_search_staff.setGeometry(QtCore.QRect(460, 60, 191, 20))
-        self.line_input_second_surname_search_staff.setObjectName("line_input_second_surname_search_staff")
+        self.line_input_full_name_search_staff = QtWidgets.QLineEdit(self.frame_details_search_staff)
+        self.line_input_full_name_search_staff.setGeometry(QtCore.QRect(140, 10, 451, 20))
+        self.line_input_full_name_search_staff.setObjectName("line_input_full_name_search_staff")
         self.line_input_document_id_search_staff = QtWidgets.QLineEdit(self.frame_details_search_staff)
-        self.line_input_document_id_search_staff.setGeometry(QtCore.QRect(710, 10, 191, 20))
+        self.line_input_document_id_search_staff.setGeometry(QtCore.QRect(690, 10, 191, 20))
         self.line_input_document_id_search_staff.setObjectName("line_input_document_id_search_staff")
         self.line_input_phone_number_search_staff = QtWidgets.QLineEdit(self.frame_details_search_staff)
-        self.line_input_phone_number_search_staff.setGeometry(QtCore.QRect(790, 60, 91, 20))
+        self.line_input_phone_number_search_staff.setGeometry(QtCore.QRect(140, 50, 91, 20))
         self.line_input_phone_number_search_staff.setText("")
         self.line_input_phone_number_search_staff.setObjectName("line_input_phone_number_search_staff")
         self.frame_buttons_actions_search_staff = QtWidgets.QFrame(self.frame_search_staff)
@@ -1272,7 +1255,10 @@ class Ui_staff_management_window(object):
         self.button_edit_selected_staff_search_staff = QtWidgets.QPushButton(self.frame_buttons_actions_search_staff)
         self.button_edit_selected_staff_search_staff.setObjectName("button_edit_selected_staff_search_staff")
         self.verticalLayout_4.addWidget(self.button_edit_selected_staff_search_staff)
-        self.subjects_widget.addTab(self.search_staff_widget, "")
+        self.button_clear_information_search_staff = QtWidgets.QPushButton(self.frame_buttons_actions_search_staff)
+        self.button_clear_information_search_staff.setObjectName("button_clear_information_search_staff")
+        self.verticalLayout_4.addWidget(self.button_clear_information_search_staff)
+        self.main_central_widget.addTab(self.search_staff_widget, "")
         self.impart_teacher_time = QtWidgets.QWidget()
         self.impart_teacher_time.setObjectName("impart_teacher_time")
         self.frame_impart_teacher_time = QtWidgets.QFrame(self.impart_teacher_time)
@@ -1459,7 +1445,7 @@ class Ui_staff_management_window(object):
         self.label_time_selected_data_dynamic_impart_tt.setFont(font)
         self.label_time_selected_data_dynamic_impart_tt.setText("")
         self.label_time_selected_data_dynamic_impart_tt.setObjectName("label_time_selected_data_dynamic_impart_tt")
-        self.subjects_widget.addTab(self.impart_teacher_time, "")
+        self.main_central_widget.addTab(self.impart_teacher_time, "")
         self.new_login = QtWidgets.QWidget()
         self.new_login.setObjectName("new_login")
         self.tablew_software_access_show = QtWidgets.QTableWidget(self.new_login)
@@ -1659,13 +1645,7 @@ class Ui_staff_management_window(object):
         self.line_software_access_7.setLineWidth(2)
         self.line_software_access_7.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_software_access_7.setObjectName("line_software_access_7")
-        self.subjects_widget.addTab(self.new_login, "")
-        self.button_admin_actions = QtWidgets.QWidget()
-        self.button_admin_actions.setObjectName("button_admin_actions")
-        self.button_open_allperms_admin = QtWidgets.QPushButton(self.button_admin_actions)
-        self.button_open_allperms_admin.setGeometry(QtCore.QRect(0, 0, 1201, 661))
-        self.button_open_allperms_admin.setObjectName("button_open_allperms_admin")
-        self.subjects_widget.addTab(self.button_admin_actions, "")
+        self.main_central_widget.addTab(self.new_login, "")
         staff_management_window.setCentralWidget(self.centralwidget)
         self.actionLimpiar_Datos = QtWidgets.QAction(staff_management_window)
         self.actionLimpiar_Datos.setObjectName("actionLimpiar_Datos")
@@ -1686,8 +1666,8 @@ class Ui_staff_management_window(object):
         
 
         ######Load data from database to show in qtablewidget subject############
-        self.db_listener = Postgresqueries(self.load_data_subjects_subjects_widget)
-        self.load_data_subjects_subjects_widget()
+        self.db_listener = Postgresqueries(self.load_data_subjects_main_central_widget)
+        self.load_data_subjects_main_central_widget()
         self.tablew_subject_show.cellClicked.connect(self.qtablew_row_clicked)
 
         ########################################################################
@@ -1750,12 +1730,23 @@ class Ui_staff_management_window(object):
         self.button_change_status_delete.clicked.connect(self.logical_delete_button)
         self.button_chhange_status_restore.clicked.connect(self.logical_restore_button)
 
+        ########################################################################################
+        ########################################################################################
+        ################################Search Staff Table######################################
+        ########################################################################################
+        self.load_staff_data_search_staff()
 
 
+        #####SIGNALS####
+        self.line_input_full_name_search_staff.textChanged.connect(self.filter_search_staff)
+        self.line_input_document_id_search_staff.textChanged.connect(self.filter_search_staff)
+        self.line_input_phone_number_search_staff.textChanged.connect(self.filter_search_staff)
 
-
+        #####Buttons####
+        self.button_edit_selected_staff_search_staff.clicked.connect(self.edit_selected_staff)
+        self.button_clear_information_search_staff.clicked.connect(self.clean_inputs_search_staff)
         self.retranslateUi(staff_management_window)
-        self.subjects_widget.setCurrentIndex(7)
+        self.main_central_widget.setCurrentIndex(7)
         QtCore.QMetaObject.connectSlotsByName(staff_management_window)
     
     ################################
@@ -1779,7 +1770,7 @@ class Ui_staff_management_window(object):
             else:
                 self.tablew_subject_show.setRowHidden(row, True)
 
-    def load_data_subjects_subjects_widget(self):
+    def load_data_subjects_main_central_widget(self):
         subject_rows = self.query.show_data_subjects()
         self.tablew_subject_show.setRowCount(0)
 
@@ -1871,7 +1862,7 @@ class Ui_staff_management_window(object):
                 self.button_edit_subject.setEnabled(False)
                 self.button_delete_subject.setEnabled(False)
             else:
-                self.load_data_subjects_subjects_widget()
+                self.load_data_subjects_main_central_widget()
                 self.id_value = None
                 self.tablew_subject_show.clearSelection()
                 self.button_edit_subject.setEnabled(False)
@@ -2739,10 +2730,10 @@ class Ui_staff_management_window(object):
         }
 
         if new_job_position == 2:
-            dialog_show_subjects_and_grades_saved = TeacherAssignmentDialog(new_subject_main_assigned, new_grade_guide_assigned, new_subjects_assigned, new_grades_assigned, None)
+            dialog_show_subjects_and_grades_saved = TeacherAssignmentDialogEditStaff(new_subject_main_assigned, new_grade_guide_assigned, new_subjects_assigned, new_grades_assigned, None)
             dialog_show_subjects_and_grades_saved.exec_()
         
-        dialog_show_data_saved = EditDialog(self.old_data_edit,new_values , None)
+        dialog_show_data_saved = EditDialogEditStaff(self.old_data_edit,new_values , None)
         
         result = dialog_show_data_saved.exec_()
         if result == QDialog.Accepted:
@@ -2881,6 +2872,8 @@ class Ui_staff_management_window(object):
                 self.tablew_change_status_if_teacher_grades_assigned.clearSelection()
 
             self.frame_buttons_change_status.show()
+
+            self.enable_disable_buttons_logical_delete(self.lds_staff_id)
         except Exception as e:
             print(f"Error al cargar los datos: {e}")
             QtWidgets.QMessageBox.information(None, "Error", "Error al cargar los datos")
@@ -2908,6 +2901,7 @@ class Ui_staff_management_window(object):
             activate_bool = False
             self.lds.logical_delete_staff_action(self.lds_staff_id, activate_bool)
             QtWidgets.QMessageBox.information(None, "Cambios Realizados", "El empleado seleccionado ha sido eliminado y desasignado de los demas registros, puede volver a restaurarlo \npero tendra que reasignarle las demas tareas.")
+            self.search_staff_button_logical_delete()
         else:
             QtWidgets.QMessageBox.information(None, "Se ha cancelado", "No se ha eliminado el registro del empleado")
 
@@ -2926,11 +2920,119 @@ class Ui_staff_management_window(object):
             activate_bool = True
             self.lds.logical_delete_staff_action(self.lds_staff_id, activate_bool)
             QtWidgets.QMessageBox.information(None, "Cambios Realizados", "El empleado seleccionado ha sido restaurado, en caso de tener grados o materias asignadas, debes volver a asignarlos")
+            self.search_staff_button_logical_delete()
         else:
             QtWidgets.QMessageBox.information(None, "Se ha cancelado", "No se ha restaurado el registro del empleado")
 
+    def enable_disable_buttons_logical_delete(self, staff_id):
+        status = self.lds.get_status(staff_id)
+        match status:
+
+            case "Activo":
+                self.button_chhange_status_restore.setEnabled(False)
+                self.button_change_status_delete.setEnabled(True)
+
+            case "Inactivo":
+                self.button_chhange_status_restore.setEnabled(True)
+                self.button_change_status_delete.setEnabled(False)
+
+            case _:
+                self.button_chhange_status_restore.setEnabled(False)
+                self.button_change_status_delete.setEnabled(False)
+
+    
+    ########################################################################################
+    ########################################################################################
+    ################################Search Staff Table######################################
+    ########################################################################################
+
+    def load_staff_data_search_staff(self):
+        self.ssw = search_staff_widget()
+        rows_staff = self.ssw.load_staff_table()
+        self.tablew_show_staff_registered_search_staff.setRowCount(0)
+
+        header = self.tablew_show_staff_registered_search_staff.horizontalHeader()
+        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        header.setStretchLastSection(True)
+
+        for row_index, row in enumerate(rows_staff):
+            self.tablew_show_staff_registered_search_staff.insertRow(row_index)
+
+            for col_index, value in enumerate(row):
+                item = QtWidgets.QTableWidgetItem(str(value))
+                item.setToolTip(str(value))
+                item.setFlags(item.flags() | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
+                item.setTextAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+                self.tablew_show_staff_registered_search_staff.setItem(row_index, col_index, item)
+
+        self.tablew_show_staff_registered_search_staff.resizeRowsToContents()
+
+    def filter_search_staff(self):
+        search_full_name = self.line_input_full_name_search_staff.text().strip().lower()
+
+        search_document_id = self.line_input_document_id_search_staff.text().strip().lower()
+        search_number_phone = self.line_input_phone_number_search_staff.text().strip().lower()
+
+        for row in range(self.tablew_show_staff_registered_search_staff.rowCount()):
+            full_name = self.tablew_show_staff_registered_search_staff.item(row, 1).text().lower() if self.tablew_show_staff_registered_search_staff.item(row, 1) else " "
+            document_id = self.tablew_show_staff_registered_search_staff.item(row, 2).text().lower() if self.tablew_show_staff_registered_search_staff.item(row, 1) else " "
+            phone_number = self.tablew_show_staff_registered_search_staff.item(row, 4).text().lower() if self.tablew_show_staff_registered_search_staff.item(row, 1) else " "
+        
+            match_first_name = search_full_name in full_name
+            match_document_id = search_document_id in document_id
+            match_phone = search_number_phone in phone_number
+
+            if (match_first_name and match_phone and match_document_id):
+                self.tablew_show_staff_registered_search_staff.setRowHidden(row, False)
+            else:
+                self.tablew_show_staff_registered_search_staff.setRowHidden(row, True)
+
+    def edit_selected_staff(self):
+        selected_row = self.tablew_show_staff_registered_search_staff.currentRow()
+
+        if selected_row >= 0:
+            id_item = self.tablew_show_staff_registered_search_staff.item(selected_row, 0)
+            if id_item:
+                selected_id = id_item.text()
+
+                self.main_central_widget.setCurrentWidget(self.edit_staff_widget)
+
+                self.line_input_edit_staff_search_id.setText(selected_id)
+
+                self.button_search_edit_staff.click()
+        else:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "No hay ninguna fila seleccionada.")
+
+    def clean_inputs_search_staff(self):
+        self.line_input_full_name_search_staff.clean()
+        self.line_input_phone_number_search_staff.clean()
+        self.line_input_document_id_search_staff.clean()
+
+    def details_button_search_staff(self):
+        selected_row = self.tablew_show_staff_registered_search_staff.currentRow()
+
+        if selected_row >= 0:
+            staff_id = self.tablew_show_staff_registered_search_staff.item(selected_row, 0)
+
+            if staff_id:
+                selected_id = staff_id.text()
+                selected_id = int(selected_id)
+
+                status =  self.ssw.get_status(selected_id)
+
+                match status:
+                    case "Activo":
+                        job_id = self.ssw.get_job_id(selected_id)
+                        if job_id == 2:
+                            
+                            guide_grade, main_subject = self.ssw.get_main_subject_guide_grade(staff_id)
 
 
+
+                    case "Inactivo":
+                        QtWidgets.QMessageBox.information(None, "Empleado Inactivo", "El empleado actualmente esta inactivo/borrado de la base de datos, no hay detalles a mostrar")
+        else:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "No hay ninguna fila seleccionada.")
 
     def retranslateUi(self, staff_management_window):
         _translate = QtCore.QCoreApplication.translate
@@ -2947,7 +3049,7 @@ class Ui_staff_management_window(object):
         self.button_add_subject.setText(_translate("staff_management_window", "Agregar Materia"))
         self.label_subject_search_name.setText(_translate("staff_management_window", "Buscar Materia"))
         self.label_subject_search_name_2.setText(_translate("staff_management_window", "Buscar ID"))
-        self.subjects_widget.setTabText(self.subjects_widget.indexOf(self.Materias), _translate("staff_management_window", "Materias"))
+        self.main_central_widget.setTabText(self.main_central_widget.indexOf(self.Materias), _translate("staff_management_window", "Materias"))
         self.label_fname.setText(_translate("staff_management_window", "Primer Nombre"))
         self.label_sname.setText(_translate("staff_management_window", "Segundo Nombre"))
         self.label_fsurname.setText(_translate("staff_management_window", "Primer Apellido"))
@@ -2991,7 +3093,7 @@ class Ui_staff_management_window(object):
         self.button_cancelar_information_add_staff.setText(_translate("staff_management_window", "Cancelar"))
         self.label_output_subjects.setText(_translate("staff_management_window", "Materias Seleccionadas"))
         self.label_output_grades.setText(_translate("staff_management_window", "Grados Seleccionados"))
-        self.subjects_widget.setTabText(self.subjects_widget.indexOf(self.add_staff_widget), _translate("staff_management_window", "Agregar Personal"))
+        self.main_central_widget.setTabText(self.main_central_widget.indexOf(self.add_staff_widget), _translate("staff_management_window", "Agregar Personal"))
         self.label_search_id_edit.setText(_translate("staff_management_window", "Buscar por ID:"))
         self.label_search_document_id_edit.setText(_translate("staff_management_window", "Buscar por Cedula:"))
         self.button_search_edit_staff.setText(_translate("staff_management_window", "Buscar"))
@@ -3027,7 +3129,7 @@ class Ui_staff_management_window(object):
         self.label_selection_guide_grade_edit.setText(_translate("staff_management_window", "Selecciona el grado guia:"))
         self.button_save_edit_staff.setText(_translate("staff_management_window", "Guardar"))
         self.button_clean_information_2.setText(_translate("staff_management_window", "Limpiar"))
-        self.subjects_widget.setTabText(self.subjects_widget.indexOf(self.edit_staff_widget), _translate("staff_management_window", "Modificar Personal"))
+        self.main_central_widget.setTabText(self.main_central_widget.indexOf(self.edit_staff_widget), _translate("staff_management_window", "Modificar Personal"))
         self.label_search_id_change_status.setText(_translate("staff_management_window", "Buscar por ID:"))
         self.label_search_document_id_change_status.setText(_translate("staff_management_window", "Buscar por Cedula:"))
         self.button_search_change_status_staff.setText(_translate("staff_management_window", "Buscar"))
@@ -3058,7 +3160,7 @@ class Ui_staff_management_window(object):
         self.button_change_status_cancel_if_teacher.setText(_translate("staff_management_window", "Cancelar"))
         self.button_confirm_change_status.setText(_translate("staff_management_window", "Confirmar"))
         self.button_cancel_change_status.setText(_translate("staff_management_window", "Cancelar"))
-        self.subjects_widget.setTabText(self.subjects_widget.indexOf(self.change_status_staff_widget), _translate("staff_management_window", "Eliminar Personal"))
+        self.main_central_widget.setTabText(self.main_central_widget.indexOf(self.change_status_staff_widget), _translate("staff_management_window", "Eliminar Personal"))
         self.tablew_show_staff_registered_search_staff.setSortingEnabled(False)
         item = self.tablew_show_staff_registered_search_staff.horizontalHeaderItem(0)
         item.setText(_translate("staff_management_window", "ID Registrado"))
@@ -3076,15 +3178,15 @@ class Ui_staff_management_window(object):
         item.setText(_translate("staff_management_window", "Edad"))
         item = self.tablew_show_staff_registered_search_staff.horizontalHeaderItem(7)
         item.setText(_translate("staff_management_window", "Puesto"))
-        self.label_first_name_search_staff.setText(_translate("staff_management_window", "Primer Nombre:"))
-        self.label_second_name_search_staff.setText(_translate("staff_management_window", "Segundo Nombre:"))
-        self.label_first_surname_search_staff.setText(_translate("staff_management_window", "Primer Apellido:"))
-        self.label_second_surname_search_staff.setText(_translate("staff_management_window", "Segundo Apellido:"))
+        item = self.tablew_show_staff_registered_search_staff.horizontalHeaderItem(8)
+        item.setText(_translate("staff_management_window", "Estado"))
+        self.label_full_name_search_staff.setText(_translate("staff_management_window", "Nombre Completo:"))
         self.label_document_id_search_staff.setText(_translate("staff_management_window", "Cedula:"))
         self.label_phone_number_search_staff.setText(_translate("staff_management_window", "Numero de Telefono:"))
         self.button_show_deailts_qtable_selected_search_staff.setText(_translate("staff_management_window", "Detalles"))
         self.button_edit_selected_staff_search_staff.setText(_translate("staff_management_window", "Editar"))
-        self.subjects_widget.setTabText(self.subjects_widget.indexOf(self.search_staff_widget), _translate("staff_management_window", "Buscar Personal"))
+        self.main_central_widget.setTabText(self.main_central_widget.indexOf(self.search_staff_widget), _translate("staff_management_window", "Buscar Personal"))
+        self.button_clear_information_search_staff.setText(_translate("staff_management_window", "Limpiar"))
         self.label_select_teacher_static_impart_tt.setText(_translate("staff_management_window", "Selecciona un profesor (Selecciona la ID Profesor si desea editar informacion):"))
         self.tablew_select_teacher_impart_tt.setSortingEnabled(True)
         item = self.tablew_select_teacher_impart_tt.horizontalHeaderItem(0)
@@ -3117,7 +3219,7 @@ class Ui_staff_management_window(object):
         self.label_subject_selected_impart_tt.setText(_translate("staff_management_window", "Materia:"))
         self.label_grade_selected_data_impart_tt.setText(_translate("staff_management_window", "Grado:"))
         self.label_teacher_selected_data_impart_tt.setText(_translate("staff_management_window", "Profesor:"))
-        self.subjects_widget.setTabText(self.subjects_widget.indexOf(self.impart_teacher_time), _translate("staff_management_window", "Tiempo de clases"))
+        self.main_central_widget.setTabText(self.main_central_widget.indexOf(self.impart_teacher_time), _translate("staff_management_window", "Tiempo de clases"))
         item = self.tablew_software_access_show.horizontalHeaderItem(0)
         item.setText(_translate("staff_management_window", "ID Empleado"))
         item = self.tablew_software_access_show.horizontalHeaderItem(1)
@@ -3143,13 +3245,11 @@ class Ui_staff_management_window(object):
         self.label_remove_access_software_access.setText(_translate("staff_management_window", "Quitar Acceso"))
         self.label_remove_access_by_document_id_software_access.setText(_translate("staff_management_window", "Cedula:"))
         self.button_remove_access_software_access.setText(_translate("staff_management_window", "Quitar Acceso"))
-        self.subjects_widget.setTabText(self.subjects_widget.indexOf(self.new_login), _translate("staff_management_window", "Acceso al software"))
-        self.button_open_allperms_admin.setText(_translate("staff_management_window", "Mostrar Consola / Abrir Ventana de Controles"))
-        self.subjects_widget.setTabText(self.subjects_widget.indexOf(self.button_admin_actions), _translate("staff_management_window", "Acciones Administrativas DB"))
+        self.main_central_widget.setTabText(self.main_central_widget.indexOf(self.new_login), _translate("staff_management_window", "Acceso al software"))
         self.actionLimpiar_Datos.setText(_translate("staff_management_window", "Limpiar Datos"))
     
 
-class EditDialog(QDialog):
+class EditDialogEditStaff(QDialog):
     def __init__(self, old_data, new_data, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Confirmar Cambios")
@@ -3212,7 +3312,7 @@ class EditDialog(QDialog):
 
         self.setLayout(layout)
 
-class TeacherAssignmentDialog(QDialog):
+class TeacherAssignmentDialogEditStaff(QDialog):
     def __init__(self, main_subject, guided_grade, subjects_list, grades_list, parent=None):
         super().__init__(parent) 
         self.main_subject = main_subject if main_subject is not None else "No asignado"
@@ -3255,6 +3355,80 @@ class TeacherAssignmentDialog(QDialog):
         layout.addWidget(self.close_button)
 
         self.setLayout(layout)
+
+
+from PyQt5 import QtWidgets, QtCore
+from datetime import datetime  # Para manejar fechas
+
+class StaffInfoDialog(QtWidgets.QDialog):
+    def __init__(self, job_id, guide_grade, main_subject, assigned_grades, assigned_subjects, schedule, fecha_registro, fecha_actualizacion, parent=None):
+        super().__init__(parent)
+
+        self.setWindowTitle("Información del Personal")
+        self.setMinimumSize(600, 400)
+
+        # Layout principal
+        layout = QtWidgets.QVBoxLayout(self)
+
+        if job_id == 2:  # Profesor
+            self.setup_teacher_ui(layout, guide_grade, main_subject, assigned_grades, assigned_subjects, schedule, fecha_registro, fecha_actualizacion)
+        else:  # Otro personal
+            self.setup_other_ui(layout, fecha_registro, fecha_actualizacion)
+
+    def setup_teacher_ui(self, layout, guide_grade, main_subject, assigned_grades, assigned_subjects, schedule, fecha_registro, fecha_actualizacion):
+        # Crear la tabla para mostrar grados, materias y horarios
+        self.table_schedule = QtWidgets.QTableWidget(self)
+        self.table_schedule.setColumnCount(4)
+        self.table_schedule.setHorizontalHeaderLabels(["Grado", "Materia", "Hora de Inicio", "Hora Final"])
+        self.table_schedule.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)  # Solo lectura
+        self.table_schedule.setSelectionBehavior(QtWidgets.QTableWidget.SelectRows)  # Seleccionar filas completas
+
+        # Labels para grado guía y materia principal
+        self.label_guide_grade = QtWidgets.QLabel(f"Grado Guía: {guide_grade}", self)
+        self.label_main_subject = QtWidgets.QLabel(f"Materia Principal: {main_subject}", self)
+
+        # QListWidget para grados y materias asignadas
+        self.list_assigned = QtWidgets.QListWidget(self)
+        self.list_assigned.addItem("Grados y Materias Asignadas:")
+        self.list_assigned.addItem("-----------------------------")
+
+        # Agregar grados y materias asignadas a la lista
+        for grado, materia in zip(assigned_grades, assigned_subjects):
+            self.list_assigned.addItem(f"{grado} - {materia}")
+
+        # Labels para fechas
+        self.label_registration_date = QtWidgets.QLabel(f"Fecha de registro: {fecha_registro.strftime('%Y-%m-%d %H:%M:%S')}", self)
+        self.label_last_update = QtWidgets.QLabel(f"Fecha última actualización: {fecha_actualizacion.strftime('%Y-%m-%d %H:%M:%S')}", self)
+
+        # Agregar widgets al layout
+        layout.addWidget(self.table_schedule)
+        layout.addWidget(self.label_guide_grade)
+        layout.addWidget(self.label_main_subject)
+        layout.addWidget(self.list_assigned)
+        layout.addWidget(self.label_registration_date)
+        layout.addWidget(self.label_last_update)
+
+        # Cargar datos del horario en la tabla
+        self.load_schedule_data(schedule)
+
+    def setup_other_ui(self, layout, fecha_registro, fecha_actualizacion):
+        # Labels para fechas
+        self.label_registration_date = QtWidgets.QLabel(f"Fecha de registro: {fecha_registro.strftime('%Y-%m-%d %H:%M:%S')}", self)
+        self.label_last_update = QtWidgets.QLabel(f"Fecha última actualización: {fecha_actualizacion.strftime('%Y-%m-%d %H:%M:%S')}", self)
+
+        # Agregar widgets al layout
+        layout.addWidget(self.label_registration_date)
+        layout.addWidget(self.label_last_update)
+
+    def load_schedule_data(self, schedule):
+        # Cargar datos del horario en la tabla
+        self.table_schedule.setRowCount(len(schedule))
+        for row_index, (grado, materia, hora_inicio, hora_final) in enumerate(schedule):
+            self.table_schedule.setItem(row_index, 0, QtWidgets.QTableWidgetItem(grado))
+            self.table_schedule.setItem(row_index, 1, QtWidgets.QTableWidgetItem(materia))
+            self.table_schedule.setItem(row_index, 2, QtWidgets.QTableWidgetItem(hora_inicio))
+            self.table_schedule.setItem(row_index, 3, QtWidgets.QTableWidgetItem(hora_final))
+
 
 if __name__ == "__main__":
     import sys

@@ -168,7 +168,6 @@ def calculate_age_edited(date_input):
     
     return age
 
-#OutFuctions for fuctions.py#
 def clear_entry_data(data):
     if not isinstance(data, str):
         return False

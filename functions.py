@@ -300,6 +300,7 @@ class logical_delete_staff():
                             WHERE tga2.teacher_id = (SELECT teacher_id FROM teachers WHERE staff_id = %s)
                             AND tga2.tga_id = itt.teacher_grade_assigned_id
                             AND sbt2.subject_teacher_id = itt.subject_teacher_id
+                            AND itt.active = true
                         );
                        """
         try:
@@ -325,6 +326,15 @@ class logical_delete_staff():
         except Exception as e:
             print(f"Error lds: detect_current_active_lds: {e}")
 
+    def set_null_grade_guide_lds(self, staff_id):
+        query = f"UPDATE teachers SET guide_grade_id = NULL WHERE staff_id = %s"
+        try:
+                self.query.cursor.execute(query,(staff_id,))
+                self.query.connection.commit()
+        except Exception as e:
+            print(f"Error LDS: set_null_grade_guide_lds: {e}")
+            self.query.connection.rollback()
+
     def logical_delete_staff_action(self, staff_id, active_change):
         if not active_change:
             if not self.detect_current_active_lds(staff_id, active_change):
@@ -334,6 +344,7 @@ class logical_delete_staff():
             try:
                 self.query.cursor.execute(query,(staff_id,))
                 self.query.connection.commit()
+                self.set_null_grade_guide_lds(staff_id)
             except Exception as e:
                 print(f"Error LDS: logical_delete_staff_deactivate: {e}")
                 self.query.connection.rollback()
@@ -349,3 +360,132 @@ class logical_delete_staff():
             except Exception as e:
                 print(f"Error LDS: logical_delete_staff_deactivate: {e}")
                 self.query.connection.rollback()
+
+class search_staff_widget():
+    def __init__(self):
+        self.query = query.Postgresqueries()
+    
+    def load_staff_table(self):
+        query = """ 
+                    SELECT
+                    s.staff_id,
+                    CONCAT_WS(' ', s.first_name, s.middle_name, s.first_surname, s.second_surname) AS staff_full_name,
+                    s.document_id,
+                    s.address,
+                    s.phone_number,
+                    s.birthday,
+                    j.job_position
+                    FROM staff s
+                    INNER JOIN job_position j ON s.job_id = j.job_id;
+                """
+        try:
+            self.query.cursor.execute(query)
+            results = self.query.cursor.fetchall()
+            if results and results is not None:
+                new_results = list()
+                for values in results:
+                    values = list(values)
+                    if values[5] is not None:
+                        birthdate = values[5]
+                        age = calculate_age_edited(birthdate)
+                        values.insert(6, age)
+                        status = self.get_status(values[0])
+                        values.insert(len(values), status)
+                        new_results.append(values)
+                return new_results
+            else:
+                return None
+        except Exception as e:
+            print(f"Error SSW: load_staff_table: {e}")
+            return None
+        
+    def get_status(self, staff_id):
+        query = f"SELECT active FROM staff WHERE staff_id = %s"
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            result = self.query.cursor.fetchone()
+            result = result[0]
+            if result:
+                return "Activo"
+            else:
+                return "Inactivo"
+        except Exception as e:
+            print(f"Error lds: get_status: {e}")
+    
+    def get_job_id(self, staff_id):
+        query = f"SELECT job_id FROM staff WHERE staff_id = %s"
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            results = self.query.cursor.fetchone()
+            if results and results[0]:
+                results = results[0]
+                return results
+            else:
+                return None
+        except Exception as e:
+            print(f"Error ssw: get_job_id: {e}")
+            return None
+    
+    def get_schedule_impart_time(self, staff_id):
+        query = f"""
+                    SELECT
+                        g.grade,
+                        sb.subject,
+                        itt.impart_time_start,
+                        itt.impart_time_end
+                    FROM impart_time_teacher itt
+                    INNER JOIN teacher_grade_assigned tga ON itt.teacher_grade_assigned_id = tga.tga_id
+                    INNER JOIN subject_teacher sbt ON itt.subject_teacher_id = sbt.subject_teacher_id
+
+                    INNER JOIN grades g ON tga.grade_id = g.grade_id
+                    INNER JOIN subjects sb ON sbt.subject_id = sb.subject_id
+
+                    WHERE 
+                        EXISTS (
+                            SELECT 1 
+                            FROM teacher_grade_assigned tga2 
+                            INNER JOIN subject_teacher sbt2 
+                                ON tga2.teacher_id = sbt2.teacher_id
+                            WHERE tga2.teacher_id = (SELECT teacher_id FROM teachers WHERE staff_id = %s)
+                            AND tga2.tga_id = itt.teacher_grade_assigned_id
+                            AND sbt2.subject_teacher_id = itt.subject_teacher_id
+                            AND itt.active = true
+                        );
+                       """
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            results = self.query.cursor.fetchall()
+            if results and results is not None:
+                return results
+            else:
+                return [("Sin asignar","Sin asignar","Sin asignar","Sin asignar")]
+        except Exception as e:
+            print(f"Error lds: get_info_impart_time_teacher: {e}")
+            return ["Error", "Error", "Error", "Error"]
+    
+    def get_main_subject_guide_grade(self, staff_id):
+        query = f""" 
+                SELECT
+                g.grade,
+                sb.subject
+                FROM teachers t
+                LEFT JOIN grades g ON t.guide_grade_id = g.grade_id
+                LEFT JOIN subjects sb ON t.main_subject = sb.subject_id
+                WHERE t.staff_id = %s
+                """
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            results = self.query.cursor.fetchall()
+            if results[0] is not None:
+                grade_result = results[0]
+            else: 
+                grade_result = None
+            
+            if results[1] is not None:
+                main_subject = results[1]
+            else:
+                main_subject = None
+            
+            return grade_result, main_subject
+        except Exception as e:
+            print(f"Error ssw: get_main_subject_guide_grade: {e}")
