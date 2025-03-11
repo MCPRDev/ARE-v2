@@ -1249,9 +1249,9 @@ class Ui_staff_management_window(object):
         self.frame_buttons_actions_search_staff.setObjectName("frame_buttons_actions_search_staff")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.frame_buttons_actions_search_staff)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.button_show_deailts_qtable_selected_search_staff = QtWidgets.QPushButton(self.frame_buttons_actions_search_staff)
-        self.button_show_deailts_qtable_selected_search_staff.setObjectName("button_show_deailts_qtable_selected_search_staff")
-        self.verticalLayout_4.addWidget(self.button_show_deailts_qtable_selected_search_staff)
+        self.button_show_details_qtable_selected_search_staff = QtWidgets.QPushButton(self.frame_buttons_actions_search_staff)
+        self.button_show_details_qtable_selected_search_staff.setObjectName("button_show_details_qtable_selected_search_staff")
+        self.verticalLayout_4.addWidget(self.button_show_details_qtable_selected_search_staff)
         self.button_edit_selected_staff_search_staff = QtWidgets.QPushButton(self.frame_buttons_actions_search_staff)
         self.button_edit_selected_staff_search_staff.setObjectName("button_edit_selected_staff_search_staff")
         self.verticalLayout_4.addWidget(self.button_edit_selected_staff_search_staff)
@@ -1745,6 +1745,10 @@ class Ui_staff_management_window(object):
         #####Buttons####
         self.button_edit_selected_staff_search_staff.clicked.connect(self.edit_selected_staff)
         self.button_clear_information_search_staff.clicked.connect(self.clean_inputs_search_staff)
+        self.button_show_details_qtable_selected_search_staff.clicked.connect(self.details_button_search_staff)
+
+
+
         self.retranslateUi(staff_management_window)
         self.main_central_widget.setCurrentIndex(7)
         QtCore.QMetaObject.connectSlotsByName(staff_management_window)
@@ -3025,9 +3029,29 @@ class Ui_staff_management_window(object):
                         job_id = self.ssw.get_job_id(selected_id)
                         if job_id == 2:
                             
-                            guide_grade, main_subject = self.ssw.get_main_subject_guide_grade(staff_id)
+                            guide_grade, main_subject = self.ssw.get_main_subject_guide_grade(selected_id)
+                            grades_assigned = self.ssw.get_grades_assigned(selected_id)
+                            subjects_assigned = self.ssw.get_subjects_assigned(selected_id)
 
+                            registered_date, updated_date = self.ssw.get_date_registered_and_last_update(selected_id)
+                            schedule = self.ssw.get_schedule_impart_time(selected_id)
 
+                            print(selected_id)
+                            print(schedule)
+
+                            sidg = StaffInfoDialog(job_id, guide_grade, main_subject, grades_assigned, subjects_assigned, schedule, registered_date, updated_date, None)
+                            sidg.exec_()
+                        
+                        else:
+                            guide_grade = None
+                            main_subject = None
+                            grades_assigned = None
+                            subjects_assigned = None
+                            registered_date, updated_date = self.ssw.get_date_registered_and_last_update(selected_id)
+                            schedule = None
+
+                            sidg = StaffInfoDialog(job_id, guide_grade, main_subject, grades_assigned, subjects_assigned, schedule, registered_date, updated_date, None)
+                            sidg.exec_()
 
                     case "Inactivo":
                         QtWidgets.QMessageBox.information(None, "Empleado Inactivo", "El empleado actualmente esta inactivo/borrado de la base de datos, no hay detalles a mostrar")
@@ -3183,7 +3207,7 @@ class Ui_staff_management_window(object):
         self.label_full_name_search_staff.setText(_translate("staff_management_window", "Nombre Completo:"))
         self.label_document_id_search_staff.setText(_translate("staff_management_window", "Cedula:"))
         self.label_phone_number_search_staff.setText(_translate("staff_management_window", "Numero de Telefono:"))
-        self.button_show_deailts_qtable_selected_search_staff.setText(_translate("staff_management_window", "Detalles"))
+        self.button_show_details_qtable_selected_search_staff.setText(_translate("staff_management_window", "Detalles"))
         self.button_edit_selected_staff_search_staff.setText(_translate("staff_management_window", "Editar"))
         self.main_central_widget.setTabText(self.main_central_widget.indexOf(self.search_staff_widget), _translate("staff_management_window", "Buscar Personal"))
         self.button_clear_information_search_staff.setText(_translate("staff_management_window", "Limpiar"))
@@ -3357,77 +3381,83 @@ class TeacherAssignmentDialogEditStaff(QDialog):
         self.setLayout(layout)
 
 
-from PyQt5 import QtWidgets, QtCore
-from datetime import datetime  # Para manejar fechas
-
 class StaffInfoDialog(QtWidgets.QDialog):
-    def __init__(self, job_id, guide_grade, main_subject, assigned_grades, assigned_subjects, schedule, fecha_registro, fecha_actualizacion, parent=None):
+    def __init__(self, job_id, guide_grade, main_subject, assigned_grades, assigned_subjects, schedule, registration_date, last_update, parent=None):
         super().__init__(parent)
+        self.setWindowTitle("Detalles del empleado")
+        self.setMinimumSize(600, 400 if job_id == 2 else 150)
+        
+        main_layout = QtWidgets.QVBoxLayout(self)
+        
+        if job_id == 2: 
+            self.setup_teacher_ui(main_layout, guide_grade, main_subject, 
+                                assigned_grades, assigned_subjects, 
+                                schedule, registration_date, last_update)
+        else:  
+            self.setup_non_teacher_ui(main_layout, registration_date, last_update)
 
-        self.setWindowTitle("Información del Personal")
-        self.setMinimumSize(600, 400)
+    def setup_teacher_ui(self, layout, guide_grade, main_subject, 
+                       assigned_grades, assigned_subjects, 
+                       schedule, reg_date, update_date):
 
-        # Layout principal
-        layout = QtWidgets.QVBoxLayout(self)
+        self.schedule_table = QtWidgets.QTableWidget()
+        self.schedule_table.setColumnCount(4)
+        self.schedule_table.setHorizontalHeaderLabels(
+            ["Grado", "Materia", "Inicia", "Termina"])
+        self.schedule_table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        self.schedule_table.setSelectionBehavior(QtWidgets.QTableWidget.SelectRows)
+        
+        self.guide_grade_lbl = QtWidgets.QLabel(f"Grado Guia: {guide_grade}")
+        self.main_subject_lbl = QtWidgets.QLabel(f"Materia Principal: {main_subject}")
+        
+        self.assigned_list = QtWidgets.QListWidget()
+        self.assigned_list.addItem("Grados asignados & Materias asignadas:")
+        for grade, subject in zip(assigned_grades, assigned_subjects):
+            self.assigned_list.addItem(f"{grade} - {subject}")
+        
+        self.reg_date_lbl = QtWidgets.QLabel(
+            f"Registrado: {reg_date.strftime('%Y-%m-%d %H:%M:%S')}")
+        self.update_date_lbl = QtWidgets.QLabel(
+            f"Ultima actualizacion: {update_date.strftime('%Y-%m-%d %H:%M:%S')}")
 
-        if job_id == 2:  # Profesor
-            self.setup_teacher_ui(layout, guide_grade, main_subject, assigned_grades, assigned_subjects, schedule, fecha_registro, fecha_actualizacion)
-        else:  # Otro personal
-            self.setup_other_ui(layout, fecha_registro, fecha_actualizacion)
+        layout.addWidget(self.schedule_table)
+        layout.addWidget(self.guide_grade_lbl)
+        layout.addWidget(self.main_subject_lbl)
+        layout.addWidget(self.assigned_list)
+        layout.addWidget(self.reg_date_lbl)
+        layout.addWidget(self.update_date_lbl)
+        
 
-    def setup_teacher_ui(self, layout, guide_grade, main_subject, assigned_grades, assigned_subjects, schedule, fecha_registro, fecha_actualizacion):
-        # Crear la tabla para mostrar grados, materias y horarios
-        self.table_schedule = QtWidgets.QTableWidget(self)
-        self.table_schedule.setColumnCount(4)
-        self.table_schedule.setHorizontalHeaderLabels(["Grado", "Materia", "Hora de Inicio", "Hora Final"])
-        self.table_schedule.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)  # Solo lectura
-        self.table_schedule.setSelectionBehavior(QtWidgets.QTableWidget.SelectRows)  # Seleccionar filas completas
+        self.populate_schedule(schedule)
 
-        # Labels para grado guía y materia principal
-        self.label_guide_grade = QtWidgets.QLabel(f"Grado Guía: {guide_grade}", self)
-        self.label_main_subject = QtWidgets.QLabel(f"Materia Principal: {main_subject}", self)
+    def setup_non_teacher_ui(self, layout, reg_date, update_date):
 
-        # QListWidget para grados y materias asignadas
-        self.list_assigned = QtWidgets.QListWidget(self)
-        self.list_assigned.addItem("Grados y Materias Asignadas:")
-        self.list_assigned.addItem("-----------------------------")
+        self.reg_date_lbl = QtWidgets.QLabel(
+            f"Registrado: {reg_date.strftime('%Y-%m-%d %H:%M:%S')}")
+        self.update_date_lbl = QtWidgets.QLabel(
+            f"Ultima actualizacion: {update_date.strftime('%Y-%m-%d %H:%M:%S')}")
 
-        # Agregar grados y materias asignadas a la lista
-        for grado, materia in zip(assigned_grades, assigned_subjects):
-            self.list_assigned.addItem(f"{grado} - {materia}")
+        layout.addWidget(self.reg_date_lbl)
+        layout.addWidget(self.update_date_lbl)
 
-        # Labels para fechas
-        self.label_registration_date = QtWidgets.QLabel(f"Fecha de registro: {fecha_registro.strftime('%Y-%m-%d %H:%M:%S')}", self)
-        self.label_last_update = QtWidgets.QLabel(f"Fecha última actualización: {fecha_actualizacion.strftime('%Y-%m-%d %H:%M:%S')}", self)
+    def populate_schedule(self, schedule):
+        self.schedule_table.setRowCount(len(schedule))
+        for row, (grade, subject, start, end) in enumerate(schedule):
+            self.schedule_table.setItem(row, 0, QtWidgets.QTableWidgetItem(grade))
+            self.schedule_table.setItem(row, 1, QtWidgets.QTableWidgetItem(subject))
+            
+            if isinstance(start, time):
+                start = start.strftime("%H:%M")
+            elif start is None:
+                start = "N/A"
+            
+            if isinstance(end, time):
+                end = end.strftime("%H:%M")
+            elif end is None:
+                end = "N/A"
 
-        # Agregar widgets al layout
-        layout.addWidget(self.table_schedule)
-        layout.addWidget(self.label_guide_grade)
-        layout.addWidget(self.label_main_subject)
-        layout.addWidget(self.list_assigned)
-        layout.addWidget(self.label_registration_date)
-        layout.addWidget(self.label_last_update)
-
-        # Cargar datos del horario en la tabla
-        self.load_schedule_data(schedule)
-
-    def setup_other_ui(self, layout, fecha_registro, fecha_actualizacion):
-        # Labels para fechas
-        self.label_registration_date = QtWidgets.QLabel(f"Fecha de registro: {fecha_registro.strftime('%Y-%m-%d %H:%M:%S')}", self)
-        self.label_last_update = QtWidgets.QLabel(f"Fecha última actualización: {fecha_actualizacion.strftime('%Y-%m-%d %H:%M:%S')}", self)
-
-        # Agregar widgets al layout
-        layout.addWidget(self.label_registration_date)
-        layout.addWidget(self.label_last_update)
-
-    def load_schedule_data(self, schedule):
-        # Cargar datos del horario en la tabla
-        self.table_schedule.setRowCount(len(schedule))
-        for row_index, (grado, materia, hora_inicio, hora_final) in enumerate(schedule):
-            self.table_schedule.setItem(row_index, 0, QtWidgets.QTableWidgetItem(grado))
-            self.table_schedule.setItem(row_index, 1, QtWidgets.QTableWidgetItem(materia))
-            self.table_schedule.setItem(row_index, 2, QtWidgets.QTableWidgetItem(hora_inicio))
-            self.table_schedule.setItem(row_index, 3, QtWidgets.QTableWidgetItem(hora_final))
+            self.schedule_table.setItem(row, 2, QtWidgets.QTableWidgetItem(start))
+            self.schedule_table.setItem(row, 3, QtWidgets.QTableWidgetItem(end))
 
 
 if __name__ == "__main__":

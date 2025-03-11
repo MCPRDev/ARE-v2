@@ -376,7 +376,8 @@ class search_staff_widget():
                     s.birthday,
                     j.job_position
                     FROM staff s
-                    INNER JOIN job_position j ON s.job_id = j.job_id;
+                    INNER JOIN job_position j ON s.job_id = j.job_id
+                    ORDER BY s.staff_id ASC;
                 """
         try:
             self.query.cursor.execute(query)
@@ -471,11 +472,12 @@ class search_staff_widget():
                 FROM teachers t
                 LEFT JOIN grades g ON t.guide_grade_id = g.grade_id
                 LEFT JOIN subjects sb ON t.main_subject = sb.subject_id
-                WHERE t.staff_id = %s
+                WHERE staff_id = %s
                 """
         try:
             self.query.cursor.execute(query,(staff_id,))
-            results = self.query.cursor.fetchall()
+            results = self.query.cursor.fetchone()
+            print(results)
             if results[0] is not None:
                 grade_result = results[0]
             else: 
@@ -489,3 +491,65 @@ class search_staff_widget():
             return grade_result, main_subject
         except Exception as e:
             print(f"Error ssw: get_main_subject_guide_grade: {e}")
+            return "Error", "Error"
+    
+    def get_grades_assigned(self, staff_id):
+        query = f"""
+                SELECT 
+                g.grade
+                FROM teacher_grade_assigned tga
+                INNER JOIN grades g ON tga.grade_id = g.grade_id
+                WHERE teacher_id = (SELECT teacher_id FROM teachers WHERE staff_id = %s) AND active = true;
+                """
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            results = self.query.cursor.fetchone()
+            if results and results is not None:
+                return results
+            else:
+                return ["Sin Asignar",]
+        except Exception as e:
+            print(f"Error ssw: get_grades_assigned: {e}")
+            return ["Error",]
+    
+    def get_subjects_assigned(self, staff_id):
+        query = f"""
+                SELECT 
+                sb.subject
+                FROM subject_teacher sbt
+                INNER JOIN subjects sb ON sbt.subject_id = sb.subject_id
+                WHERE sbt.teacher_id = (SELECT teacher_id FROM teachers WHERE staff_id = %s) AND sbt.active = true;
+                """
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            results = self.query.cursor.fetchall()
+            if results and results is not None:
+                return results
+            else:
+                return ["Sin asignar",]
+        except Exception as e:
+            print(f"Error ssw: get_subject_assigned: {e}")
+            return ["Error",]
+    
+    def get_date_registered_and_last_update(self, staff_id):
+        query = f""" 
+                SELECT
+                registered_at,
+                updated_at
+                FROM staff
+                WHERE staff_id = %s AND active = true;
+                """
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            results = self.query.cursor.fetchone()
+            print(results)
+            if results and results is not None:
+                registered_date = results[0]
+                updated_date = results[1]
+                return registered_date, updated_date
+            else:
+                return "Sin Asignar", "Sin Asignar"
+        except Exception as e:
+            print(f"Error ssw: get_date_regis_upd: {e}")
+            return "Error", "Error"
+
