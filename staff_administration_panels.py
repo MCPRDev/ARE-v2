@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QHeaderView, QApplication, QMainWindow, QPushButton, QDialog, QVBoxLayout, QLabel, QLineEdit, QHBoxLayout, QWidget, QListWidget, QMessageBox
+from PyQt5.QtWidgets import QHeaderView, QApplication, QMainWindow, QPushButton, QDialog, QVBoxLayout, QLabel, QLineEdit, QHBoxLayout, QWidget, QListWidget, QMessageBox, QMenu
 from PyQt5.QtCore import QDate, Qt
 from add_subject_subwindow import Ui_add_subject_sub_window
 from query import *
@@ -1297,6 +1297,8 @@ class Ui_staff_management_window(object):
         self.tablew_select_teacher_impart_tt.setHorizontalHeaderItem(6, item)
         item = QtWidgets.QTableWidgetItem()
         self.tablew_select_teacher_impart_tt.setHorizontalHeaderItem(7, item)
+        self.tablew_select_teacher_impart_tt.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        self.tablew_select_teacher_impart_tt.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.listw_select_grade_impart_tt = QtWidgets.QListWidget(self.frame_impart_teacher_time)
         self.listw_select_grade_impart_tt.setGeometry(QtCore.QRect(10, 470, 141, 192))
         self.listw_select_grade_impart_tt.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.SelectedClicked)
@@ -1747,6 +1749,15 @@ class Ui_staff_management_window(object):
         self.button_clear_information_search_staff.clicked.connect(self.clean_inputs_search_staff)
         self.button_show_details_qtable_selected_search_staff.clicked.connect(self.details_button_search_staff)
 
+    ########################################################################################
+    ########################################################################################
+    ################################Impart Time assign######################################
+    ########################################################################################
+        self.load_impart_time_teachers()
+
+
+        self.tablew_select_teacher_impart_tt.setContextMenuPolicy(3)  # 3 = Qt.CustomContextMenu
+        self.tablew_select_teacher_impart_tt.customContextMenuRequested.connect(self.show_context_menu)
 
 
         self.retranslateUi(staff_management_window)
@@ -3059,6 +3070,99 @@ class Ui_staff_management_window(object):
                         QtWidgets.QMessageBox.information(None, "Empleado Inactivo", "El empleado actualmente esta inactivo/borrado de la base de datos, no hay detalles a mostrar")
         else:
             QtWidgets.QMessageBox.warning(None, "Advertencia", "No hay ninguna fila seleccionada.")
+
+    ########################################################################################
+    ########################################################################################
+    ################################Impart Time assign######################################
+    ########################################################################################
+
+    def load_impart_time_teachers(self):
+        self.aitt = assign_impart_time_teacher()
+        impart_time_results = self.aitt.load_impart_time_table()
+        self.tablew_select_teacher_impart_tt.setRowCount(0)
+
+        if impart_time_results is not None:
+            header = self.tablew_select_teacher_impart_tt.horizontalHeader()
+            header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+            header.setStretchLastSection(True)
+
+            for row_index, row in enumerate(impart_time_results):
+                self.tablew_select_teacher_impart_tt.insertRow(row_index)
+
+                for col_index, value in enumerate(row):
+                    item = QtWidgets.QTableWidgetItem(str(value))
+                    item.setToolTip(str(value))
+                    item.setFlags(item.flags() | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
+                    item.setTextAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+                    self.tablew_select_teacher_impart_tt.setItem(row_index, col_index, item)
+
+            self.tablew_select_teacher_impart_tt.resizeRowsToContents()
+        else:
+            pass
+    
+    def show_context_menu(self, position):
+        selected_row = self.tablew_select_teacher_impart_tt.currentRow()
+        if selected_row == -1:
+            return
+
+        context_menu = QMenu(None)
+
+        edit_action = context_menu.addAction("Editar")
+        delete_action = context_menu.addAction("Desasignar")
+
+        edit_action.triggered.connect(self.edit_selected_staff_itt)
+        delete_action.triggered.connect(self.unassign_impart_tiem)
+
+        context_menu.exec_(self.tablew_select_teacher_impart_tt.viewport().mapToGlobal(position))
+
+    def edit_selected_staff_itt(self):
+        selected_row = self.tablew_select_teacher_impart_tt.currentRow()
+
+        if selected_row >= 0:
+            id_item = self.tablew_select_teacher_impart_tt.item(selected_row, 0)
+            if id_item:
+                selected_id = id_item.text()
+                staff_id = self.aitt.get_staff_id_w_teacher_id(selected_id)
+
+                self.main_central_widget.setCurrentWidget(self.edit_staff_widget)
+
+                self.line_input_edit_staff_search_id.setText(str(staff_id))
+
+                self.button_search_edit_staff.click()
+        else:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "No hay ninguna fila seleccionada.")
+
+    def unassign_impart_tiem(self):
+        selected_row = self.tablew_select_teacher_impart_tt.currentRow()
+
+        if selected_row >= 0:
+            id_item = self.tablew_select_teacher_impart_tt.item(selected_row, 0)
+            grade_assigned_item = self.tablew_select_teacher_impart_tt.item(selected_row, 4)
+            subject_assined_item = self.tablew_select_teacher_impart_tt.item(selected_row, 5)
+            time_start_item = self.tablew_select_teacher_impart_tt.item(selected_row, 6)
+            time_end_item = self.tablew_select_teacher_impart_tt.item(selected_row, 7)
+
+            if id_item:
+                selected_id = id_item.text()
+                selected_grade = grade_assigned_item.text()
+                selected_subject = subject_assined_item.text()
+                selected_time_start = time_start_item.text()
+                selected_time_end = time_end_item.text()
+
+                print(selected_time_start, selected_time_end)
+
+                try:
+                    self.aitt.unassign_impart_time_action(str(selected_id), str(selected_grade), str(selected_subject), str(selected_time_start), str(selected_time_end))
+                    QtWidgets.QMessageBox.information(None, "Exito", "Se ha desasignado la hora")
+                    self.load_impart_time_teachers()
+                except Exception as e:
+                    QtWidgets.QMessageBox.warning(None, "Error", "No se ha podido eliminar la hora asignada")
+                    print(e)
+
+        else:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "No hay ninguna fila seleccionada.")
+
+        
 
     def retranslateUi(self, staff_management_window):
         _translate = QtCore.QCoreApplication.translate

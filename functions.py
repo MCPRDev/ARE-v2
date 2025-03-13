@@ -15,7 +15,6 @@ class loggin_gui_action():
             return True, access_type
         
         return False, None
-    
 
 class subject_gui_action():
     def __init__(self):
@@ -560,3 +559,109 @@ class search_staff_widget():
             print(f"Error ssw: get_date_regis_upd: {e}")
             return "Error", "Error"
 
+class assign_impart_time_teacher():
+    def __init__(self):
+        self.query = query.Postgresqueries()
+    
+    def load_impart_time_table(self):
+        query = """ 
+                SELECT
+                    th.teacher_id,
+                    CONCAT_WS(' ', st.first_name, st.middle_name, st.first_surname, st.second_surname) AS full_name,
+                    g.grade AS guide_grade,
+                    sb.subject AS main_subject,
+                    g2.grade AS teacher_grade_assigned,
+                    sb2.subject AS subject_teacher_assigned,
+                    itt.impart_time_start,
+                    itt.impart_time_end
+                FROM impart_time_teacher itt
+
+                INNER JOIN teacher_grade_assigned tga 
+                    ON tga.tga_id = itt.teacher_grade_assigned_id
+                    
+                INNER JOIN subject_teacher sbt 
+                    ON sbt.subject_teacher_id = itt.subject_teacher_id
+                    
+                INNER JOIN teachers th 
+                    ON th.teacher_id = sbt.teacher_id
+                    
+                INNER JOIN grades g 
+                    ON g.grade_id = th.guide_grade_id
+                    
+                INNER JOIN grades g2 
+                    ON g2.grade_id = tga.grade_id
+                    
+                INNER JOIN subjects sb 
+                    ON sb.subject_id = th.main_subject
+                    
+                INNER JOIN subjects sb2 
+                    ON sb2.subject_id = sbt.subject_id
+                    
+                INNER JOIN staff st 
+                    ON st.staff_id = th.staff_id
+                WHERE itt.active = true;
+                """
+        try:
+            self.query.cursor.execute(query)
+            results = self.query.cursor.fetchall()
+            if results and results is not None:
+                return results
+            else:
+                return None
+        except Exception as e:
+            print(f"Error aitt: load_impart_time_table: {e}")
+
+    def get_staff_id_w_teacher_id(self, teacher_id):
+        query = f"SELECT staff_id FROM teachers WHERE teacher_id = %s"
+        try:
+            self.query.cursor.execute(query,(teacher_id,))
+            result = self.query.cursor.fetchone()
+            if result and result is not None:
+                return result[0]
+            else:
+                return None
+        except Exception as e:
+            print(f"Error aitt: get_staff_id_w_teacher_id: {e}")
+    
+    def unassign_impart_time_action(self, teacher_id, grade, subject, time_starts, time_ends):
+        query = f"""
+                    WITH target_records AS (
+                        SELECT 
+                            itt.itt_id  -- Selecciona el ID de la tabla que deseas actualizar
+                        FROM 
+                            impart_time_teacher itt
+                        INNER JOIN 
+                            teacher_grade_assigned tga 
+                            ON tga.tga_id = itt.teacher_grade_assigned_id
+                        INNER JOIN 
+                            grades g 
+                            ON g.grade_id = tga.grade_id
+                        INNER JOIN 
+                            subject_teacher sbt 
+                            ON sbt.subject_teacher_id = itt.subject_teacher_id
+                        INNER JOIN 
+                            subjects sb 
+                            ON sb.subject_id = sbt.subject_id
+                        INNER JOIN 
+                            teachers th 
+                            ON th.teacher_id = tga.teacher_id
+                        WHERE 
+                            th.teacher_id = %s
+                            AND g.grade = %s
+                            AND sb.subject = %s
+                            AND itt.impart_time_start = %s
+                            AND itt.impart_time_end = %s
+                    )
+                    UPDATE 
+                        impart_time_teacher
+                    SET 
+                        active = false 
+                    WHERE 
+                        itt_id IN (SELECT itt_id FROM target_records);
+                """
+        try:
+            self.query.cursor.execute(query,(teacher_id, grade, subject, time_starts, time_ends,))
+            self.query.connection.commit()
+        except Exception as e:
+            print(f"Error aitt: unassign_impart_time_action: {e}")
+            self.query.connection.rollback()

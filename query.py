@@ -824,6 +824,7 @@ class Postgresqueries():
             print(f'Error deleting data: {e}')
             return False
         
+        
 
 
 #########################CONSOLE TEST#########################
