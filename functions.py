@@ -563,46 +563,58 @@ class assign_impart_time_teacher():
     def __init__(self):
         self.query = query.Postgresqueries()
     
-    def load_impart_time_table(self):
-        query = """ 
-                SELECT
-                    th.teacher_id,
-                    CONCAT_WS(' ', st.first_name, st.middle_name, st.first_surname, st.second_surname) AS full_name,
-                    g.grade AS guide_grade,
-                    sb.subject AS main_subject,
-                    g2.grade AS teacher_grade_assigned,
-                    sb2.subject AS subject_teacher_assigned,
-                    itt.impart_time_start,
-                    itt.impart_time_end
-                FROM impart_time_teacher itt
-
-                INNER JOIN teacher_grade_assigned tga 
-                    ON tga.tga_id = itt.teacher_grade_assigned_id
-                    
-                INNER JOIN subject_teacher sbt 
-                    ON sbt.subject_teacher_id = itt.subject_teacher_id
-                    
-                INNER JOIN teachers th 
-                    ON th.teacher_id = sbt.teacher_id
-                    
-                INNER JOIN grades g 
-                    ON g.grade_id = th.guide_grade_id
-                    
-                INNER JOIN grades g2 
-                    ON g2.grade_id = tga.grade_id
-                    
-                INNER JOIN subjects sb 
-                    ON sb.subject_id = th.main_subject
-                    
-                INNER JOIN subjects sb2 
-                    ON sb2.subject_id = sbt.subject_id
-                    
-                INNER JOIN staff st 
-                    ON st.staff_id = th.staff_id
-                WHERE itt.active = true;
-                """
+    def load_impart_time_table(self, Order):
+        query = f"""SELECT * FROM teacher_assigned_and_not_assigned_impart_time"""
+        match Order:
+            case 0:
+                pre_order = "ORDER BY teacher_id ASC;"
+            case 1:
+                pre_order = """ 
+                                ORDER BY 
+                                    CASE 
+                                        WHEN teacher_grade_assigned = 'Primer Grado' THEN 1
+                                        WHEN teacher_grade_assigned = 'Segundo Grado' THEN 2
+                                        WHEN teacher_grade_assigned = 'Tercero Grado' THEN 3
+                                        WHEN teacher_grade_assigned = 'Cuarto Grado' THEN 4
+                                        WHEN teacher_grade_assigned = 'Quinto Grado' THEN 5
+                                        WHEN teacher_grade_assigned = 'Sexto Grado' THEN 6
+                                        WHEN teacher_grade_assigned = 'Septimo Grado' THEN 7
+                                        WHEN teacher_grade_assigned = 'Octavo Grado' THEN 8
+                                        WHEN teacher_grade_assigned = 'Noveno Grado' THEN 9
+                                        WHEN teacher_grade_assigned = 'Decimo Grado' THEN 10
+                                        WHEN teacher_grade_assigned = 'Undecimo Grado' THEN 11
+                                        ELSE 99
+                                    END ASC;
+                            """
+            case 2:
+                pre_order = """
+                                ORDER BY impart_time_start ASC;
+                            """
+            case 3:
+                pre_order = """
+                                ORDER BY impart_time_end DESC NULLS LAST;
+                            """
+            case 4:
+                pre_order = """ 
+                                ORDER BY 
+                                    CASE 
+                                        WHEN impart_time_start IS NULL THEN 0 
+                                        ELSE 1 
+                                    END ASC;
+                            """
+            case 5:
+                pre_order = """ 
+                                ORDER BY 
+                                    CASE 
+                                        WHEN impart_time_end IS NULL THEN 0 
+                                        ELSE 1 
+                                    END ASC;
+                            """
+            case _:
+                pre_order = ";"
+        final_query = query + " " + pre_order
         try:
-            self.query.cursor.execute(query)
+            self.query.cursor.execute(final_query)
             results = self.query.cursor.fetchall()
             if results and results is not None:
                 return results
@@ -665,3 +677,97 @@ class assign_impart_time_teacher():
         except Exception as e:
             print(f"Error aitt: unassign_impart_time_action: {e}")
             self.query.connection.rollback()
+    
+    def verify_teacher_time_assign(self, teacher_id ,grade, subject, time_starts, time_ends):
+        query = f""" 
+                    SELECT 'conflict' AS result
+                    FROM vw_itt_to_verify_data
+                    WHERE (
+                        teacher_id = %s 
+                        AND grade = %s
+                        AND subject = %s
+                        AND impart_time_start = %s 
+                        AND impart_time_end = %s 
+                        AND active = true) 
+                    UNION 
+                    SELECT 'conflict' AS result
+                    FROM vw_itt_to_verify_data
+                    WHERE(
+                        teacher_id = %s
+                        AND impart_time_start = %s 
+                        AND impart_time_end = %s
+                    )
+                """
+        try:
+            self.query.cursor.execute(query, (teacher_id, grade, subject, time_starts, time_ends, teacher_id, time_starts, time_ends))
+            results = self.query.cursor.fetchone()
+
+            return results is None
+        except Exception as e:
+            print(f"Error aitt: verify_teacher_time_assign: {e}")
+            return False
+    
+    def load_subjects(self, teacher_id):
+        query = f"""
+                    SELECT
+                    sb.subject
+                    FROM subject_teacher sbt
+                    INNER JOIN teachers th ON sbt.teacher_id = th.teacher_id
+                    INNER JOIN subjects sb ON sbt.subject_id = sb.subject_id
+                    WHERE th.teacher_id = %s AND sbt.active = true;
+                """
+        try:
+            self.query.cursor.execute(query,(teacher_id,))
+            results = self.query.cursor.fetchall()
+            if results and results is not None:
+                return results
+            else:
+                return [('Sin Asignar',),]
+        except Exception as e:
+            print(f"Error aitt: load_subjects: {e}")
+            return None
+    
+    def load_grades(self, teacher_id):
+        query = f"""
+                    SELECT
+                    g.grade
+                    FROM teacher_grade_assigned tga
+                    INNER JOIN teachers th ON tga.teacher_id = th.teacher_id
+                    INNER JOIN grades g ON tga.grade_id = g.grade_id
+                    WHERE th.teacher_id = %s AND tga.active = true;
+                """
+        try:
+            self.query.cursor.execute(query,(teacher_id,))
+            results = self.query.cursor.fetchall()
+            if results and results is not None:
+                return results
+            else:
+                return [('Sin Asignar',),]
+        except Exception as e:
+            print(f"Error aitt: load_subjects: {e}")
+            return None
+
+    def get_id_tga_and_sbt_existing(self, grade, subject, teacher_id):
+        query = f"""
+                    SELECT
+                    tga.tga_id,
+                    sbt.subject_teacher_id
+                    FROM teachers th
+                    INNER JOIN teacher_grade_assigned tga ON th.teacher_id = tga.teacher_id
+                    INNER JOIN subject_teacher sbt ON th.teacher_id = sbt.teacher_id
+
+                    INNER JOIN grades g ON tga.grade_id = g.grade_id
+                    INNER JOIN subjects sb ON sbt.subject_id = sb.subject_id
+
+                    WHERE g.grade = %s AND sb.subject = %s AND th.teacher_id = %s AND th.active = true;
+                """
+        try:
+            self.query.cursor.execute(query,(grade, subject, teacher_id,))
+            results = self.query.cursor.fetchone()
+            if results and results is not None:
+                return results
+            else:
+                return None
+        except Exception as e:
+            print(f"Error aitt: get_id_tga_and_sbt_existing: {e}")
+            return None

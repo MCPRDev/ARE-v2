@@ -4,6 +4,7 @@ import select
 import time
 from outfuctions import *
 
+#This query is for general things, not a specific use in the project but it can be used for any other project
 
 class Postgresqueries():
     def __init__(self, update_callback=None): 
@@ -825,34 +826,3 @@ class Postgresqueries():
             return False
         
         
-
-
-#########################CONSOLE TEST#########################
-#pg = Postgresqueries()
-#print(pg.show_data_subjects())
-#pg.insert_subject('Matematica Oratoria')
-#pg.login('admin_basic_log_in_user', 'admin_basic_log_in_password')
-#print(pg.search_query('staff', 42, None, None))
-#pg.search_query('student_representative', None, '123-123123-1234K', None)
-#datos = pg.search_query('students', 1, None, None)
-#print(datos[-1])
-
-#pg.change_status('students', )
-
-#pg.search_query('staff', 2, '', None)
-#pg.get_table_columns()
-#pg.edit_registered_values()
-#pg.change_status('False')
-#update = {
-#    'phone_number': '1231-1233'
-#    }
-#
-#pg.edit_multiple_columns(update)
-
-#pg.show_table_record('students', 5)
-#code = 'MC-021205-1234567'
-#pg.query_insert_student(code, 'John', '', 'John', '', '1990-01-01', 1, 1)
-#pg.query_insert_student_representative('Yoquese', '', 'Perez', '', '123-654321-1234A', 'Main ST 534' ,'0000-0000')
-#print(type(pg.query_students_by_grade(1)))
-
-#pg.login('admin_basic_log_in_user','admin_basic_log_in_password')

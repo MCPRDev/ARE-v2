@@ -1267,7 +1267,7 @@ class Ui_staff_management_window(object):
         self.frame_impart_teacher_time.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_impart_teacher_time.setObjectName("frame_impart_teacher_time")
         self.label_select_teacher_static_impart_tt = QtWidgets.QLabel(self.frame_impart_teacher_time)
-        self.label_select_teacher_static_impart_tt.setGeometry(QtCore.QRect(10, 10, 481, 16))
+        self.label_select_teacher_static_impart_tt.setGeometry(QtCore.QRect(10, 10, 661, 16))
         font = QtGui.QFont()
         font.setFamily("Microsoft JhengHei")
         font.setPointSize(10)
@@ -1447,6 +1447,15 @@ class Ui_staff_management_window(object):
         self.label_time_selected_data_dynamic_impart_tt.setFont(font)
         self.label_time_selected_data_dynamic_impart_tt.setText("")
         self.label_time_selected_data_dynamic_impart_tt.setObjectName("label_time_selected_data_dynamic_impart_tt")
+        self.combox_filter_tablew_select_teacher_impart_tt = QtWidgets.QComboBox(self.frame_impart_teacher_time)
+        self.combox_filter_tablew_select_teacher_impart_tt.setGeometry(QtCore.QRect(1079, 4, 121, 22))
+        self.combox_filter_tablew_select_teacher_impart_tt.setObjectName("combox_filter_tablew_select_teacher_impart_tt")
+        self.combox_filter_tablew_select_teacher_impart_tt.addItem("")
+        self.combox_filter_tablew_select_teacher_impart_tt.addItem("")
+        self.combox_filter_tablew_select_teacher_impart_tt.addItem("")
+        self.combox_filter_tablew_select_teacher_impart_tt.addItem("")
+        self.combox_filter_tablew_select_teacher_impart_tt.addItem("")
+        self.combox_filter_tablew_select_teacher_impart_tt.addItem("")
         self.main_central_widget.addTab(self.impart_teacher_time, "")
         self.new_login = QtWidgets.QWidget()
         self.new_login.setObjectName("new_login")
@@ -1759,6 +1768,10 @@ class Ui_staff_management_window(object):
         self.tablew_select_teacher_impart_tt.setContextMenuPolicy(3)  # 3 = Qt.CustomContextMenu
         self.tablew_select_teacher_impart_tt.customContextMenuRequested.connect(self.show_context_menu)
 
+        self.combox_filter_tablew_select_teacher_impart_tt.currentIndexChanged.connect(self.combox_filter_tablew_select_teacher_impart_tt_changed)
+
+        self.tablew_select_teacher_impart_tt.cellClicked.connect(self.load_subject_selected_teacher)
+        self.tablew_select_teacher_impart_tt.cellClicked.connect(self.load_grades_selected_teacher)
 
         self.retranslateUi(staff_management_window)
         self.main_central_widget.setCurrentIndex(7)
@@ -3021,9 +3034,9 @@ class Ui_staff_management_window(object):
             QtWidgets.QMessageBox.warning(None, "Advertencia", "No hay ninguna fila seleccionada.")
 
     def clean_inputs_search_staff(self):
-        self.line_input_full_name_search_staff.clean()
-        self.line_input_phone_number_search_staff.clean()
-        self.line_input_document_id_search_staff.clean()
+        self.line_input_full_name_search_staff.clear()
+        self.line_input_phone_number_search_staff.clear()
+        self.line_input_document_id_search_staff.clear()
 
     def details_button_search_staff(self):
         selected_row = self.tablew_show_staff_registered_search_staff.currentRow()
@@ -3078,7 +3091,10 @@ class Ui_staff_management_window(object):
 
     def load_impart_time_teachers(self):
         self.aitt = assign_impart_time_teacher()
-        impart_time_results = self.aitt.load_impart_time_table()
+        self.tablew_select_teacher_impart_tt_order = self.combox_filter_tablew_select_teacher_impart_tt.currentIndex()
+
+
+        impart_time_results = self.aitt.load_impart_time_table(self.tablew_select_teacher_impart_tt_order)
         self.tablew_select_teacher_impart_tt.setRowCount(0)
 
         if impart_time_results is not None:
@@ -3099,6 +3115,10 @@ class Ui_staff_management_window(object):
             self.tablew_select_teacher_impart_tt.resizeRowsToContents()
         else:
             pass
+    
+    def combox_filter_tablew_select_teacher_impart_tt_changed(self):
+        if self.tablew_select_teacher_impart_tt_order != self.combox_filter_tablew_select_teacher_impart_tt.currentIndex():
+            self.load_impart_time_teachers()
     
     def show_context_menu(self, position):
         selected_row = self.tablew_select_teacher_impart_tt.currentRow()
@@ -3162,8 +3182,90 @@ class Ui_staff_management_window(object):
         else:
             QtWidgets.QMessageBox.warning(None, "Advertencia", "No hay ninguna fila seleccionada.")
 
-        
+    def load_subject_selected_teacher(self):
+        selected_row = self.tablew_select_teacher_impart_tt.currentRow()
 
+        if selected_row >= 0:
+            teacher_id_selected = self.tablew_select_teacher_impart_tt.item(selected_row, 0)
+            if teacher_id_selected:
+                old_teacher_id_selected = teacher_id_selected
+                teacher_id_selected = teacher_id_selected.text()
+
+                if old_teacher_id_selected != teacher_id_selected or old_teacher_id_selected == teacher_id_selected:
+                    self.listw_select_subject_impart_tt.clear()
+                    self.listw_select_subject_impart_tt.clearSelection()
+
+                subjects_assigned = self.aitt.load_subjects(teacher_id_selected)
+                for subject in subjects_assigned:
+                    self.listw_select_subject_impart_tt.addItem(subject[0])
+                
+                subject_selected = self.tablew_select_teacher_impart_tt.item(selected_row, 5)
+                subject_selected = subject_selected.text()
+
+                self.current_subject_to_assign_qtable = subject_selected
+
+                matching_items = self.listw_select_subject_impart_tt.findItems(subject_selected, QtCore.Qt.MatchExactly)
+                if matching_items:
+                    self.listw_select_subject_impart_tt.setCurrentItem(matching_items[0])
+                else:
+                    QtWidgets.QMessageBox.warning(None, "Advertencia", "No se encontró un elemento coincidente en la lista.")
+
+        else:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "No hay ninguna fila seleccionada.")
+
+    def load_grades_selected_teacher(self):
+        selected_row = self.tablew_select_teacher_impart_tt.currentRow()
+
+        if selected_row >= 0:
+            teacher_id_selected = self.tablew_select_teacher_impart_tt.item(selected_row, 0)
+            if teacher_id_selected:
+                old_teacher_id_selected = teacher_id_selected
+                teacher_id_selected = teacher_id_selected.text()
+
+                if old_teacher_id_selected != teacher_id_selected or old_teacher_id_selected == teacher_id_selected:
+                    self.listw_select_grade_impart_tt.clear()
+                    self.listw_select_grade_impart_tt.clearSelection()
+
+                subjects_assigned = self.aitt.load_grades(teacher_id_selected)
+                for subject in subjects_assigned:
+                    self.listw_select_grade_impart_tt.addItem(subject[0])
+                
+                grade_selected = self.tablew_select_teacher_impart_tt.item(selected_row, 4)
+                grade_selected = grade_selected.text()
+                
+                self.current_grade_to_assign_qtable = grade_selected
+
+                matching_items = self.listw_select_grade_impart_tt.findItems(grade_selected, QtCore.Qt.MatchExactly)
+                if matching_items:
+                    self.listw_select_grade_impart_tt.setCurrentItem(matching_items[0])
+                else:
+                    QtWidgets.QMessageBox.warning(None, "Advertencia", "No se encontró un elemento coincidente en la lista.")
+
+        else:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "No hay ninguna fila seleccionada.")
+
+    def assign_impart_time(self):
+        current_selected_grade = self.listw_select_grade_impart_tt.selectedItems()
+        current_selected_subject = self.listw_select_subject_impart_tt.selectedItems()
+        
+        if not current_selected_grade or not current_selected_subject:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "No se ha seleccionado un grado o una materia")
+            return
+        
+        if current_selected_grade or current_selected_subject != self.current_grade_to_assign_qtable or self.current_subject_to_assign_qtable:
+            grade_text = current_selected_grade[0].text()
+            subject_text = current_selected_subject[0].text()
+
+            for row in range(self.tablew_select_teacher_impart_tt.rowCount()):
+                grade_item = self.tablew_select_teacher_impart_tt.item(row, 4)
+                subject_item = self.tablew_select_teacher_impart_tt.item(row, 5)
+
+                if grade_item and subject_item:
+                    if grade_item.text() == grade_text and subject_item.text() == subject_text:
+                        self.tablew_select_teacher_impart_tt.selectRow(row)
+                        
+                    else:
+                        QtWidgets.QMessageBox.warning(None, "Sin coincidencias", "No se encontró ninguna fila que coincida con el grado y la materia seleccionados.")
     def retranslateUi(self, staff_management_window):
         _translate = QtCore.QCoreApplication.translate
         staff_management_window.setWindowTitle(_translate("staff_management_window", "Administracion de personal"))
@@ -3317,7 +3419,7 @@ class Ui_staff_management_window(object):
         self.button_edit_selected_staff_search_staff.setText(_translate("staff_management_window", "Editar"))
         self.main_central_widget.setTabText(self.main_central_widget.indexOf(self.search_staff_widget), _translate("staff_management_window", "Buscar Personal"))
         self.button_clear_information_search_staff.setText(_translate("staff_management_window", "Limpiar"))
-        self.label_select_teacher_static_impart_tt.setText(_translate("staff_management_window", "Selecciona un profesor (Selecciona la ID Profesor si desea editar informacion):"))
+        self.label_select_teacher_static_impart_tt.setText(_translate("staff_management_window", "Selecciona un profesor (Click Izquierdo para asignar horas de clase | Click derecho para desasignar o editar):"))
         self.tablew_select_teacher_impart_tt.setSortingEnabled(True)
         item = self.tablew_select_teacher_impart_tt.horizontalHeaderItem(0)
         item.setText(_translate("staff_management_window", "ID Profesor"))
@@ -3349,6 +3451,12 @@ class Ui_staff_management_window(object):
         self.label_subject_selected_impart_tt.setText(_translate("staff_management_window", "Materia:"))
         self.label_grade_selected_data_impart_tt.setText(_translate("staff_management_window", "Grado:"))
         self.label_teacher_selected_data_impart_tt.setText(_translate("staff_management_window", "Profesor:"))
+        self.combox_filter_tablew_select_teacher_impart_tt.setItemText(0, _translate("staff_management_window", "Id profesor"))
+        self.combox_filter_tablew_select_teacher_impart_tt.setItemText(1, _translate("staff_management_window", "Grado asignado"))
+        self.combox_filter_tablew_select_teacher_impart_tt.setItemText(2, _translate("staff_management_window", "Hora inicial"))
+        self.combox_filter_tablew_select_teacher_impart_tt.setItemText(3, _translate("staff_management_window", "Hora final"))
+        self.combox_filter_tablew_select_teacher_impart_tt.setItemText(4, _translate("staff_management_window", "Hora inicial sin asignar"))
+        self.combox_filter_tablew_select_teacher_impart_tt.setItemText(5, _translate("staff_management_window", "Hora final sin asignar"))
         self.main_central_widget.setTabText(self.main_central_widget.indexOf(self.impart_teacher_time), _translate("staff_management_window", "Tiempo de clases"))
         item = self.tablew_software_access_show.horizontalHeaderItem(0)
         item.setText(_translate("staff_management_window", "ID Empleado"))
