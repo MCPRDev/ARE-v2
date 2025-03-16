@@ -40,28 +40,20 @@ SELECT
     itt.impart_time_start,
     itt.impart_time_end
 FROM impart_time_teacher itt
-
 INNER JOIN teacher_grade_assigned tga 
     ON tga.tga_id = itt.teacher_grade_assigned_id
-    
 INNER JOIN subject_teacher sbt 
     ON sbt.subject_teacher_id = itt.subject_teacher_id
-    
 INNER JOIN teachers th 
     ON th.teacher_id = sbt.teacher_id
-    
-INNER JOIN grades g 
+LEFT JOIN grades g
     ON g.grade_id = th.guide_grade_id
-    
 INNER JOIN grades g2 
     ON g2.grade_id = tga.grade_id
-    
-INNER JOIN subjects sb 
+LEFT JOIN subjects sb
     ON sb.subject_id = th.main_subject
-    
 INNER JOIN subjects sb2 
     ON sb2.subject_id = sbt.subject_id
-    
 INNER JOIN staff st 
     ON st.staff_id = th.staff_id
 WHERE itt.active = true
