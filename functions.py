@@ -771,3 +771,97 @@ class assign_impart_time_teacher():
         except Exception as e:
             print(f"Error aitt: get_id_tga_and_sbt_existing: {e}")
             return None
+    
+    def get_subject_id(self, subject):
+        query = "SELECT subject_id FROM subjects WHERE subject = %s"
+        try:
+            self.query.cursor.execute(query,(subject,))
+            result = self.query.cursor.fetchone()
+            if result and result is not None:
+                return result[0]
+            else:
+                return None
+        except Exception as e:
+            print(f"Error aitt: get_subject_id: {e}")
+            return None
+
+    def get_grade_id(self, grade):
+        query = "SELECT grade_id FROM grades WHERE grade = %s"
+        try:
+            self.query.cursor.execute(query,(grade,))
+            result = self.query.cursor.fetchone()
+            if result and result is not None:
+                return result[0]
+            else:
+                return None
+        except Exception as e:
+            print(f"Error aitt: get_grade_id: {e}")
+            return None
+
+    def assign_impart_time_action(self, teacher_id, grade, subject, time_starts, time_ends, action):
+        if not self.verify_teacher_time_assign(teacher_id, grade, subject, time_starts, time_ends):
+            return
+        match action:
+            case "UPDATE": #This is an update action, here the teacher already has the grade and subject assigned
+                results = self.get_id_tga_and_sbt_existing(grade, subject, teacher_id)
+                grade_id = results[0]
+                subject_id = results[1]
+                query = f"""
+                            INSERT INTO 
+                                impart_time_teacher (subject_teacher_id, teacher_grade_assigned_id, impart_time_start, impart_time_end)
+                            VALUES
+                                (%s, %s, %s, %s);
+                        """
+                try:
+                    self.query.cursor.execute(query,(subject_id, grade_id, time_starts, time_ends,))
+                    self.query.connection.commit()
+                except Exception as e:
+                    print(f"Error aitt: assign_impart_time_action: {e}")
+                    self.query.connection.rollback()
+            
+            case "INSERT": #This is an insert action, if the teacher has not the grade and subject assigned, we need to assign it
+                grade_id = self.get_grade_id(grade)
+                subject_id = self.get_subject_id(subject)
+                if subject_id is None or grade_id is None:
+                    return
+                
+                query_insert_teacher_grade = f"""
+                                                INSERT INTO teacher_grade_assigned (teacher_id, grade_id)
+                                                VALUES (%s, %s)
+                                                RETURNING tga_id;
+                                            """
+                try:
+                    self.query.cursor.execute(query_insert_teacher_grade,(teacher_id, grade_id,))
+                    results = self.query.cursor.fetchone()
+                    tga_id = results[0]
+                except Exception as e:
+                    print(f"Error aitt: assign_impart_time_action: {e}")
+                    self.query.connection.rollback()
+                
+                query_insert_subject_teacher = f"""
+                                                INSERT INTO subject_teacher (teacher_id, subject_id)
+                                                VALUES (%s, %s)
+                                                RETURNING subject_teacher_id;
+                                                """
+                try:
+                    self.query.cursor.execute(query_insert_subject_teacher,(teacher_id, subject_id,))
+                    results = self.query.cursor.fetchone()
+                    sbt_id = results[0]
+                except Exception as e:
+                    print(f"Error aitt: assign_impart_time_action: {e}")
+                    self.query.connection.rollback()
+                
+                query_insert_impart_time = f"""
+                                            INSERT INTO impart_time_teacher (subject_teacher_id, teacher_grade_assigned_id, impart_time_start, impart_time_end)
+                                            VALUES (%s, %s, %s, %s);
+                                            """
+                try:
+                    self.query.cursor.execute(query_insert_impart_time,(sbt_id, tga_id, time_starts, time_ends,))
+                    self.query.connection.commit()
+                except Exception as e:
+                    print(f"Error aitt: assign_impart_time_action: {e}")
+                    self.query.connection.rollback()
+                
+            case _:
+                return
+

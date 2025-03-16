@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, time
 import re
 import uuid
 import bcrypt
@@ -174,3 +174,61 @@ def clear_entry_data(data):
     
     return data.strip()
 
+##############Specific Impart time assigned widget########
+
+def verify_start_time(start_time):
+    if isinstance (start_time, time):
+        if start_time.hour < 7 or start_time.hour > 18:
+            return False
+        else:
+            return True
+    
+    elif isinstance(start_time, str):
+        try:
+            start_time = datetime.strptime(start_time, "%H:%M:%S").time()
+            if start_time.hour < 7 or start_time.hour > 18:
+                return False
+            else:
+                return True
+        except ValueError:
+            return False
+
+def verify_end_time(end_time):
+    if isinstance (end_time, time):
+        if end_time.hour < 7 or end_time.hour > 18:
+            return False
+        else:
+            return True
+    
+    elif isinstance(end_time, str):
+        try:
+            end_time = datetime.strptime(end_time, "%H:%M:%S").time()
+            if end_time.hour < 7 or end_time.hour > 18:
+                return False
+            else:
+                return True
+        except ValueError:
+            return False
+        
+    else:
+        return False
+
+def verify_start_end_tiem(start_time, end_time):
+    if isinstance(start_time, time) and isinstance(end_time, time):
+        if start_time >= end_time:
+            return False
+        else:
+            return True
+    
+    elif isinstance(start_time, str) and isinstance(end_time, str):
+        try:
+            start_time = datetime.strptime(start_time, "%H:%M:%S").time()
+            end_time = datetime.strptime(end_time, "%H:%M:%S").time()
+            if start_time >= end_time:
+                return False
+            else:
+                return True
+        except ValueError:
+            return False
+    else:
+        return False

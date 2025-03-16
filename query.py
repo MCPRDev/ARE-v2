@@ -1,7 +1,7 @@
 import psycopg2
 import threading
 import select
-import time
+import time as time_module
 from outfuctions import *
 
 #This query is for general things, not a specific use in the project but it can be used for any other project
@@ -60,7 +60,7 @@ class Postgresqueries():
             except Exception as e:
                 print(f"❌ Error while listening: {e}")
 
-            time.sleep(1)
+            time_module.sleep(1)
 
 
     def close_connection(self):

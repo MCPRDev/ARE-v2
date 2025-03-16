@@ -1299,6 +1299,9 @@ class Ui_staff_management_window(object):
         self.tablew_select_teacher_impart_tt.setHorizontalHeaderItem(7, item)
         self.tablew_select_teacher_impart_tt.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         self.tablew_select_teacher_impart_tt.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.tablew_select_teacher_impart_tt.setSortingEnabled(False)
+        self.tablew_select_teacher_impart_tt.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.tablew_select_teacher_impart_tt.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.listw_select_grade_impart_tt = QtWidgets.QListWidget(self.frame_impart_teacher_time)
         self.listw_select_grade_impart_tt.setGeometry(QtCore.QRect(10, 470, 141, 192))
         self.listw_select_grade_impart_tt.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.SelectedClicked)
@@ -1456,6 +1459,30 @@ class Ui_staff_management_window(object):
         self.combox_filter_tablew_select_teacher_impart_tt.addItem("")
         self.combox_filter_tablew_select_teacher_impart_tt.addItem("")
         self.combox_filter_tablew_select_teacher_impart_tt.addItem("")
+        self.label_name_search_impart_tt = QtWidgets.QLabel(self.frame_impart_teacher_time)
+        self.label_name_search_impart_tt.setGeometry(QtCore.QRect(680, 10, 61, 16))
+        font = QtGui.QFont()
+        font.setFamily("Microsoft JhengHei")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_name_search_impart_tt.setFont(font)
+        self.label_name_search_impart_tt.setObjectName("label_name_search_impart_tt")
+        self.line_input_search_name_teacher_impart_tt = QtWidgets.QLineEdit(self.frame_impart_teacher_time)
+        self.line_input_search_name_teacher_impart_tt.setGeometry(QtCore.QRect(738, 8, 201, 20))
+        self.line_input_search_name_teacher_impart_tt.setObjectName("line_input_search_name_teacher_impart_tt")
+        self.label_id_search_impart_tt = QtWidgets.QLabel(self.frame_impart_teacher_time)
+        self.label_id_search_impart_tt.setGeometry(QtCore.QRect(941, 10, 21, 16))
+        font = QtGui.QFont()
+        font.setFamily("Microsoft JhengHei")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_id_search_impart_tt.setFont(font)
+        self.label_id_search_impart_tt.setObjectName("label_id_search_impart_tt")
+        self.line_input_search_id_teacher_impart_tt = QtWidgets.QLineEdit(self.frame_impart_teacher_time)
+        self.line_input_search_id_teacher_impart_tt.setGeometry(QtCore.QRect(960, 8, 81, 20))
+        self.line_input_search_id_teacher_impart_tt.setObjectName("line_input_search_id_teacher_impart_tt")
         self.main_central_widget.addTab(self.impart_teacher_time, "")
         self.new_login = QtWidgets.QWidget()
         self.new_login.setObjectName("new_login")
@@ -1772,6 +1799,21 @@ class Ui_staff_management_window(object):
 
         self.tablew_select_teacher_impart_tt.cellClicked.connect(self.load_subject_selected_teacher)
         self.tablew_select_teacher_impart_tt.cellClicked.connect(self.load_grades_selected_teacher)
+        self.tablew_select_teacher_impart_tt.cellClicked.connect(self.dynamic_label_details_impart_time)
+        self.tablew_select_teacher_impart_tt.itemSelectionChanged.connect(self.enable_assign_save_button)
+
+        self.timeedit_select_impart_start_time_impart_tt.timeChanged.connect(self.dynamic_label_details_impart_time)
+        self.timeedit_select_impart_end_time_impart_tt.timeChanged.connect(self.dynamic_label_details_impart_time)
+
+        self.button_save_information_selected_impart_tt.clicked.connect(self.assign_impart_time)
+
+        self.button_save_information_selected_impart_tt.setEnabled(False)
+
+        self.listw_select_grade_impart_tt.itemSelectionChanged.connect(self.dynamic_label_details_impart_time)
+        self.listw_select_subject_impart_tt.itemSelectionChanged.connect(self.dynamic_label_details_impart_time)
+
+        self.line_input_search_name_teacher_impart_tt.textChanged.connect(self.filter_search_impart_time)
+        self.line_input_search_id_teacher_impart_tt.textChanged.connect(self.filter_search_impart_time)
 
         self.retranslateUi(staff_management_window)
         self.main_central_widget.setCurrentIndex(7)
@@ -2968,7 +3010,6 @@ class Ui_staff_management_window(object):
                 self.button_chhange_status_restore.setEnabled(False)
                 self.button_change_status_delete.setEnabled(False)
 
-    
     ########################################################################################
     ########################################################################################
     ################################Search Staff Table######################################
@@ -3169,8 +3210,9 @@ class Ui_staff_management_window(object):
                 selected_time_start = time_start_item.text()
                 selected_time_end = time_end_item.text()
 
-                print(selected_time_start, selected_time_end)
-
+                if selected_time_start == "None" and selected_time_end == "None":
+                    return 
+                
                 try:
                     self.aitt.unassign_impart_time_action(str(selected_id), str(selected_grade), str(selected_subject), str(selected_time_start), str(selected_time_end))
                     QtWidgets.QMessageBox.information(None, "Exito", "Se ha desasignado la hora")
@@ -3190,6 +3232,8 @@ class Ui_staff_management_window(object):
             if teacher_id_selected:
                 old_teacher_id_selected = teacher_id_selected
                 teacher_id_selected = teacher_id_selected.text()
+
+                self.teacher_id_selected_impart = teacher_id_selected
 
                 if old_teacher_id_selected != teacher_id_selected or old_teacher_id_selected == teacher_id_selected:
                     self.listw_select_subject_impart_tt.clear()
@@ -3243,29 +3287,197 @@ class Ui_staff_management_window(object):
 
         else:
             QtWidgets.QMessageBox.warning(None, "Advertencia", "No hay ninguna fila seleccionada.")
+    
+    def enable_assign_save_button(self):
+        if self.tablew_select_teacher_impart_tt.selectedItems:
+            self.button_save_information_selected_impart_tt.setEnabled(True)
+        else:
+            self.button_save_information_selected_impart_tt.setEnabled(False)
+
+    def clear_events_impart_time(self):
+        self.listw_select_grade_impart_tt.clear()
+        self.listw_select_subject_impart_tt.clear()
+        self.listw_select_grade_impart_tt.clearSelection()
+        self.listw_select_subject_impart_tt.clearSelection()
+
+        self.button_save_information_selected_impart_tt.setEnabled(False)
 
     def assign_impart_time(self):
+
         current_selected_grade = self.listw_select_grade_impart_tt.selectedItems()
         current_selected_subject = self.listw_select_subject_impart_tt.selectedItems()
-        
+
+        compare_grade = current_selected_grade[0].text()
+        compare_subject = current_selected_subject[0].text()
+
+        current_teacher_id = self.tablew_select_teacher_impart_tt.item(self.tablew_select_teacher_impart_tt.currentRow(), 0)
+        current_teacher_id = current_teacher_id.text()
+
         if not current_selected_grade or not current_selected_subject:
             QtWidgets.QMessageBox.warning(None, "Advertencia", "No se ha seleccionado un grado o una materia")
             return
-        
-        if current_selected_grade or current_selected_subject != self.current_grade_to_assign_qtable or self.current_subject_to_assign_qtable:
+
+        if compare_grade != self.current_grade_to_assign_qtable or compare_subject != self.current_subject_to_assign_qtable and current_teacher_id == self.teacher_id_selected_impart:
+            
             grade_text = current_selected_grade[0].text()
             subject_text = current_selected_subject[0].text()
+
+            time_starts = self.timeedit_select_impart_start_time_impart_tt.time().toString("HH:mm:ss")
+            time_ends = self.timeedit_select_impart_end_time_impart_tt.time().toString("HH:mm:ss")
+
+            if not self.aitt.verify_teacher_time_assign(current_teacher_id, grade_text, subject_text ,time_starts, time_ends):
+                QtWidgets.QMessageBox.warning(None, "Advertencia", "El profesor ya tiene una hora asignada en ese rango de tiempo o el grado ya tiene asignada esa hora")
+                return
+
+            if not verify_start_time(time_starts):
+                QtWidgets.QMessageBox.warning(None, "Advertencia", "La hora de inicio no puede ser menor a las 6:00")
+                return 
+            
+            if not verify_end_time(time_ends):
+                QtWidgets.QMessageBox.warning(None, "Advertencia", "La hora de finalizacion no puede ser mayor a las 18:00")
+                return
+            
+            if not verify_start_end_tiem(time_starts, time_ends):
+                QtWidgets.QMessageBox.warning(None, "Advertencia", "La hora de finalizacion no puede ser menor a la hora de inicio")
+                return
+            
+            found_match = False
 
             for row in range(self.tablew_select_teacher_impart_tt.rowCount()):
                 grade_item = self.tablew_select_teacher_impart_tt.item(row, 4)
                 subject_item = self.tablew_select_teacher_impart_tt.item(row, 5)
-
                 if grade_item and subject_item:
                     if grade_item.text() == grade_text and subject_item.text() == subject_text:
                         self.tablew_select_teacher_impart_tt.selectRow(row)
+                        action = "UPDATE"
+                        found_match = True
                         
-                    else:
-                        QtWidgets.QMessageBox.warning(None, "Sin coincidencias", "No se encontró ninguna fila que coincida con el grado y la materia seleccionados.")
+                        try:
+                            self.aitt.assign_impart_time_action(current_teacher_id, grade_text, subject_text, time_starts, time_ends, action)
+                            QtWidgets.QMessageBox.information(None, "Exito", "Se ha asignado la hora")
+                            self.tablew_select_teacher_impart_tt.clearSelection()
+                            self.clear_events_impart_time()
+                            self.load_impart_time_teachers()
+                            return
+                        except Exception as e:
+                            QtWidgets.QMessageBox.warning(None, "Error", "No se ha podido asignar la hora")
+                            self.tablew_select_teacher_impart_tt.clearSelection()
+                            self.clear_events_impart_time()
+                            print(e)
+                            return
+            if not found_match:
+                action = "INSERT"
+                
+                try:
+                    self.aitt.assign_impart_time_action(current_teacher_id ,grade_text, subject_text, time_starts, time_ends, action)
+                    QtWidgets.QMessageBox.information(None, "Exito", "Se ha asignado la hora")
+                    self.load_impart_time_teachers()
+                    self.tablew_select_teacher_impart_tt.clearSelection()
+                    self.clear_events_impart_time()
+                    return
+                except Exception as e:
+                    QtWidgets.QMessageBox.warning(None, "Error", "No se ha podido asignar la hora")
+                    self.tablew_select_teacher_impart_tt.clearSelection()
+                    self.clear_events_impart_time()
+                    print(e)
+                    return
+        else:
+            grade_text = current_selected_grade[0].text()
+            subject_text = current_selected_subject[0].text()
+
+            time_starts = self.timeedit_select_impart_start_time_impart_tt.time().toString("HH:mm:ss")
+            time_ends = self.timeedit_select_impart_end_time_impart_tt.time().toString("HH:mm:ss")
+
+            if not self.aitt.verify_teacher_time_assign(current_teacher_id, grade_text, subject_text ,time_starts, time_ends):
+                QtWidgets.QMessageBox.warning(None, "Advertencia", "El profesor ya tiene una hora asignada en ese rango de tiempo")
+                return
+
+            if not verify_start_time(time_starts):
+                QtWidgets.QMessageBox.warning(None, "Advertencia", "La hora de inicio no puede ser menor a las 6:00")
+                return 
+            
+            if not verify_end_time(time_ends):
+                QtWidgets.QMessageBox.warning(None, "Advertencia", "La hora de finalizacion no puede ser mayor a las 18:00")
+                return
+            
+            if not verify_start_end_tiem(time_starts, time_ends):
+                QtWidgets.QMessageBox.warning(None, "Advertencia", "La hora de finalizacion no puede ser menor a la hora de inicio")
+                return
+            
+            action = "UPDATE"
+            try:
+                self.aitt.assign_impart_time_action(current_teacher_id, grade_text, subject_text, time_starts, time_ends, action)
+                QtWidgets.QMessageBox.information(None, "Exito", "Se ha asignado la hora")
+                self.tablew_select_teacher_impart_tt.clearSelection()
+                self.clear_events_impart_time()
+                self.load_impart_time_teachers()
+                return
+            except Exception as e:
+                QtWidgets.QMessageBox.warning(None, "Error", "No se ha podido asignar la hora")
+                self.tablew_select_teacher_impart_tt.clearSelection()
+                self.clear_events_impart_time()
+                print(e)
+                return
+
+    def filter_search_impart_time(self):
+        search_all_name_table = self.line_input_search_name_teacher_impart_tt.text().strip().lower()
+        search_id = self.line_input_search_id_teacher_impart_tt.text().strip().lower()
+
+        print(f"Buscando: Nombre: {search_all_name_table}, ID: {search_id}")
+
+        for row in range(self.tablew_select_teacher_impart_tt.rowCount()):
+            id_teacher = self.tablew_select_teacher_impart_tt.item(row, 0).text().lower() if self.tablew_select_teacher_impart_tt.item(row, 0) else " "
+            full_name = self.tablew_select_teacher_impart_tt.item(row, 1).text().lower() if self.tablew_select_teacher_impart_tt.item(row, 1) else " "
+            grade = self.tablew_select_teacher_impart_tt.item(row, 4).text().lower() if self.tablew_select_teacher_impart_tt.item(row, 4) else " "
+            subject = self.tablew_select_teacher_impart_tt.item(row, 5).text().lower() if self.tablew_select_teacher_impart_tt.item(row, 5) else " "
+
+            print(f"Fila {row}: ID: {id_teacher}, Nombre: {full_name}, Grado: {grade}, Materia: {subject}")
+
+            match_id = search_id in id_teacher
+            match_full_name = search_all_name_table in full_name
+            match_grade = search_all_name_table in grade
+            match_subject = search_all_name_table in subject
+
+            print(f"Coincidencias: ID: {match_id}, Nombre: {match_full_name}, Grado: {match_grade}, Materia: {match_subject}")
+
+            if (match_id and match_full_name or match_grade or match_subject):
+                self.tablew_select_teacher_impart_tt.setRowHidden(row, False)
+            else:
+                self.tablew_select_teacher_impart_tt.setRowHidden(row, True)
+    
+    def dynamic_label_details_impart_time(self):
+        selected_row = self.tablew_select_teacher_impart_tt.currentRow()
+        if selected_row >= 0:
+            teacher_name = self.tablew_select_teacher_impart_tt.item(selected_row, 1).text()
+            grade = self.tablew_select_teacher_impart_tt.item(selected_row, 4).text()
+            subject = self.tablew_select_teacher_impart_tt.item(selected_row, 5).text()
+            start_time = self.timeedit_select_impart_start_time_impart_tt.time().toString("HH:mm:ss")
+            end_time = self.timeedit_select_impart_end_time_impart_tt.time().toString("HH:mm:ss")
+
+            compare_grade = self.listw_select_grade_impart_tt.currentItem().text() if self.listw_select_grade_impart_tt.currentItem() else grade
+            compare_subject = self.listw_select_subject_impart_tt.currentItem().text() if self.listw_select_subject_impart_tt.currentItem() else subject
+
+            if grade != compare_grade:
+                grade = self.listw_select_grade_impart_tt.currentItem().text()
+
+            if subject != compare_subject:
+                subject = self.listw_select_subject_impart_tt.currentItem().text()
+
+        else:
+            teacher_name = None
+            grade = None
+            subject = None
+            start_time = None
+            end_time = None
+
+        self.label_teacher_selected_dynamic_impart_tt.setText(teacher_name) if teacher_name else self.label_teacher_selected_dynamic_impart_tt.setText(" ")
+        self.label_grade_selected_data_dynamic_impart_tt_.setText(grade) if grade else self.label_grade_selected_data_dynamic_impart_tt_.setText(" ")
+        self.label_subject_selected_data_dynamic_impart_tt.setText(subject) if subject else self.label_subject_selected_data_dynamic_impart_tt.setText(" ")
+        full_time = f"{start_time} - {end_time}" if start_time and end_time else " "
+        self.label_time_selected_data_dynamic_impart_tt.setText(full_time) if start_time and end_time else self.label_time_selected_data_dynamic_impart_tt.setText(" ")
+
+
+
     def retranslateUi(self, staff_management_window):
         _translate = QtCore.QCoreApplication.translate
         staff_management_window.setWindowTitle(_translate("staff_management_window", "Administracion de personal"))
@@ -3420,7 +3632,6 @@ class Ui_staff_management_window(object):
         self.main_central_widget.setTabText(self.main_central_widget.indexOf(self.search_staff_widget), _translate("staff_management_window", "Buscar Personal"))
         self.button_clear_information_search_staff.setText(_translate("staff_management_window", "Limpiar"))
         self.label_select_teacher_static_impart_tt.setText(_translate("staff_management_window", "Selecciona un profesor (Click Izquierdo para asignar horas de clase | Click derecho para desasignar o editar):"))
-        self.tablew_select_teacher_impart_tt.setSortingEnabled(True)
         item = self.tablew_select_teacher_impart_tt.horizontalHeaderItem(0)
         item.setText(_translate("staff_management_window", "ID Profesor"))
         item = self.tablew_select_teacher_impart_tt.horizontalHeaderItem(1)
@@ -3457,6 +3668,8 @@ class Ui_staff_management_window(object):
         self.combox_filter_tablew_select_teacher_impart_tt.setItemText(3, _translate("staff_management_window", "Hora final"))
         self.combox_filter_tablew_select_teacher_impart_tt.setItemText(4, _translate("staff_management_window", "Hora inicial sin asignar"))
         self.combox_filter_tablew_select_teacher_impart_tt.setItemText(5, _translate("staff_management_window", "Hora final sin asignar"))
+        self.label_name_search_impart_tt.setText(_translate("staff_management_window", "Nombre:"))
+        self.label_id_search_impart_tt.setText(_translate("staff_management_window", "ID:"))
         self.main_central_widget.setTabText(self.main_central_widget.indexOf(self.impart_teacher_time), _translate("staff_management_window", "Tiempo de clases"))
         item = self.tablew_software_access_show.horizontalHeaderItem(0)
         item.setText(_translate("staff_management_window", "ID Empleado"))
