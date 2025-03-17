@@ -1808,6 +1808,8 @@ class Ui_staff_management_window(object):
         self.button_save_information_selected_impart_tt.clicked.connect(self.assign_impart_time)
 
         self.button_save_information_selected_impart_tt.setEnabled(False)
+        self.button_clean_information_selected_impart_tt.clicked.connect(self.clear_data_impart_time)
+        self.button_unassign_time_selected_impart_tt.clicked.connect(self.unassign_all_subject_grades_impart_time)
 
         self.listw_select_grade_impart_tt.itemSelectionChanged.connect(self.dynamic_label_details_impart_time)
         self.listw_select_subject_impart_tt.itemSelectionChanged.connect(self.dynamic_label_details_impart_time)
@@ -3476,7 +3478,39 @@ class Ui_staff_management_window(object):
         full_time = f"{start_time} - {end_time}" if start_time and end_time else " "
         self.label_time_selected_data_dynamic_impart_tt.setText(full_time) if start_time and end_time else self.label_time_selected_data_dynamic_impart_tt.setText(" ")
 
+    def clear_data_impart_time(self):
+        self.listw_select_grade_impart_tt.clear()
+        self.listw_select_subject_impart_tt.clear()
+        self.listw_select_grade_impart_tt.clearSelection()
+        self.listw_select_subject_impart_tt.clearSelection()
+        self.timeedit_select_impart_start_time_impart_tt.setTime(QtCore.QTime(7, 0, 0))
+        self.timeedit_select_impart_end_time_impart_tt.setTime(QtCore.QTime(8, 0, 0))
+        self.tablew_select_teacher_impart_tt.clearSelection()
+        self.button_save_information_selected_impart_tt.setEnabled(False)
+        self.line_input_search_name_teacher_impart_tt.clear()
+        self.line_input_search_id_teacher_impart_tt.clear()
+        self.label_teacher_selected_dynamic_impart_tt.clear()
+        self.label_grade_selected_data_dynamic_impart_tt_.clear()
+        self.label_subject_selected_data_dynamic_impart_tt.clear()
+        self.label_time_selected_data_dynamic_impart_tt.clear()
 
+    def unassign_all_subject_grades_impart_time(self):
+        message = "Esta accion desasignara todas las horas de inicio y final asignadas a los profesores \n¿Estás seguro de que deseas desasignar a todos los maestros?"
+
+        reply = QMessageBox.question(
+            None,
+            "Confirmar Acción",
+            message,
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            self.aitt.unassing_all_impart_time()
+            QtWidgets.QMessageBox.information(None, "Cambios Realizados", "Los maestros han sido desasignados de las horas de inicio y final de los grados y materias asignadas")
+            self.load_impart_time_teachers()
+        else:
+            QtWidgets.QMessageBox.information(None, "Cancelado", "No se ha desasignado ningun maestro a su horario")
 
     def retranslateUi(self, staff_management_window):
         _translate = QtCore.QCoreApplication.translate

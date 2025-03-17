@@ -865,3 +865,11 @@ class assign_impart_time_teacher():
             case _:
                 return
 
+    def unassing_all_impart_time(self):
+        query = "UPDATE impart_time_teacher SET active = false"
+        try:
+            self.query.cursor.execute(query)
+            self.query.connection.commit()
+        except Exception as e:
+            print(f"Error aitt: unassing_all_impart_time: {e}")
+            self.query.connection.rollback()
