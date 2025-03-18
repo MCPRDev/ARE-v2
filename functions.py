@@ -873,3 +873,152 @@ class assign_impart_time_teacher():
         except Exception as e:
             print(f"Error aitt: unassing_all_impart_time: {e}")
             self.query.connection.rollback()
+
+class access_login_software():
+    def __init__(self):
+        self.query = query.Postgresqueries()
+    
+    def get_data_table(self):
+        query = f"""
+                    SELECT
+                    st.staff_id,
+                    CONCAT_WS(' ', st.first_name, st.middle_name, st.first_surname, st.second_surname) as full_name,
+                    lg.log_user,
+                    lg.updated_at,
+                    lgt.access_type,
+                    lg.active
+                    FROM login_access lg
+                    INNER JOIN staff st ON st.staff_id = lg.staff_id
+                    INNER JOIN login_access_type lgt ON lgt.id_access_type = lg.access_type
+                """
+        try:
+            self.query.cursor.execute(query)
+            results = self.query.cursor.fetchall()
+            if results and results is not None:
+                return results
+            else:
+                return None
+        except Exception as e:
+            print(f"Error als: get_data_table: {e}")
+            return None
+    
+    def verify_active_login_access(self, staff_id):
+        query = "SELECT active FROM staff WHERE staff_id = %s"
+        try:
+            self.query.cursor.execute(query,(staff_id,))
+            result = self.query.cursor.fetchone()
+            if result and result[0]:
+                if result[0] == True:
+                    return True
+                else:
+                    return False
+            else:
+                return False
+        except Exception as e:
+            print(f"Error als: verify_active_login_access: {e}")
+            return False
+
+    def add_login_access(self, staff_id, user, password):
+        query = "SELECT job_id FROM staff WHERE staff_id = %s"
+        self.query.cursor.execute(query, (staff_id,))
+        job_id = self.query.cursor.fetchone()
+        job_id = job_id[0]
+
+        match job_id:
+            case 1:
+                access_type = 1
+            case 2:
+                access_type = 2
+        
+        query = "SELECT COUNT(*) FROM login_access WHERE staff_id = %s"
+        self.query.cursor.execute(query, (staff_id,))
+        result = self.query.cursor.fetchone()
+        if result[0] > 0:
+            update_query = "UPDATE login_access SET log_user = %s, log_password = %s WHERE staff_id = %s"
+            try:
+                self.query.login_update(staff_id, user, password)
+            except Exception as e:
+                print(f"Error als: add_login_access: {e}")
+        else:
+            insert_query = "INSERT INTO login_access (staff_id, log_user, log_password, access_type) VALUES (%s, %s, %s, %s)"
+            try:
+                self.query.login_insert(staff_id, user, password, access_type,)
+            except Exception as e:
+                print(f"Error als: add_login_access: {e}")
+    
+    def deactivate_login_access(self, staff_id, document_id):
+        if staff_id is not None:
+            query = "UPDATE login_access SET active = false WHERE staff_id = %s"
+            try:
+                self.query.cursor.execute(query, (staff_id,))
+                self.query.connection.commit()
+            except Exception as e:
+                print(f"Error als: deactivate_login_access: {e}")
+                self.query.connection.rollback()
+        
+        else:
+            query = "UPDATE login_access SET active = false WHERE staff_id = (SELECT staff_id FROM staff WHERE document_id = %s)"
+            try:
+                self.query.cursor.execute(query, (document_id,))
+                self.query.connection.commit()
+            except Exception as e:
+                print(f"Error als: deactivate_login_access: {e}")
+                self.query.connection.rollback()
+
+    def verify_id_or_document_id(self, staff_id, document_id):
+        if staff_id is not None:
+            query = "SELECT staff_id FROM staff WHERE staff_id = %s"
+            self.query.cursor.execute(query, (staff_id,))
+            result = self.query.cursor.fetchone()
+            if result and result[0] is not None:
+                return True
+            else:
+                return False
+        else:
+            query = "SELECT staff_id FROM staff WHERE document_id = %s"
+            self.query.cursor.execute(query, (document_id,))
+            result = self.query.cursor.fetchone()
+            if result and result[0] is not None:
+                return True
+            else:
+                return False
+
+    def verify_if_login_access_exists(self, staff_id, document_id):
+        if staff_id is not None:
+            query = "SELECT COUNT(*) FROM login_access WHERE staff_id = %s"
+            self.query.cursor.execute(query, (staff_id,))
+            result = self.query.cursor.fetchone()
+            if result[0] > 0:
+                return True
+            else:
+                return False
+        else:
+            query = "SELECT COUNT(*) FROM login_access WHERE staff_id = (SELECT staff_id FROM staff WHERE document_id = %s)"
+            self.query.cursor.execute(query, (document_id,))
+            result = self.query.cursor.fetchone()
+            if result[0] > 0:
+                return True
+            else:
+                return False
+
+    def get_staff_id_w_document_id(self, document_id):
+        query = "SELECT staff_id FROM staff WHERE document_id = %s"
+        try:
+            self.query.cursor.execute(query, (document_id,))
+            result = self.query.cursor.fetchone()
+            if result and result is not None:
+                return result[0]
+            else:
+                return " "
+        except Exception as e:
+            print(f"Error als: get_staff_id_w_document_id: {e}")
+            return " "
+    
+    def verify_if_staff_exists(self, staff_id):
+        query = "SELECT COUNT(*) FROM staff WHERE staff_id = %s"
+        self.query.cursor.execute(query, (staff_id,))
+        result = self.query.cursor.fetchone()
+        if result[0] > 0:
+            return True
+        else:
+            return False

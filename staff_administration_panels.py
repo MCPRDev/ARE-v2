@@ -1488,7 +1488,6 @@ class Ui_staff_management_window(object):
         self.new_login.setObjectName("new_login")
         self.tablew_software_access_show = QtWidgets.QTableWidget(self.new_login)
         self.tablew_software_access_show.setGeometry(QtCore.QRect(0, 0, 1201, 461))
-        self.tablew_software_access_show.setEditTriggers(QtWidgets.QAbstractItemView.SelectedClicked)
         self.tablew_software_access_show.setObjectName("tablew_software_access_show")
         self.tablew_software_access_show.setColumnCount(6)
         self.tablew_software_access_show.setRowCount(0)
@@ -1504,6 +1503,9 @@ class Ui_staff_management_window(object):
         self.tablew_software_access_show.setHorizontalHeaderItem(4, item)
         item = QtWidgets.QTableWidgetItem()
         self.tablew_software_access_show.setHorizontalHeaderItem(5, item)
+        self.tablew_software_access_show.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers) 
+        self.tablew_software_access_show.setSortingEnabled(False)
+        self.tablew_software_access_show.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.label_search_id_software_access = QtWidgets.QLabel(self.new_login)
         self.label_search_id_software_access.setGeometry(QtCore.QRect(10, 489, 91, 16))
         font = QtGui.QFont()
@@ -1513,23 +1515,10 @@ class Ui_staff_management_window(object):
         font.setWeight(75)
         self.label_search_id_software_access.setFont(font)
         self.label_search_id_software_access.setObjectName("label_search_id_software_access")
-        self.label_search_document_id_software_access = QtWidgets.QLabel(self.new_login)
-        self.label_search_document_id_software_access.setGeometry(QtCore.QRect(170, 489, 121, 16))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft JhengHei")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_search_document_id_software_access.setFont(font)
-        self.label_search_document_id_software_access.setObjectName("label_search_document_id_software_access")
         self.line_input_search_by_register_id_staff_software_access = QtWidgets.QLineEdit(self.new_login)
         self.line_input_search_by_register_id_staff_software_access.setGeometry(QtCore.QRect(100, 489, 61, 20))
         self.line_input_search_by_register_id_staff_software_access.setText("")
         self.line_input_search_by_register_id_staff_software_access.setObjectName("line_input_search_by_register_id_staff_software_access")
-        self.line_input_search_by_document_id_software_access = QtWidgets.QLineEdit(self.new_login)
-        self.line_input_search_by_document_id_software_access.setGeometry(QtCore.QRect(290, 489, 101, 20))
-        self.line_input_search_by_document_id_software_access.setText("")
-        self.line_input_search_by_document_id_software_access.setObjectName("line_input_search_by_document_id_software_access")
         self.label_add_access_software_access = QtWidgets.QLabel(self.new_login)
         self.label_add_access_software_access.setGeometry(QtCore.QRect(140, 540, 101, 16))
         font = QtGui.QFont()
@@ -1791,32 +1780,54 @@ class Ui_staff_management_window(object):
     ########################################################################################
         self.load_impart_time_teachers()
 
-
+        ####Table context menu
         self.tablew_select_teacher_impart_tt.setContextMenuPolicy(3)  # 3 = Qt.CustomContextMenu
         self.tablew_select_teacher_impart_tt.customContextMenuRequested.connect(self.show_context_menu)
 
+        ###combobox order/filter
         self.combox_filter_tablew_select_teacher_impart_tt.currentIndexChanged.connect(self.combox_filter_tablew_select_teacher_impart_tt_changed)
 
+        ####Table signals
         self.tablew_select_teacher_impart_tt.cellClicked.connect(self.load_subject_selected_teacher)
         self.tablew_select_teacher_impart_tt.cellClicked.connect(self.load_grades_selected_teacher)
         self.tablew_select_teacher_impart_tt.cellClicked.connect(self.dynamic_label_details_impart_time)
         self.tablew_select_teacher_impart_tt.itemSelectionChanged.connect(self.enable_assign_save_button)
 
+        ###Dynamic Labels
         self.timeedit_select_impart_start_time_impart_tt.timeChanged.connect(self.dynamic_label_details_impart_time)
         self.timeedit_select_impart_end_time_impart_tt.timeChanged.connect(self.dynamic_label_details_impart_time)
 
+        ##Buttons signals
         self.button_save_information_selected_impart_tt.clicked.connect(self.assign_impart_time)
-
         self.button_save_information_selected_impart_tt.setEnabled(False)
         self.button_clean_information_selected_impart_tt.clicked.connect(self.clear_data_impart_time)
         self.button_unassign_time_selected_impart_tt.clicked.connect(self.unassign_all_subject_grades_impart_time)
 
+        ###Listwidget signals
         self.listw_select_grade_impart_tt.itemSelectionChanged.connect(self.dynamic_label_details_impart_time)
         self.listw_select_subject_impart_tt.itemSelectionChanged.connect(self.dynamic_label_details_impart_time)
 
+        ###Search qlines signals
         self.line_input_search_name_teacher_impart_tt.textChanged.connect(self.filter_search_impart_time)
         self.line_input_search_id_teacher_impart_tt.textChanged.connect(self.filter_search_impart_time)
 
+        ############################################################################################
+        ############################################################################################
+        #################################ADD ACCESS WIDGET#########################################
+        ############################################################################################
+
+        self.load_data_access_staff()
+
+        self.line_input_search_by_register_id_staff_software_access.textChanged.connect(self.filter_search_access_staff)
+        self.line_input_search_by_user_software_access.textChanged.connect(self.filter_search_access_staff)
+
+        self.button_clean_information_software_access.clicked.connect(self.clear_inputs_add_staff_access)
+        
+        self.line_input_remove_access_by_staff_id_software_access.textChanged.connect(self.block_input_lines_add_access_staff)
+        self.line_input_remove_access_by_document_id_software_access.textChanged.connect(self.block_input_lines_add_access_staff)
+
+        self.button_add_access_software_access.clicked.connect(self.add_access_staff)
+        self.button_remove_access_software_access.clicked.connect(self.remove_access_staff)
         self.retranslateUi(staff_management_window)
         self.main_central_widget.setCurrentIndex(7)
         QtCore.QMetaObject.connectSlotsByName(staff_management_window)
@@ -3425,7 +3436,6 @@ class Ui_staff_management_window(object):
         search_all_name_table = self.line_input_search_name_teacher_impart_tt.text().strip().lower()
         search_id = self.line_input_search_id_teacher_impart_tt.text().strip().lower()
 
-        print(f"Buscando: Nombre: {search_all_name_table}, ID: {search_id}")
 
         for row in range(self.tablew_select_teacher_impart_tt.rowCount()):
             id_teacher = self.tablew_select_teacher_impart_tt.item(row, 0).text().lower() if self.tablew_select_teacher_impart_tt.item(row, 0) else " "
@@ -3433,14 +3443,11 @@ class Ui_staff_management_window(object):
             grade = self.tablew_select_teacher_impart_tt.item(row, 4).text().lower() if self.tablew_select_teacher_impart_tt.item(row, 4) else " "
             subject = self.tablew_select_teacher_impart_tt.item(row, 5).text().lower() if self.tablew_select_teacher_impart_tt.item(row, 5) else " "
 
-            print(f"Fila {row}: ID: {id_teacher}, Nombre: {full_name}, Grado: {grade}, Materia: {subject}")
-
             match_id = search_id in id_teacher
             match_full_name = search_all_name_table in full_name
             match_grade = search_all_name_table in grade
             match_subject = search_all_name_table in subject
 
-            print(f"Coincidencias: ID: {match_id}, Nombre: {match_full_name}, Grado: {match_grade}, Materia: {match_subject}")
 
             if (match_id and match_full_name or match_grade or match_subject):
                 self.tablew_select_teacher_impart_tt.setRowHidden(row, False)
@@ -3511,6 +3518,150 @@ class Ui_staff_management_window(object):
             self.load_impart_time_teachers()
         else:
             QtWidgets.QMessageBox.information(None, "Cancelado", "No se ha desasignado ningun maestro a su horario")
+
+    ########################################################################################
+    ########################################################################################
+    ################################Add Access Staff#######################################
+    ########################################################################################
+
+    def load_data_access_staff(self):
+        self.als = access_login_software()
+
+        login_info_rows = self.als.get_data_table()
+        self.tablew_software_access_show.setRowCount(0)
+
+        if login_info_rows is not None:
+            header = self.tablew_software_access_show.horizontalHeader()
+            header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+            header.setStretchLastSection(True)
+
+            for row_index, row in enumerate(login_info_rows):
+                self.tablew_software_access_show.insertRow(row_index)
+
+                for col_index, value in enumerate(row):
+                    if isinstance(value, datetime):
+                        value = value.strftime('%d-%m-%Y %H:%M:%S')
+                    elif value is None:
+                        value = "N/A"
+                    item = QtWidgets.QTableWidgetItem(str(value))
+                    item.setToolTip(str(value))
+                    item.setFlags(item.flags() | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
+                    item.setTextAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+                    self.tablew_software_access_show.setItem(row_index, col_index, item)
+
+            self.tablew_software_access_show.resizeRowsToContents()
+        else:
+            pass
+    
+    def filter_search_access_staff(self):
+        search_id = self.line_input_search_by_register_id_staff_software_access.text().strip().lower()
+
+        search_user = self.line_input_search_by_user_software_access.text().strip().lower()
+
+        for row in range(self.tablew_software_access_show.rowCount()):
+            id_registered = self.tablew_software_access_show.item(row, 0).text().lower() if self.tablew_software_access_show.item(row, 1) else " "
+            user_registered = self.tablew_software_access_show.item(row, 2).text().lower() if self.tablew_software_access_show.item(row, 1) else " "
+        
+            match_id = search_id in id_registered
+            match_user = search_user in user_registered
+
+            if (match_id and match_user):
+                self.tablew_software_access_show.setRowHidden(row, False)
+            else:
+                self.tablew_software_access_show.setRowHidden(row, True)
+            
+    def add_access_staff(self):
+        staff_id = self.line_input_add_access_by_staff_id_software_access.text().strip()
+        user = self.line_input_new_user_add_software_access.text().strip()
+        password = self.line_input_new_password_software_access.text().strip()
+
+        if not staff_id:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "El campo de ID de empleado no puede estar vacio")
+            return
+
+        if not user:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "El campo de usuario no puede estar vacio")
+            return
+
+        if not password:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "El campo de contraseña no puede estar vacio")
+            return
+
+        if not self.als.verify_if_staff_exists(staff_id):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "El ID de empleado no existe")
+            return
+        
+        if len(user) < 12 and not is_valid_username(user):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "El usuario debe tener al menos 12 caracteres y solo puede contener letras, numeros y guiones bajos")
+            return
+        
+        if not is_valid_password(password):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "La contraseña debe tener al menos 12 caracteres")
+            return
+        
+        
+
+        try:
+            self.als.add_login_access(staff_id, user, password)
+            QtWidgets.QMessageBox.information(None, "Exito", "Se ha añadido el usuario")
+            self.load_data_access_staff()
+            self.clear_inputs_add_staff_access()
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(None, "Error", "No se ha podido añadir el usuario")
+            print(e)
+
+    def remove_access_staff(self):
+        staff_id = self.line_input_remove_access_by_staff_id_software_access.text().strip() if self.line_input_remove_access_by_staff_id_software_access.text().strip() else None
+        document_id = self.line_input_remove_access_by_document_id_software_access.text().strip() if self.line_input_remove_access_by_document_id_software_access.text().strip() else None
+
+        if not staff_id and not document_id:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "El campo de ID de empleado o cedula no puede estar vacio")
+            return
+        if not self.als.verify_id_or_document_id(staff_id, document_id):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "El ID de empleado o cedula no existe")
+            return
+        
+        if not self.als.verify_if_login_access_exists(staff_id, document_id):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "El empleado esta registrado al sistema de acceso")
+            return
+
+        message = "Esta accion desasignara el acceso al sistema de acceso del empleado \n¿Estás seguro de que deseas desasignar el acceso?"
+        reply = QMessageBox.question(
+            None, "Confirmar Acción", message, QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            try:
+                self.als.deactivate_login_access(staff_id, document_id)
+                QtWidgets.QMessageBox.information(None, "Cambios Realizados", "Se ha desasignado el acceso al sistema de acceso")
+                self.load_data_access_staff()
+                self.clear_inputs_add_staff_access()
+            except Exception as e:
+                QtWidgets.QMessageBox.warning(None, "Error", "No se ha podido desasignar el acceso al sistema de acceso")
+                print(e)
+        else:
+            QtWidgets.QMessageBox.information(None, "Cancelado", "No se ha recovado el acceso al sistema de acceso")
+
+    def clear_inputs_add_staff_access(self):
+        self.line_input_add_access_by_staff_id_software_access.clear()
+        self.line_input_new_user_add_software_access.clear()
+        self.line_input_new_password_software_access.clear()
+        self.line_input_search_by_register_id_staff_software_access.clear()
+        self.line_input_search_by_user_software_access.clear()
+        self.line_input_remove_access_by_staff_id_software_access.clear()
+        self.line_input_remove_access_by_document_id_software_access.clear()
+
+    def block_input_lines_add_access_staff(self):
+        staff_id_text = self.line_input_remove_access_by_staff_id_software_access.text().strip()
+        document_id_text = self.line_input_remove_access_by_document_id_software_access.text().strip()
+
+        if staff_id_text:
+            self.line_input_remove_access_by_document_id_software_access.setEnabled(False)
+        elif document_id_text:
+            self.line_input_remove_access_by_staff_id_software_access.setEnabled(False)
+        else: 
+            self.line_input_remove_access_by_staff_id_software_access.setEnabled(True)
+            self.line_input_remove_access_by_document_id_software_access.setEnabled(True)
 
     def retranslateUi(self, staff_management_window):
         _translate = QtCore.QCoreApplication.translate
@@ -3712,13 +3863,12 @@ class Ui_staff_management_window(object):
         item = self.tablew_software_access_show.horizontalHeaderItem(2)
         item.setText(_translate("staff_management_window", "Usuario"))
         item = self.tablew_software_access_show.horizontalHeaderItem(3)
-        item.setText(_translate("staff_management_window", "Contraseña"))
+        item.setText(_translate("staff_management_window", "Contraseña Ultima Vez Actualizada"))
         item = self.tablew_software_access_show.horizontalHeaderItem(4)
         item.setText(_translate("staff_management_window", "Tipo de Acceso"))
         item = self.tablew_software_access_show.horizontalHeaderItem(5)
         item.setText(_translate("staff_management_window", "Estado"))
         self.label_search_id_software_access.setText(_translate("staff_management_window", "Buscar por ID:"))
-        self.label_search_document_id_software_access.setText(_translate("staff_management_window", "Buscar por Cedula:"))
         self.label_add_access_software_access.setText(_translate("staff_management_window", "Agregar Acceso"))
         self.label_search_and_add_by_register_id_staff_software_access.setText(_translate("staff_management_window", "ID Empleado:"))
         self.label_new_user_software_access.setText(_translate("staff_management_window", "Nuevo Usuario:"))

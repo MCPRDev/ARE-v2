@@ -83,13 +83,54 @@ class Postgresqueries():
             self.cursor.execute(query, (username_input,))
             row = self.cursor.fetchone()
 
-            if row and row[0] == password_input:
-                print("Login successful!")
-                return True, row[1]
-            else:
-                print("Invalid username or password.")
+            if row is None:
+                print("Username not found. Please try again.")
                 return False, None
             
+            hash_password = row[0]
+            access_type = row[1]
+
+            if verify_password(password_input, hash_password):
+                print("Login successful!")
+                return True, access_type
+            else:
+                print("Invalid password. Please try again.")
+                return False, None
+
+    def login_insert(self, staff_id, username, password, access_type): #Insert login data on the table
+        if not is_valid_username(username) or not is_valid_password(password):
+            print("Invalid username or password format. Please try again.")
+            return False
+        
+        hash_password = hashing_password(password)
+        query = "INSERT INTO login_access (staff_id, log_user, log_password, access_type) VALUES (%s, %s, %s, %s)"
+        try:
+            self.cursor.execute(query, (staff_id, username, hash_password, access_type))
+            self.connection.commit()
+            print("Login data inserted successfully!")
+            return True
+        except Exception as e:
+            self.connection.rollback()
+            print(f"Error inserting login data: {e}")
+            return False
+    
+    def login_update(self, staff_id, user, password):
+        if not is_valid_username(user) or not is_valid_password(password):
+            print("Invalid username or password format. Please try again.")
+            return False
+        
+        hash_password = hashing_password(password)
+        query = "UPDATE login_access SET log_user = %s, log_password = %s WHERE staff_id = %s"
+        try:
+            self.cursor.execute(query, (user, hash_password, staff_id))
+            self.connection.commit()
+            print("Login data updated successfully!")
+            return True
+        except Exception as e:
+            self.connection.rollback()
+            print(f"Error updating login data: {e}")
+            return False
+
     def insert_staff(self, first_name, middle_name, first_surname, second_surname, document_id, address, job_id, phone_number, birthday): #Custom staff insert on the table
 
         if document_id_validation(document_id):
