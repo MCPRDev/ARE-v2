@@ -52,7 +52,13 @@ El objetivo principal de este proyecto es modernizar el sistema original ARE (Ad
 
 La organización del repositorio es la siguiente:
 
-/are-v2.0/ ├── docs/ # Documentación del proyecto ├── src/ # Código fuente de la aplicación │ ├── gui/ # Implementación de la interfaz gráfica │ ├── db/ # Configuración y scripts de base de datos │ └── core/ # Lógica central del sistema ├── tests/ # Casos de prueba y scripts de testing └── README.md # Este archivo
+/are-v2.0/ 
+├── docs/ # Documentación del proyecto 
+├── src/ # Código fuente de la aplicación 
+│ ├── gui/ # Implementación de la interfaz gráfica 
+│ ├── db/ # Configuración y scripts de base de datos 
+│ └── core/ # Lógica central del sistema ├── tests/ # Casos de prueba y scripts de testing 
+└── README.md # Este archivo
 
 ---
 
