@@ -47,9 +47,10 @@ CREATE TABLE public.login_access (
     access_id SERIAL PRIMARY KEY,  -- Primary Key (SERIAL)
     staff_id integer,
     log_user character varying(25) NOT NULL UNIQUE,
-    log_password character varying(50) NOT NULL UNIQUE,
+    log_password character varying(255) NOT NULL UNIQUE,
     access_type integer,
     active boolean DEFAULT true,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (staff_id) REFERENCES public.staff(staff_id),  -- Foreign Key
     FOREIGN KEY (access_type) REFERENCES public.login_access_type(id_access_type)  -- Foreign Key
 );

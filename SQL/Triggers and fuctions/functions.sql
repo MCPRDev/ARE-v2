@@ -312,3 +312,42 @@ BEGIN
     RETURN NEW;
 END;
 $$;
+
+-- Función: update_login_access_on_job_change
+-- Descripción: Actualiza el acceso de un usuario según el cambio de job_id.
+CREATE OR REPLACE FUNCTION update_login_access_on_job_change()
+RETURNS TRIGGER AS $$
+BEGIN
+
+    IF (OLD.job_id = 1 AND NEW.job_id = 2) OR (OLD.job_id = 2 AND NEW.job_id = 1) THEN
+
+        UPDATE public.login_access
+        SET access_type = NEW.job_id,
+            active = true
+        WHERE staff_id = NEW.staff_id;
+    ELSIF NEW.job_id = 3 THEN
+
+        UPDATE public.login_access
+        SET access_type = NULL,
+            active = false
+        WHERE staff_id = NEW.staff_id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- función: update_login_access_on_active_change
+-- Descripción: Actualiza el acceso de un usuario según el cambio de estado activo, si esta active = false, se removera el acceso, de caso contrario se activara y tendra su acceso
+CREATE OR REPLACE FUNCTION update_login_access_on_active_change()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF OLD.active IS DISTINCT FROM NEW.active AND (NEW.job_id = 1 OR NEW.job_id = 2) THEN
+        UPDATE public.login_access
+        SET active = NEW.active
+        WHERE staff_id = NEW.staff_id;
+    END IF;
+	
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;

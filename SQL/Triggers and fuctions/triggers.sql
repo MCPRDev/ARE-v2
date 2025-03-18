@@ -60,3 +60,25 @@ CREATE TRIGGER update_students_timestamp
 BEFORE UPDATE ON public.students 
 FOR EACH ROW 
 EXECUTE FUNCTION public.update_timestamp();
+
+-- Trigger: update_subjects_timestamp
+-- Descripción: Se ejecuta antes de actualizar un registro en la tabla login_access. Actualiza el campo updated_at con la fecha y hora actuales.
+
+CREATE TRIGGER update_login_access_timestamp
+BEFORE UPDATE ON public.login_access
+FOR EACH ROW
+EXECUTE FUNCTION public.update_timestamp();
+
+-- Trigger: staff_job_id_change_trigger
+-- Descripción: Se ejecuta después de actualizar el job_id en la tabla staff. Actualiza el acceso a la plataforma según el job_id.
+CREATE TRIGGER staff_job_id_change_trigger
+AFTER UPDATE OF job_id ON public.staff
+FOR EACH ROW
+EXECUTE FUNCTION public.update_login_access_on_job_change();
+
+-- Trigger: staff_active_change_trigger
+-- Descripción: Se ejecuta después de actualizar el campo active en la tabla staff. Actualiza el acceso a la plataforma según el estado activo.
+CREATE TRIGGER staff_active_change_trigger
+AFTER UPDATE OF active ON public.staff
+FOR EACH ROW
+EXECUTE FUNCTION update_login_access_on_active_change();
