@@ -48,19 +48,6 @@ El objetivo principal de este proyecto es modernizar el sistema original ARE (Ad
 
 ---
 
-## Estructura del Proyecto
-
-La organización del repositorio es la siguiente:
-
-/are-v2.0/ 
-├── docs/ # Documentación del proyecto 
-├── src/ # Código fuente de la aplicación 
-│ ├── gui/ # Implementación de la interfaz gráfica 
-│ ├── db/ # Configuración y scripts de base de datos 
-└── README.md # Este archivo
-
----
-
 ## Futuras Mejoras
 
 - **Refactorización del Código:**  
