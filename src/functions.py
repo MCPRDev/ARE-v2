@@ -1,6 +1,8 @@
 import query
 from outfuctions import *
 
+#Every subwidget in staff_administration_panel has their actions
+
 class loggin_gui_action():
     def __init__(self):
         self.query = query.Postgresqueries()
@@ -9,7 +11,7 @@ class loggin_gui_action():
         if not clear_entry_data(username) or not clear_entry_data(password):
             return False, None
         
-        login_success, access_type = self.query.login(username, password)
+        login_success, access_type = self.query.login(username, password) #We use login from query.py to get the data and log in
 
         if login_success:
             return True, access_type
@@ -29,10 +31,12 @@ class subject_gui_action():
         self.query.show_data_subjects()
         return True
 
+#There are some queries here that is not from query.py, it is, because is information y need to get at the momment and one time, not like a cycle
+#So query.py is for complex queries
 class staff_add_action():
     def __init__(self):
         self.query = query.Postgresqueries()
-    
+    #Just a fuction to verify if there is no document_id_repeated
     def validate_document_id_repeated(self, document):
         query_check_document_id = "SELECT COUNT(*) FROM staff WHERE document_id = %s"
         self.query.cursor.execute(query_check_document_id, (document,))
@@ -46,7 +50,7 @@ class staff_add_action():
 class staff_edit_gui_action():
     def __init__(self):
         self.query = query.Postgresqueries()
-    
+    #get_status_edit_staff is a fuction to get from the DB if the staff is active, we cannot edit a inactive staff
     def get_status_edit_staff(self, staff_id):
         query = f"SELECT active FROM staff WHERE staff_id = %s"
         try:
@@ -59,13 +63,13 @@ class staff_edit_gui_action():
                 return "Inactivo"
         except Exception as e:
             print(f"Error lds: get_status: {e}")
-
+    #Here we the information depends on what user enter, if the search is by id or document id
     def entry_data_search_query(self, search_id, search_document_id):
         if not isinstance(search_id, (int, type(None))) or not isinstance(search_document_id, (str, type(None))):
             print(search_document_id)
             return False
         
-        results = self.query.search_query("staff", search_id, search_document_id, None)
+        results = self.query.search_query("staff", search_id, search_document_id, None) #Using this query because this query depends other ones like edit_record
         
         if not results:
             return False
@@ -74,8 +78,7 @@ class staff_edit_gui_action():
             return results
         else:
             return False
-
-    
+    #Here gets the job position and transformit in a text to show it in the gui
     def job_position_get(self, staff_id_registered):
         self.query.cursor.execute(f"SELECT jp.job_id FROM staff st INNER JOIN job_position jp ON st.job_id = jp.job_id WHERE staff_id = {staff_id_registered}")
         result = self.query.cursor.fetchone()
@@ -92,7 +95,7 @@ class staff_edit_gui_action():
                     return "Sin registro"
         else:
             return "Sin Asignar"
-
+    #Get main subject and grade assigned from a specific teacher
     def main_teacher_has(self, staff_id):
         self.query.cursor.execute(f"SELECT s.subject FROM teachers t INNER JOIN subjects s ON t.main_subject = s.subject_id WHERE staff_id = {staff_id}")
         result = self.query.cursor.fetchone()
@@ -109,7 +112,7 @@ class staff_edit_gui_action():
             main_grade = "Sin Asignar"
         
         return main_subject, main_grade
-    
+    #subjects assigned
     def impart_subjects(self, staff_id):
         self.query.cursor.execute(f"""
         SELECT
@@ -127,7 +130,7 @@ class staff_edit_gui_action():
             return subjects_imparted
         else:
             return ["Sin Asignar",]
-    
+    #grades assigned
     def grades_assigned(self, staff_id):
         self.query.cursor.execute(f"""
         SELECT
@@ -145,7 +148,7 @@ class staff_edit_gui_action():
             return grades_assigned
         else:
             return ["Sin Asignar",]
-    
+    #Here we'll obtain the teacher primary_bool but in the gui works differents, in the gui we want to know if th teacher is change to elementary or high school teacher
     def primary_teacher_bool(self, staff_id):
         query = "SELECT primary_teacher FROM teachers WHERE staff_id = %s"
         self.query.cursor.execute(query, (staff_id,))
@@ -153,8 +156,8 @@ class staff_edit_gui_action():
         
         if result and result[0] is not None:
             primary_teacher_bool = result[0]
-            if primary_teacher_bool == True:
-                return False
+            if primary_teacher_bool == True: #So in the BD --> are_v2 --> teachers --> primary_teacher // if its true so its false that it is a high school teacher
+                return False #So, to work with that we change and return false to send that signal that IT'S NOT A HIGH SCHOOL TEACHER
             else:
                 return True
         else:
@@ -229,7 +232,7 @@ class logical_delete_staff():
             return False
         
         return results
-    
+    #job_position_get_lds is just to show it in the GUI and the user watchs what is, because we can show numbers like 1, 2 or 3 without knowing what it means
     def job_position_get_lds(self, staff_id_registered):
         self.query.cursor.execute(f"SELECT jp.job_id FROM staff st INNER JOIN job_position jp ON st.job_id = jp.job_id WHERE staff_id = {staff_id_registered}")
         result = self.query.cursor.fetchone()
@@ -564,11 +567,11 @@ class assign_impart_time_teacher():
         self.query = query.Postgresqueries()
     
     def load_impart_time_table(self, Order):
-        query = f"""SELECT * FROM teacher_assigned_and_not_assigned_impart_time"""
+        query = f"""SELECT * FROM teacher_assigned_and_not_assigned_impart_time""" #We select the information from the view and just order by
         match Order:
             case 0:
                 pre_order = "ORDER BY teacher_id ASC;"
-            case 1:
+            case 1: #A specific order by for the grades, with the view a can't get the id of every grade because it changes the view a lot and don't get the information I wanted to show in the gui
                 pre_order = """ 
                                 ORDER BY 
                                     CASE 
@@ -678,7 +681,7 @@ class assign_impart_time_teacher():
             print(f"Error aitt: unassign_impart_time_action: {e}")
             self.query.connection.rollback()
     
-    def verify_teacher_time_assign(self, teacher_id ,grade, subject, time_starts, time_ends):
+    def verify_teacher_time_assign(self, teacher_id ,grade, subject, time_starts, time_ends): #With this functions we verify if there is any teacher already assign with a specific grade and times or if that times are already assign and the teacher cannot impart in that time
         query = f""" 
                     SELECT 'conflict' AS result
                     FROM vw_itt_to_verify_data

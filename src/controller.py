@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 from gui_login_window import Ui_login_windows
 from selection_panel_window import Ui_selection_management_window
-
+#Controller is in charge of open, close and get signals for the windows, specially to logout in selection panel
 class Controller:
     def __init__(self):
         self.login_window = None
@@ -13,7 +13,7 @@ class Controller:
             self.selection_panel = None
 
         self.login_window = QtWidgets.QMainWindow()
-        self.ui = Ui_login_windows(self)
+        self.ui = Ui_login_windows(self) #here we recieve Controller self to get the signals in the corresponding module
         self.ui.setupUi(self.login_window)
         self.login_window.show()
 
@@ -23,6 +23,6 @@ class Controller:
             self.login_window = None
 
         self.selection_panel_window = QtWidgets.QMainWindow()
-        self.ui = Ui_selection_management_window(self)
+        self.ui = Ui_selection_management_window(self) #here we recieve Controller self to get the signals in the corresponding module
         self.ui.setupUi(self.selection_panel_window)
         self.selection_panel_window.show()

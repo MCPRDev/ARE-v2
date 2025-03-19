@@ -6,20 +6,25 @@ from Levenshtein import distance as levenshtein_distance
 
 
 #OutFuctions for query#
+#Validation for entry username
 def is_valid_username(username):
     return bool(re.match(r"^\w+$", username))
 
+#Validation for entry password
 def is_valid_password(password):
     return len(password) >= 12
 
+#bcryp hash password
 def hashing_password(password):
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
     return hashed_password.decode('utf-8')
 
+#check input password with hasshed_password
 def verify_password(input_password, hashed_password):
     return bcrypt.checkpw(input_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
+#verify document id
 def document_id_validation(document):
     if not isinstance(document, str):
         return False
@@ -30,6 +35,7 @@ def document_id_validation(document):
     else:
         return False
 
+#if not document_id_validation then rewrite it
 def rewrite_document_id(document_id):
     if len(document_id) != 14:
         return "Formato inválido"
@@ -38,12 +44,14 @@ def rewrite_document_id(document_id):
 
     return f"{document_id[:3]}-{document_id[3:9]}-{document_id[9:]}"
 
+
 def id_validation(id):
     if not isinstance(id, int):
         return False
     else:
         return True
-    
+
+#There are differents students code, sometimes they don't have a middle name or second surname, so the len(student_code) is different    
 def student_code_validation(student_code):
     if not isinstance(student_code, str):
         return False
@@ -60,6 +68,7 @@ def student_code_validation(student_code):
     
     return re.match(patron, student_code) is not None
 
+#just verify the phone number's lenght 
 def phone_number_validation(phone_number):
     if not isinstance(phone_number, str):
         return False
@@ -83,13 +92,14 @@ def age_validator(age):
         return False
     return True
 
-
+#If not phone_number so, rewrite
 def rewrite_phone_number(phone_number: str) -> str:
     if len(phone_number) != 8:
         return False
     
     return f"{phone_number[:4]}-{phone_number[4:]}"
 
+#We use code generator for students, this is unique code for the center, is not like the student code use for the nacional register
 def code_center_generator(student_code, student_total):
     try:
         first_code_part = student_code.split('-')[0]

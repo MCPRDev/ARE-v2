@@ -1816,19 +1816,20 @@ class Ui_staff_management_window(object):
         ############################################################################################
         #################################ADD ACCESS WIDGET#########################################
         ############################################################################################
-
+        ####input lines signals search
         self.line_input_search_by_register_id_staff_software_access.textChanged.connect(self.filter_search_access_staff)
         self.line_input_search_by_user_software_access.textChanged.connect(self.filter_search_access_staff)
-
-        self.button_clean_information_software_access.clicked.connect(self.clear_inputs_add_staff_access)
         
-        self.line_input_remove_access_by_staff_id_software_access.textChanged.connect(self.block_input_lines_add_access_staff)
-        self.line_input_remove_access_by_document_id_software_access.textChanged.connect(self.block_input_lines_add_access_staff)
-
+        #buttons
+        self.button_clean_information_software_access.clicked.connect(self.clear_inputs_add_staff_access)
         self.button_add_access_software_access.clicked.connect(self.add_access_staff)
         self.button_remove_access_software_access.clicked.connect(self.remove_access_staff)
+        
+        #######input lines signals to block
+        self.line_input_remove_access_by_staff_id_software_access.textChanged.connect(self.block_input_lines_add_access_staff)
+        self.line_input_remove_access_by_document_id_software_access.textChanged.connect(self.block_input_lines_add_access_staff)
+#####################################################################################################################################################
         self.retranslateUi(staff_management_window)
-        self.main_central_widget.setCurrentIndex(7)
         QtCore.QMetaObject.connectSlotsByName(staff_management_window)
     
     ################################

@@ -7,7 +7,7 @@ from outfuctions import *
 #This query is for general things, not a specific use in the project but it can be used for any other project
 
 class Postgresqueries():
-    def __init__(self, update_callback=None): 
+    def __init__(self, update_callback=None): #Localhost so it's not a problem with this credentials :D
         connection = psycopg2.connect(host="localhost", 
                               port=5432, 
                               dbname="are_v2",
@@ -23,7 +23,7 @@ class Postgresqueries():
         self.listen_thread = threading.Thread(target=self.listen_for_changes_subject_changes, daemon=True)
         self.listen_thread.start()
     
-    def reconnect(self):
+    def reconnect(self): #If there is any lost connection we reconnect at the instant to avoid errors with the GUI
         try:
             self.connection = psycopg2.connect(
                 host="localhost",
@@ -39,8 +39,8 @@ class Postgresqueries():
         except Exception as e:
             print(f"❌ Error trying to reconnect: {e}")
 
-    def listen_for_changes_subject_changes(self):
-        self.cursor.execute("LISTEN subject_changes;")
+    def listen_for_changes_subject_changes(self): #Listening for changes allow us to check if there is any change on the db specific for subjects, that allow us to use for specific functions in the gui
+        self.cursor.execute("LISTEN subject_changes;") #so, if it's any change it allow us to reload that table and show it at the momment the user added it or deleted it
 
         while True:
             if self.connection.closed:
@@ -69,7 +69,7 @@ class Postgresqueries():
     def __del__(self):
         self.close_connection()
 
-    def login(self, username_input, password_input): #Login fuctions to check password and username registered on the table --- This must be upgraded with authentication tokens
+    def login(self, username_input, password_input): #Login fuctions to check password and username registered on the table with hashed password
             query_username = "SELECT * FROM login_access"
             self.cursor.execute(query_username)
             rows = self.cursor.fetchall()
@@ -96,7 +96,7 @@ class Postgresqueries():
                 print("Invalid password. Please try again.")
                 return False, None
 
-    def login_insert(self, staff_id, username, password, access_type): #Insert login data on the table
+    def login_insert(self, staff_id, username, password, access_type): #Insert login data on the table hashing the password
         if not is_valid_username(username) or not is_valid_password(password):
             print("Invalid username or password format. Please try again.")
             return False
@@ -113,7 +113,7 @@ class Postgresqueries():
             print(f"Error inserting login data: {e}")
             return False
     
-    def login_update(self, staff_id, user, password):
+    def login_update(self, staff_id, user, password): #update the user and password if it loses access
         if not is_valid_username(user) or not is_valid_password(password):
             print("Invalid username or password format. Please try again.")
             return False
@@ -368,7 +368,7 @@ class Postgresqueries():
         
         return True
     
-    def edit_subjects_teacher_assigned(self, main_subject, subjects, staff_id):
+    def edit_subjects_teacher_assigned(self, main_subject, subjects, staff_id): #Edit subjects
 
         if main_subject is not None:
             query = f"UPDATE teachers SET main_subject = (SELECT subject_id FROM subjects WHERE subject = %s) WHERE staff_id = %s"
@@ -415,7 +415,7 @@ class Postgresqueries():
                 print(f"Error inserting or updating subjects related with the teacher, Errir {e}")
                 self.connection.rollback()
     
-    def edit_grades_teacher_assigned(self, guide_grade, grades, staff_id):
+    def edit_grades_teacher_assigned(self, guide_grade, grades, staff_id): #Edit the grades assigned to change it or delete it
         if guide_grade is not None:
             query = f"UPDATE teachers SET guide_grade_id = (SELECT grade_id FROM grades WHERE grade = %s) WHERE staff_id = %s"
             try:
@@ -611,13 +611,13 @@ class Postgresqueries():
             self.connection.rollback()
             print(f'Error inserting student: {e}')
     
-    def query_students_by_grade(self, grade_id):
+    def query_students_by_grade(self, grade_id): #Filter all students by grade
         if not validate_grade(grade_id):
             print('Invalid grade ID')
             return False
         
         try:
-            query = f"SELECT * FROM students WHERE grade_id = %s"
+            query = f"SELECT * FROM students WHERE grade_id = %s and active = true"
             self.cursor.execute(query, (grade_id,))
             results = self.cursor.fetchall()
             if results is not None:
@@ -634,7 +634,7 @@ class Postgresqueries():
             print(f'Error querying students by grade: {e}')
             return None
     
-    def query_insert_student_representative(self, first_name, middle_name, first_surname, second_surname, representative_document_id, residential_address, phone_number):
+    def query_insert_student_representative(self, first_name, middle_name, first_surname, second_surname, representative_document_id, residential_address, phone_number): #Custom insert student
         if not document_id_validation(representative_document_id):
             print('Invalid representative document ID')
             return False
@@ -672,7 +672,7 @@ class Postgresqueries():
             self.connection.rollback()
             print(f'Error inserting student representative: {e}')
 
-    def show_data_subjects(self):
+    def show_data_subjects(self): #Load subjects where is active
         try:
             self.cursor.execute("SELECT subject_id, subject FROM subjects WHERE active = true")
             
@@ -682,7 +682,7 @@ class Postgresqueries():
             print(f'Error fetching data subjects: {e}')
             return []
     
-    def show_data_grades_guide(self, high_school_teacher):
+    def show_data_grades_guide(self, high_school_teacher): #Load grades depending what education level is, 1 = elementary - 2 = high school
         if high_school_teacher == True:
             query = """SELECT g.grade FROM grades g LEFT JOIN teachers t ON g.grade_id = t.guide_grade_id WHERE t.guide_grade_id IS NULL AND g.education_level_id = 2"""
             try:
@@ -702,7 +702,7 @@ class Postgresqueries():
                     print(f'Error fetching data grades: {e}')
                     return []
     
-    def show_data_grades_all(self, high_school_teacher):
+    def show_data_grades_all(self, high_school_teacher): #Load grades depending the education level
         if high_school_teacher == True:
             query = "SELECT grade FROM grades WHERE education_level_id = 2"
             try:
@@ -724,8 +724,8 @@ class Postgresqueries():
                     print(f'Error fetching data grades: {e}')
                     return []
         
-    def show_students_by_guide_teacher(self, id_teacher):
-        if not id_validation(id_teacher):
+    def show_students_by_guide_teacher(self, guide_grade_id): #Load students by guide grade (we obtain the teacher name, id registered student, grade the student is, and full name student)
+        if not id_validation(guide_grade_id):
             print('Invalid ID teacher')
             return False
         
@@ -740,7 +740,7 @@ class Postgresqueries():
                     JOIN grades g ON st.grade_id = g.grade_id
                     WHERE t.guide_grade_id = %s;"""
         try:
-            self.cursor.execute(query, (id_teacher,))
+            self.cursor.execute(query, (guide_grade_id,))
             results = self.cursor.fetchall()
             if results is not None:
                 if len(results) > 0:
@@ -756,8 +756,8 @@ class Postgresqueries():
             print(f'Error querying students by guide teacher: {e}')
             return None
     
-    def insert_subject(self, subject):
-        if not validate_and_clean_subject_entry_query(subject):
+    def insert_subject(self, subject): #Insert a subject
+        if not validate_and_clean_subject_entry_query(subject): #verify if the subject is not repeated
             print('Invalid subject')
             return False
         
@@ -789,7 +789,7 @@ class Postgresqueries():
             print(f'Error inserting subject: {e}')
             return False
     
-    def edit_subject_name(self, id_subject, new_name_subject):
+    def edit_subject_name(self, id_subject, new_name_subject): #Edit a specific subject name, where the subject has the old name to change
         if not validate_and_clean_subject_entry_query(new_name_subject):
             print('Invalid new subject name')
             return False
@@ -801,7 +801,7 @@ class Postgresqueries():
         self.cursor.execute("SELECT subject FROM subjects")
         subjects_added = [row[0] for row in self.cursor.fetchall()]
 
-        if not validate_data_entry_no_repeted(new_name_subject, subjects_added):
+        if not validate_data_entry_no_repeted(new_name_subject, subjects_added): #If the subject name is the same, don't update it
             print("Error, this subject already exists")
             return False
         
@@ -818,12 +818,12 @@ class Postgresqueries():
             print(f'Error editing subject: {e}')
             return False
         
-    def get_subject_id_already_exists(self, subject):
+    def get_subject_id_already_exists(self, subject): #verify if the subject already exist
         self.cursor.execute(f"SELECT subject_id FROM subjects WHERE subject = '{subject}'")
         subjects_ids = [row[0] for row in self.cursor.fetchall()]
         return subjects_ids
     
-    def delete_data_from_table(self, table, entry_id):
+    def delete_data_from_table(self, table, entry_id): #get the table and the name id is registered on the table, this an automatic get id from every table on the db
         tables = [
             'impart_time_teacher',
             'login_access',

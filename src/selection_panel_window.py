@@ -3,7 +3,7 @@ from staff_administration_panels import Ui_staff_management_window
 
 class Ui_selection_management_window(object):
     def __init__(self, controller):
-        self.Controller = controller
+        self.Controller = controller #We get the signal from the controller an assign it into a variable to use it
 
     def setupUi(self, selection_management_window):
         selection_management_window.setObjectName("selection_management_window")
