@@ -1676,12 +1676,16 @@ class Ui_staff_management_window(object):
         staff_management_window.setCentralWidget(self.centralwidget)
         self.actionLimpiar_Datos = QtWidgets.QAction(staff_management_window)
         self.actionLimpiar_Datos.setObjectName("actionLimpiar_Datos")
+        #############################################################################
+        ##########################LOAD QWIDGETS##################################
+        self.main_central_widget.currentChanged.connect(self.widgets_current_on)
         #############################Query##########################################
         self.query = Postgresqueries()
         ###############################################################################
         #################################Subjects Widget#############################
         ########################Subwindows############################################
         self.add_subject_window = None
+        self.load_subject_widget()
         #################################################################################
         ######################Buttons subjects############################################
         self.button_add_subject.clicked.connect(self.add_subject_window_emergent)
@@ -1693,8 +1697,7 @@ class Ui_staff_management_window(object):
         
 
         ######Load data from database to show in qtablewidget subject############
-        self.db_listener = Postgresqueries(self.load_data_subjects_main_central_widget)
-        self.load_data_subjects_main_central_widget()
+        
         self.tablew_subject_show.cellClicked.connect(self.qtablew_row_clicked)
 
         ########################################################################
@@ -1751,17 +1754,16 @@ class Ui_staff_management_window(object):
         ###################LOGICAL DELETE STAFF#################################
         ########################################################################
         self.hide_frames_logical_delete_staff()
-
+        
         ##################BUTTONS###############################################
         self.button_search_change_status_staff.clicked.connect(self.search_staff_button_logical_delete)
         self.button_change_status_delete.clicked.connect(self.logical_delete_button)
         self.button_chhange_status_restore.clicked.connect(self.logical_restore_button)
-
+        self.button_clean_information_change_status.clicked.connect(self.clear_button_logical_delete)
         ########################################################################################
         ########################################################################################
         ################################Search Staff Table######################################
         ########################################################################################
-        self.load_staff_data_search_staff()
 
 
         #####SIGNALS####
@@ -1778,7 +1780,6 @@ class Ui_staff_management_window(object):
     ########################################################################################
     ################################Impart Time assign######################################
     ########################################################################################
-        self.load_impart_time_teachers()
 
         ####Table context menu
         self.tablew_select_teacher_impart_tt.setContextMenuPolicy(3)  # 3 = Qt.CustomContextMenu
@@ -1815,8 +1816,6 @@ class Ui_staff_management_window(object):
         ############################################################################################
         #################################ADD ACCESS WIDGET#########################################
         ############################################################################################
-
-        self.load_data_access_staff()
 
         self.line_input_search_by_register_id_staff_software_access.textChanged.connect(self.filter_search_access_staff)
         self.line_input_search_by_user_software_access.textChanged.connect(self.filter_search_access_staff)
@@ -2096,6 +2095,28 @@ class Ui_staff_management_window(object):
         self.combox_job_id_selection.setCurrentIndex(0)
         self.line_input_phone_number.clear()
         self.birthdate_input_get.setDate(QDate.currentDate())
+
+        self.cb_assign_grade.setChecked(False)
+        self.cb_assign_subject.setChecked(False)
+        self.cb_highschool_teacher.setChecked(False)
+
+        self.frame_assign_grade.hide()
+        self.frame_assign_subject.hide()
+        self.frame_multi_selection_subjects.hide()
+        self.frame_grades_assigned.hide()
+
+        self.qlistw_grade_assign.clear()
+        self.qlistw_subject_assign.clear()
+        self.qlistw_subject_selection.clear()
+        self.qlistw_grades_impart_selection.clear()
+
+        self.qlistw_grade_assign.clearSelection()
+        self.qlistw_subject_assign.clearSelection()
+        self.qlistw_subject_selection.clearSelection()
+        self.qlistw_grades_impart_selection.clearSelection()
+
+        self.frame_output_information_will_save.hide()
+        self.frame_teacher_selection.hide()
 
     def add_staff_button_save_action(self):
         first_name = str(self.line_input_fname.text()).strip().lower()
@@ -2495,7 +2516,7 @@ class Ui_staff_management_window(object):
         self.label_job_id_dynamic_edit.clear()
         self.label_birthdate_dynamic_edit.clear()
         self.label_age_dynamic_edit.clear()
-
+        
         self.frame_if_teacher.hide()
 
         self.label_if_teacher_main_subject_dynamic.clear()
@@ -2725,6 +2746,7 @@ class Ui_staff_management_window(object):
 
         self.checkbox_if_teacher_edit_subjects_assigned.setChecked(False)
         self.checkbox_if_teacher_edit_grades_assigned.setChecked(False)
+        self.frame_buttons_edit.hide()
 
     def get_data_update_edit_staff(self):
         first_name = str(self.line_input_first_name_edit.text()) if self.line_input_first_name_edit.text().strip() else None
@@ -3023,6 +3045,12 @@ class Ui_staff_management_window(object):
                 self.button_chhange_status_restore.setEnabled(False)
                 self.button_change_status_delete.setEnabled(False)
 
+    def clear_button_logical_delete(self):
+        self.line_input_change_status_staff_search_id.clear()
+        
+        self.frame_if_teacher_change_status_staff.hide()
+        self.frame_change_status_staff_outputinfo.hide()
+        self.frame_buttons_change_status.hide()
     ########################################################################################
     ########################################################################################
     ################################Search Staff Table######################################
@@ -3662,6 +3690,55 @@ class Ui_staff_management_window(object):
         else: 
             self.line_input_remove_access_by_staff_id_software_access.setEnabled(True)
             self.line_input_remove_access_by_document_id_software_access.setEnabled(True)
+
+
+    ########################################################################################
+    ########################################################################################
+    ################################Load Widget Fuctions#####################################
+    ########################################################################################
+    def load_subject_widget(self):
+        self.db_listener = Postgresqueries(self.load_data_subjects_main_central_widget)
+        self.load_data_subjects_main_central_widget()
+
+    def load_staff_add_widget(self):
+        self.clear_information_add_staff()
+    
+    def load_staff_edit_widget(self):
+        self.clear_label_output_edit()
+        self.frame_edit_info.hide()
+    
+    def load_staff_remove_widget(self):
+        self.clear_button_logical_delete()
+
+    def load_search_staff_wdiget(self):
+        self.clean_inputs_search_staff()
+        self.load_staff_data_search_staff()
+    
+    def load_impart_time_teacher_widget(self):
+        self.clear_data_impart_time()
+        self.load_impart_time_teachers()
+    
+    def load_add_access_staff_widget(self):
+        self.clear_inputs_add_staff_access()
+        self.load_data_access_staff()
+
+    def widgets_current_on(self, index):
+        match index:
+            case 0:
+                self.load_subject_widget()
+            case 1:
+                self.load_staff_add_widget()
+            case 2:
+                self.load_staff_edit_widget()
+            case 3:
+                self.load_staff_remove_widget()
+            case 4:
+                self.load_search_staff_wdiget()
+            case 5:
+                self.load_impart_time_teacher_widget()
+            case 6:
+                self.load_add_access_staff_widget()
+                
 
     def retranslateUi(self, staff_management_window):
         _translate = QtCore.QCoreApplication.translate

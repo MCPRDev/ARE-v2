@@ -41,7 +41,6 @@ class Postgresqueries():
 
     def listen_for_changes_subject_changes(self):
         self.cursor.execute("LISTEN subject_changes;")
-        print("📡 Recieving changes...")
 
         while True:
             if self.connection.closed:
