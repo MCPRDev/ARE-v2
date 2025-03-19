@@ -57,7 +57,6 @@ La organización del repositorio es la siguiente:
 ├── src/ # Código fuente de la aplicación 
 │ ├── gui/ # Implementación de la interfaz gráfica 
 │ ├── db/ # Configuración y scripts de base de datos 
-│ └── core/ # Lógica central del sistema ├── tests/ # Casos de prueba y scripts de testing 
 └── README.md # Este archivo
 
 ---
@@ -72,6 +71,13 @@ La organización del repositorio es la siguiente:
 
 - **Optimización de la Interfaz:**  
   Mejoras continuas en el diseño y usabilidad de la GUI para proporcionar una experiencia de usuario superior.
+
+---
+
+## Login
+
+User: admin_basic_log_in_user
+Password: admin_basic_log_in_password
 
 ---
 

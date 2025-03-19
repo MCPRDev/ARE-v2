@@ -1,9 +1,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from functions import loggin_gui_action
-from selection_panel_window import Ui_selection_management_window
 
 class Ui_login_windows(object):
+    def __init__(self, controller):
+        self.Controller = controller
+
     def setupUi(self, login_windows):
         login_windows.setObjectName("login_windows")
         login_windows.setEnabled(True)
@@ -11,7 +13,7 @@ class Ui_login_windows(object):
         login_windows.setMinimumSize(QtCore.QSize(600, 315))
         login_windows.setMaximumSize(QtCore.QSize(600, 315))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("GUI IMAGE/login_windows_images/login_icon_window.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("src/gui/GUI IMAGE/login_windows_images/login_icon_window.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         login_windows.setWindowIcon(icon)
         login_windows.setToolTip("")
         login_windows.setDocumentMode(False)
@@ -22,7 +24,7 @@ class Ui_login_windows(object):
         self.login_icon_user.setGeometry(QtCore.QRect(250, 40, 71, 71))
         self.login_icon_user.setAutoFillBackground(False)
         self.login_icon_user.setText("")
-        self.login_icon_user.setPixmap(QtGui.QPixmap("GUI IMAGE/login_windows_images/login_icon_user.png"))
+        self.login_icon_user.setPixmap(QtGui.QPixmap("src/gui/GUI IMAGE/login_windows_images/login_icon_user.png"))
         self.login_icon_user.setScaledContents(True)
         self.login_icon_user.setAlignment(QtCore.Qt.AlignHCenter|QtCore.Qt.AlignTop)
         self.login_icon_user.setObjectName("login_icon_user")
@@ -81,7 +83,7 @@ class Ui_login_windows(object):
     def exit_login(self):
         exit()
         return True
-    
+
     def login(self):
         try:
 
@@ -104,7 +106,7 @@ class Ui_login_windows(object):
             match access_type: #Here we check what kind of access has the user logging in
                 case 0:
                     self.login_windows.close()
-                    self.start_selection_panels()
+                    self.Controller.show_panel_selection()
 
                     login_success = QMessageBox()
                     login_success.setIcon(QMessageBox.Information)
@@ -114,7 +116,7 @@ class Ui_login_windows(object):
                     return False, access_type
                 case 1:
                     self.login_windows.close()
-                    self.start_selection_panels()
+                    self.Controller.show_panel_selection()
 
                     login_success = QMessageBox()
                     login_success.setIcon(QMessageBox.Information)
@@ -147,12 +149,6 @@ class Ui_login_windows(object):
         except Exception as e:
             print(f"An error occurred: {e}")
             return False
-    
-    def start_selection_panels(self):
-            self.selection_panels = QtWidgets.QMainWindow()
-            self.ui_panels = Ui_selection_management_window() 
-            self.ui_panels.setupUi(self.selection_panels)
-            self.selection_panels.show()  
 
         
     def retranslateUi(self, login_windows):

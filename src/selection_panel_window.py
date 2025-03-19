@@ -2,14 +2,18 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from staff_administration_panels import Ui_staff_management_window
 
 class Ui_selection_management_window(object):
+    def __init__(self, controller):
+        self.Controller = controller
+
     def setupUi(self, selection_management_window):
         selection_management_window.setObjectName("selection_management_window")
         selection_management_window.resize(693, 168)
         selection_management_window.setMinimumSize(QtCore.QSize(693, 168))
         selection_management_window.setMaximumSize(QtCore.QSize(693, 168))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("GUI IMAGE/selection_management_window/icon_window_selection_panel.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("src/gui/GUI IMAGE/selection_management_window/icon_window_selection_panel.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         selection_management_window.setWindowIcon(icon)
+        self.selection_management_window = selection_management_window
         self.centralwidget = QtWidgets.QWidget(selection_management_window)
         self.centralwidget.setObjectName("centralwidget")
         self.staff_management_button = QtWidgets.QPushButton(self.centralwidget)
@@ -29,9 +33,18 @@ class Ui_selection_management_window(object):
         self.staff_administration_window = None
 
         self.staff_management_button.clicked.connect(self.staff_administration_window_open)
+        self.logout_button.clicked.connect(self.handle_logout)
         
         self.retranslateUi(selection_management_window)
         QtCore.QMetaObject.connectSlotsByName(selection_management_window)
+
+    def handle_logout(self):
+        if self.Controller:
+            self.Controller.show_login()
+            self.selection_management_window.close()
+            if self.staff_administration_window:
+                self.staff_administration_window.close()
+
     
     def staff_administration_window_open(self):
         try:
@@ -42,7 +55,8 @@ class Ui_selection_management_window(object):
             self.staff_administration_window.show()  
         except Exception as e:
             print(f"Error al abrir ventana de administracion de personal: {str(e)}")
-        
+
+
     def retranslateUi(self, selection_management_window):
         _translate = QtCore.QCoreApplication.translate
         selection_management_window.setWindowTitle(_translate("selection_management_window", "Panel de seleccion"))

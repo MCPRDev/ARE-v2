@@ -70,7 +70,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <property name="documentMode">
      <bool>false</bool>
@@ -3346,6 +3346,13 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QPushButton" name="button_clear_information_search_staff">
+          <property name="text">
+           <string>PushButton</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </widget>
@@ -3374,7 +3381,7 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>481</width>
+         <width>661</width>
          <height>16</height>
         </rect>
        </property>
@@ -3387,7 +3394,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Selecciona un profesor (Selecciona la ID Profesor si desea editar informacion):</string>
+        <string>Selecciona un profesor (Click Izquierdo para asignar horas de clase | Click derecho para desasignar o editar):</string>
        </property>
       </widget>
       <widget class="QTableWidget" name="tablew_select_teacher_impart_tt">
@@ -3833,6 +3840,46 @@
          <string/>
         </property>
        </widget>
+      </widget>
+      <widget class="QComboBox" name="combox_filter_tablew_select_teacher_impart_tt">
+       <property name="geometry">
+        <rect>
+         <x>1079</x>
+         <y>4</y>
+         <width>121</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>Id profesor</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Grado asignado</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Hora inicial</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Hora final</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Hora inicial sin asignar</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Hora final sin asignar</string>
+        </property>
+       </item>
       </widget>
      </widget>
     </widget>

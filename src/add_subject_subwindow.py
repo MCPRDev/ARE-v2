@@ -10,7 +10,7 @@ class Ui_add_subject_sub_window(object):
         add_subject_sub_window.setMinimumSize(QtCore.QSize(400, 156))
         add_subject_sub_window.setMaximumSize(QtCore.QSize(400, 156))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("GUI IMAGE/selection_management_window/staff_management_window/add_subjects_icon/open-book.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("src/gui/GUI IMAGE/selection_management_window/staff_management_window/add_subjects_icon/open-book.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         add_subject_sub_window.setWindowIcon(icon)
         self.label = QtWidgets.QLabel(add_subject_sub_window)
         self.label.setGeometry(QtCore.QRect(140, 20, 111, 16))

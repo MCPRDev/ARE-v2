@@ -22,7 +22,7 @@ class Ui_staff_management_window(object):
         staff_management_window.setMaximumSize(QtCore.QSize(1215, 690))
         staff_management_window.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("GUI IMAGE/selection_management_window/staff_management_window/staff_management_icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("src/gui/GUI IMAGE/selection_management_window/staff_management_window/staff_management_icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         staff_management_window.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(staff_management_window)
         self.centralwidget.setObjectName("centralwidget")
