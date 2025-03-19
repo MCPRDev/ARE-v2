@@ -229,13 +229,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="button_refresh_subjects_list">
-          <property name="text">
-           <string>Refrescar Tabla</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="button_edit_subject">
           <property name="text">
            <string>Editar Materia</string>
