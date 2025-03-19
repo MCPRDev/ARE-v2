@@ -4146,13 +4146,3 @@ class StaffInfoDialog(QtWidgets.QDialog):
 
             self.schedule_table.setItem(row, 2, QtWidgets.QTableWidgetItem(start))
             self.schedule_table.setItem(row, 3, QtWidgets.QTableWidgetItem(end))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    selection_management_window = QtWidgets.QMainWindow()
-    ui = Ui_staff_management_window()
-    ui.setupUi(selection_management_window)
-    selection_management_window.show()
-    sys.exit(app.exec_())

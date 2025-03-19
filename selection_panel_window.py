@@ -51,13 +51,3 @@ class Ui_selection_management_window(object):
         self.score_grade_management_button.setText(_translate("selection_management_window", "Administracion de notas"))
         self.student_management_button.setText(_translate("selection_management_window", "Administracion de estudiantes"))
         self.logout_button.setText(_translate("selection_management_window", "Logout"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    selection_management_window = QtWidgets.QMainWindow()
-    ui = Ui_selection_management_window()
-    ui.setupUi(selection_management_window)
-    selection_management_window.show()
-    sys.exit(app.exec_())

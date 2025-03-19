@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from functions import loggin_gui_action
-
+from selection_panel_window import Ui_selection_management_window
 
 class Ui_login_windows(object):
     def setupUi(self, login_windows):
@@ -15,6 +15,7 @@ class Ui_login_windows(object):
         login_windows.setWindowIcon(icon)
         login_windows.setToolTip("")
         login_windows.setDocumentMode(False)
+        self.login_windows = login_windows
         self.centralwidget = QtWidgets.QWidget(login_windows)
         self.centralwidget.setObjectName("centralwidget")
         self.login_icon_user = QtWidgets.QLabel(self.centralwidget)
@@ -102,6 +103,9 @@ class Ui_login_windows(object):
             
             match access_type: #Here we check what kind of access has the user logging in
                 case 0:
+                    self.login_windows.close()
+                    self.start_selection_panels()
+
                     login_success = QMessageBox()
                     login_success.setIcon(QMessageBox.Information)
                     login_success.setText("Success Login successful as Administrator (All Permissions granted)")
@@ -109,6 +113,9 @@ class Ui_login_windows(object):
                     x = login_success.exec_()
                     return False, access_type
                 case 1:
+                    self.login_windows.close()
+                    self.start_selection_panels()
+
                     login_success = QMessageBox()
                     login_success.setIcon(QMessageBox.Information)
                     login_success.setText("Success Login successful as Administrator")
@@ -140,7 +147,12 @@ class Ui_login_windows(object):
         except Exception as e:
             print(f"An error occurred: {e}")
             return False
-        
+    
+    def start_selection_panels(self):
+            self.selection_panels = QtWidgets.QMainWindow()
+            self.ui_panels = Ui_selection_management_window() 
+            self.ui_panels.setupUi(self.selection_panels)
+            self.selection_panels.show()  
 
         
     def retranslateUi(self, login_windows):
@@ -151,12 +163,3 @@ class Ui_login_windows(object):
         self.password_login_text.setText(_translate("login_windows", "Password"))
         self.Exit_button.setText(_translate("login_windows", "Exit"))
         self.Login_button.setText(_translate("login_windows", "Login"))
-    
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    login_windows = QtWidgets.QMainWindow()
-    ui = Ui_login_windows()
-    ui.setupUi(login_windows)
-    login_windows.show()
-    sys.exit(app.exec_())
